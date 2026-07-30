@@ -55,7 +55,7 @@ class Database:
     def close(self) -> None:
         self.connection.close()
 
-    def __enter__(self) -> "Database":
+    def __enter__(self) -> Database:
         return self
 
     def __exit__(self, *_: object) -> None:
@@ -67,6 +67,10 @@ class Database:
             (root_name, str(root_path)),
         )
         self.connection.commit()
+        
+        if cursor.lastrowid is None:
+            raise RuntimeError("SQLite did not return an ID for the newly created scan")
+            
         return int(cursor.lastrowid)
 
     def finish_scan(
