@@ -1,0 +1,33 @@
+paths:
+  downloads:
+    - /mnt/Data/Media/Downloads/sabnzdb/complete/music/
+  library:
+    - /mnt/Data/Media/Music/
+
+database:
+  path: .musicclean/musicclean.db
+
+logging:
+  directory: .musicclean/logs
+  level: INFO
+  max_bytes: 10485760
+  backup_count: 5
+
+scanner:
+  follow_symlinks: false
+  include_hidden: false
+  batch_size: 1000
+  extensions:
+    - .flac
+    - .mp3
+    - .m4a
+    - .aac
+    - .alac
+    - .ogg
+    - .opus
+    - .wav
+    - .aiff
+    - .aif
+    - .ape
+    - .wv
+    - .dsf
