@@ -1,99 +1,86 @@
 # MusicClean
 
-MusicClean is a command-line tool for scanning and cleaning large music collections on
-TrueNAS, FreeBSD, Linux, Windows, and macOS.
+MusicClean is a cross-platform command-line tool for inventorying, analyzing, and
+eventually cleaning large music collections.
 
-## Sprint 1 features
+## Sprint 2 capabilities
 
-- YAML configuration
-- Rotating log files
-- SQLite inventory database
-- Incremental filesystem scanning
-- Audio-file filtering
-- CLI commands for initialization, scanning, statistics, and database optimization
-- GitHub Actions test workflow
+- Recursive audio-file discovery
+- SQLite inventory with automatic schema migration
+- Incremental rescans based on file size and nanosecond modification time
+- BLAKE3 whole-file hashes
+- Audio metadata and technical properties through Mutagen
+- Codec, bitrate, sample rate, bit depth, channel count, duration, and common tags
+- Embedded-artwork detection
+- MusicBrainz identifier capture when present
+- Live Rich progress display
+- Windows, FreeBSD, TrueNAS, Linux, and macOS-compatible paths
+- Ruff, mypy, pytest, and GitHub Actions validation
 
-## Default paths
+No files are moved, renamed, modified, or deleted in Sprint 2.
 
-Download staging:
+## Upgrade an existing development checkout
 
-```text
-/mnt/Data/Media/Downloads/sabnzdb/complete/music/
+```powershell
+git switch develop
+git pull --ff-only origin develop
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 ```
 
-Permanent library:
-
-```text
-/mnt/Data/Media/Music/
-```
-
-## Install on Windows for development
-
-```bash
-git clone https://github.com/rickgomez2003/musicclean.git
-cd musicclean
-py -3.11 -m venv .venv
-source .venv/Scripts/activate
-python -m pip install --upgrade pip
-pip install -e ".[dev]"
-musicclean --help
-```
-
-## Install on FreeBSD / TrueNAS
-
-```sh
-pkg install -y python311 py311-pip
-python3.11 -m venv .venv
-. .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -e .
-musicclean --help
-```
+Your existing SQLite database is upgraded automatically when MusicClean opens it.
 
 ## Initialize
 
-```sh
-musicclean init
+```powershell
+.\.venv\Scripts\musicclean.exe init
 ```
 
-This creates local runtime directories and copies `config.example.yaml` to `config.yaml`
-when no local configuration exists.
+Use `--force` only when you intentionally want to replace the local `config.yaml`:
+
+```powershell
+.\.venv\Scripts\musicclean.exe init --force
+```
 
 ## Scan
 
-```sh
-musicclean scan
+Scan every configured root:
+
+```powershell
+.\.venv\Scripts\musicclean.exe scan
 ```
 
-Scan a specific configured root:
+Scan only one configured group:
 
-```sh
-musicclean scan --root downloads
-musicclean scan --root library
+```powershell
+.\.venv\Scripts\musicclean.exe scan --root downloads
+.\.venv\Scripts\musicclean.exe scan --root library
 ```
+
+Temporarily skip expensive operations:
+
+```powershell
+.\.venv\Scripts\musicclean.exe scan --no-hash
+.\.venv\Scripts\musicclean.exe scan --no-metadata
+```
+
+The first complete scan reads and hashes every audio file. A later scan skips analysis
+when the file size and nanosecond modification time are unchanged.
 
 ## Statistics
 
-```sh
-musicclean stats
+```powershell
+.\.venv\Scripts\musicclean.exe stats
 ```
 
-## Optimize SQLite
+## Validation
 
-```sh
-musicclean optimize
+```powershell
+.\.venv\Scripts\ruff.exe check .
+.\.venv\Scripts\pytest.exe
+.\.venv\Scripts\mypy.exe src
 ```
 
-## Development
+## Current safety behavior
 
-```bash
-pytest
-ruff check .
-mypy src
-```
-
-## Status
-
-This repository is under active development. Destructive cleanup is intentionally not
-enabled in Sprint 1; the first release establishes a reliable inventory and database
-foundation.
+Sprint 2 is read-only with respect to the music collection. It only writes to the local
+MusicClean SQLite database and log directory.

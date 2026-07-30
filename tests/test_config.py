@@ -15,6 +15,9 @@ database:
 logging:
   directory: logs
 scanner:
+  hash_files: true
+  read_metadata: false
+  hash_chunk_size: 131072
   extensions:
     - flac
     - .mp3
@@ -27,3 +30,6 @@ scanner:
     assert config.database.path == (tmp_path / "data/musicclean.db").resolve()
     assert config.logging.directory == (tmp_path / "logs").resolve()
     assert config.scanner.extensions == frozenset({".flac", ".mp3"})
+    assert config.scanner.hash_files is True
+    assert config.scanner.read_metadata is False
+    assert config.scanner.hash_chunk_size == 131072

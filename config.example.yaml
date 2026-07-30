@@ -16,11 +16,15 @@ logging:
 scanner:
   follow_symlinks: false
   include_hidden: false
-  batch_size: 1000
+  batch_size: 250
+  hash_files: true
+  read_metadata: true
+  hash_chunk_size: 4194304
   extensions:
     - .flac
     - .mp3
     - .m4a
+    - .mp4
     - .aac
     - .alac
     - .ogg

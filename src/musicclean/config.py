@@ -29,6 +29,9 @@ class ScannerConfig:
     follow_symlinks: bool
     include_hidden: bool
     batch_size: int
+    hash_files: bool
+    read_metadata: bool
+    hash_chunk_size: int
     extensions: frozenset[str]
 
 
@@ -97,7 +100,10 @@ def load_config(path: Path) -> AppConfig:
         scanner=ScannerConfig(
             follow_symlinks=bool(scanner.get("follow_symlinks", False)),
             include_hidden=bool(scanner.get("include_hidden", False)),
-            batch_size=max(1, int(scanner.get("batch_size", 1000))),
+            batch_size=max(1, int(scanner.get("batch_size", 250))),
+            hash_files=bool(scanner.get("hash_files", True)),
+            read_metadata=bool(scanner.get("read_metadata", True)),
+            hash_chunk_size=max(65_536, int(scanner.get("hash_chunk_size", 4_194_304))),
             extensions=extensions,
         ),
     )
