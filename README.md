@@ -1,112 +1,81 @@
 # MusicClean
 
-MusicClean is a cross-platform command-line tool for inventorying, analyzing, and
-eventually cleaning large music collections.
+## Sprint 4.1 — Metadata Error Analyzer
 
-## Sprint 3 capabilities
+Sprint 4.1 adds a real `musicclean errors` command while keeping MusicClean
+completely read-only against the music collection.
 
-- Exact duplicate detection using stored BLAKE3 hashes
-- Duplicate groups sorted by reclaimable disk space
-- Total duplicate-file and reclaimable-space summaries
-- Optional root-group filtering
-- Minimum file-size filtering
-- Table, JSON, and UTF-8 CSV reports
-- Automatic SQLite schema migration and indexes
-- Recursive audio-file discovery
-- Incremental rescans based on file size and nanosecond modification time
-- Audio metadata and technical properties through Mutagen
-- Live Rich progress reporting
-- Automated Ruff, MyPy, Pytest, and coverage checks on Python 3.11–3.13
+### Install
 
-MusicClean remains read-only with respect to the music collection. It does not move,
-rename, modify, quarantine, or delete audio files.
-
-## Upgrade
+Copy the Sprint 4.1 files over the repository and reinstall:
 
 ```powershell
-git switch develop
-git pull --ff-only origin develop
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 ```
 
-## Scan
-
-A duplicate report requires hashes, so do not use `--no-hash` for the indexing scan.
+### Verify
 
 ```powershell
-.\.venv\Scripts\musicclean.exe scan
+.\.venv\Scripts\musicclean.exe --version
+.\.venv\Scripts\musicclean.exe errors --help
 ```
 
-A second scan skips analysis for files whose size and nanosecond modification time have
-not changed.
+Expected version:
 
-## Exact duplicate report
-
-Display the 50 groups with the most reclaimable space:
-
-```powershell
-.\.venv\Scripts\musicclean.exe duplicates
+```text
+MusicClean 0.4.1
 ```
 
-Show more groups:
+### Analyze existing errors
+
+No rescan is required because Sprint 3 already stored the metadata errors in SQLite:
 
 ```powershell
-.\.venv\Scripts\musicclean.exe duplicates --limit 200
+.\.venv\Scripts\musicclean.exe errors
 ```
 
-Limit the query to one configured root:
+Show all current records:
 
 ```powershell
-.\.venv\Scripts\musicclean.exe duplicates --root library
+.\.venv\Scripts\musicclean.exe errors --limit 1000
 ```
 
-Ignore files smaller than 10 MiB:
+Filter one category:
 
 ```powershell
-.\.venv\Scripts\musicclean.exe duplicates --minimum-size 10485760
+.\.venv\Scripts\musicclean.exe errors --category truncated_file
 ```
 
-Write JSON:
+### Export
 
 ```powershell
-.\.venv\Scripts\musicclean.exe duplicates `
-  --format json `
-  --output .musicclean\reports\duplicates.json
-```
-
-Write a spreadsheet-compatible CSV:
-
-```powershell
-.\.venv\Scripts\musicclean.exe duplicates `
+.\.venv\Scripts\musicclean.exe errors `
   --format csv `
-  --output .musicclean\reports\duplicates.csv
+  --output .musicclean\reports\metadata-errors.csv
 ```
-
-The reclaimable-space calculation assumes that one file in every exact duplicate group
-must be retained.
-
-## Statistics
 
 ```powershell
-.\.venv\Scripts\musicclean.exe stats
+.\.venv\Scripts\musicclean.exe errors `
+  --format json `
+  --output .musicclean\reports\metadata-errors.json
 ```
 
-The statistics now include exact duplicate groups, files in those groups, and potentially
-reclaimable disk space.
+### Categories
 
-## Validation
+- `unsupported_format`
+- `damaged_or_invalid`
+- `truncated_file`
+- `tag_parse_failure`
+- `access_failure`
+- `empty_or_unreadable`
+- `unknown`
+
+Suggested actions are advisory. MusicClean does not repair, move, or delete files.
+
+### Validate
 
 ```powershell
 .\.venv\Scripts\ruff.exe check .
 .\.venv\Scripts\pytest.exe
 .\.venv\Scripts\mypy.exe src
-```
-
-Run the same coverage threshold used by CI:
-
-```powershell
-.\.venv\Scripts\pytest.exe `
-  --cov=musicclean `
-  --cov-report=term-missing `
-  --cov-report=xml
 ```

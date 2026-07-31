@@ -4,14 +4,16 @@ import sqlite3
 from collections.abc import Iterable, Iterator, Sequence
 from pathlib import Path
 
+from musicclean.error_analysis import assess_metadata_error
 from musicclean.models import (
     AnalyzedFile,
     DuplicateFile,
     DuplicateGroup,
     FileRecord,
+    MetadataErrorRecord,
 )
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 BASE_SCHEMA = """
 PRAGMA foreign_keys = ON;
@@ -118,6 +120,8 @@ class Database:
                 ON files(album_artist, album);
             CREATE INDEX IF NOT EXISTS idx_files_analyzed_state
                 ON files(analyzed_size, analyzed_modified_ns);
+            CREATE INDEX IF NOT EXISTS idx_files_metadata_error
+                ON files(metadata_error);
             """
         )
         self.connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
@@ -305,10 +309,7 @@ class Database:
         row = self.connection.execute(
             f"""
             WITH duplicate_groups AS (
-                SELECT
-                    content_hash,
-                    size,
-                    COUNT(*) AS file_count
+                SELECT content_hash, size, COUNT(*) AS file_count
                 FROM files
                 WHERE content_hash IS NOT NULL
                   AND size >= ?
@@ -436,6 +437,85 @@ class Database:
                 size=size,
                 files=files,
             )
+
+    def metadata_error_summary(
+        self,
+        *,
+        root_name: str | None = None,
+    ) -> dict[str, int]:
+        parameters: list[object] = []
+        root_clause = ""
+        if root_name is not None:
+            root_clause = "AND root_name = ?"
+            parameters.append(root_name)
+
+        rows = self.connection.execute(
+            f"""
+            SELECT metadata_error
+            FROM files
+            WHERE metadata_error IS NOT NULL
+              AND TRIM(metadata_error) <> ''
+              {root_clause}
+            """,
+            parameters,
+        ).fetchall()
+
+        summary: dict[str, int] = {}
+        for row in rows:
+            assessment = assess_metadata_error(str(row["metadata_error"]))
+            key = assessment.category.value
+            summary[key] = summary.get(key, 0) + 1
+        return summary
+
+    def metadata_errors(
+        self,
+        *,
+        root_name: str | None = None,
+        category: str | None = None,
+        limit: int | None = 200,
+    ) -> list[MetadataErrorRecord]:
+        parameters: list[object] = []
+        root_clause = ""
+        if root_name is not None:
+            root_clause = "AND root_name = ?"
+            parameters.append(root_name)
+
+        rows = self.connection.execute(
+            f"""
+            SELECT path, root_name, extension, size, codec, metadata_error
+            FROM files
+            WHERE metadata_error IS NOT NULL
+              AND TRIM(metadata_error) <> ''
+              {root_clause}
+            ORDER BY size DESC, path
+            """,
+            parameters,
+        ).fetchall()
+
+        results: list[MetadataErrorRecord] = []
+        for row in rows:
+            error = str(row["metadata_error"])
+            assessment = assess_metadata_error(error)
+            if category is not None and assessment.category.value != category:
+                continue
+
+            results.append(
+                MetadataErrorRecord(
+                    path=Path(str(row["path"])),
+                    root_name=str(row["root_name"]),
+                    extension=str(row["extension"]),
+                    size=int(row["size"]),
+                    codec=str(row["codec"]) if row["codec"] is not None else None,
+                    error=error,
+                    category=assessment.category.value,
+                    suggested_action=assessment.suggested_action,
+                )
+            )
+
+            if limit is not None and len(results) >= limit:
+                break
+
+        return results
 
     def stats(self) -> dict[str, int | float]:
         row = self.connection.execute(

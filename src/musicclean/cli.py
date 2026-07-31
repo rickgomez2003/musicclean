@@ -21,8 +21,12 @@ from rich.table import Table
 from musicclean import __version__
 from musicclean.config import AppConfig, ConfigError, ScannerConfig, load_config
 from musicclean.database import Database
+from musicclean.error_reporting import (
+    write_metadata_errors_csv,
+    write_metadata_errors_json,
+)
 from musicclean.logging_setup import configure_logging
-from musicclean.models import DuplicateGroup
+from musicclean.models import DuplicateGroup, MetadataErrorRecord
 from musicclean.reporting import write_csv_report, write_json_report
 from musicclean.scanner import scan_root
 
@@ -79,7 +83,6 @@ def _format_bytes(value: int) -> str:
 
 
 def version_callback(value: bool) -> None:
-    """Print the version before Typer checks for a subcommand."""
     if value:
         console.print(f"MusicClean {__version__}")
         raise typer.Exit()
@@ -278,43 +281,31 @@ def duplicates(
     ] = None,
     minimum_size: Annotated[
         int,
-        typer.Option(
-            "--minimum-size",
-            min=0,
-            help="Ignore files smaller than this many bytes.",
-        ),
+        typer.Option("--minimum-size", min=0),
     ] = 1,
     limit: Annotated[
         int | None,
-        typer.Option("--limit", min=1, help="Maximum duplicate groups to return."),
+        typer.Option("--limit", min=1),
     ] = 50,
     report_format: Annotated[
         ReportFormat,
-        typer.Option(
-            "--format",
-            case_sensitive=False,
-            help="Output format: table, json, or csv.",
-        ),
+        typer.Option("--format", case_sensitive=False),
     ] = "table",
     output: Annotated[
         Path | None,
-        typer.Option("--output", "-o", help="Report output path for JSON or CSV."),
+        typer.Option("--output", "-o"),
     ] = None,
     config_path: Annotated[
         Path,
-        typer.Option("--config", help="Path to the YAML configuration file."),
+        typer.Option("--config"),
     ] = DEFAULT_CONFIG,
     verbose: Annotated[
         bool,
-        typer.Option("--verbose", "-v", help="Enable debug logging."),
+        typer.Option("--verbose", "-v"),
     ] = False,
 ) -> None:
     """Find exact duplicate files using stored BLAKE3 hashes."""
     config = _load(config_path, verbose)
-
-    if root is not None and root not in config.paths:
-        console.print(f"[red]Unknown root group:[/red] {root}")
-        raise typer.Exit(code=2)
 
     with Database(config.database.path) as database:
         summary = database.duplicate_summary(
@@ -341,8 +332,7 @@ def duplicates(
         return
 
     if output is None:
-        suffix = report_format
-        output = Path(".musicclean/reports") / f"exact-duplicates.{suffix}"
+        output = Path(".musicclean/reports") / f"exact-duplicates.{report_format}"
 
     if report_format == "json":
         write_json_report(groups, output)
@@ -352,15 +342,108 @@ def duplicates(
     console.print(f"[green]Report written:[/green] {output.resolve()}")
 
 
+def _render_metadata_errors(records: list[MetadataErrorRecord]) -> None:
+    if not records:
+        console.print("[green]No metadata errors matched the requested filters.[/green]")
+        return
+
+    table = Table(title=f"Metadata Errors · {len(records):,} shown")
+    table.add_column("Category")
+    table.add_column("Codec")
+    table.add_column("Size", justify="right")
+    table.add_column("Path")
+    table.add_column("Error")
+    table.add_column("Suggested action")
+
+    for record in records:
+        table.add_row(
+            record.category,
+            record.codec or record.extension or "Unknown",
+            _format_bytes(record.size),
+            str(record.path),
+            record.error[:100],
+            record.suggested_action,
+        )
+
+    console.print(table)
+
+
+@app.command(name="errors")
+def errors_command(
+    root: Annotated[
+        str | None,
+        typer.Option("--root", help="Limit results to one configured root."),
+    ] = None,
+    category: Annotated[
+        str | None,
+        typer.Option(
+            "--category",
+            help="Filter by an error category shown in the summary.",
+        ),
+    ] = None,
+    limit: Annotated[
+        int | None,
+        typer.Option("--limit", min=1),
+    ] = 200,
+    report_format: Annotated[
+        ReportFormat,
+        typer.Option("--format", case_sensitive=False),
+    ] = "table",
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o"),
+    ] = None,
+    config_path: Annotated[
+        Path,
+        typer.Option("--config"),
+    ] = DEFAULT_CONFIG,
+    verbose: Annotated[
+        bool,
+        typer.Option("--verbose", "-v"),
+    ] = False,
+) -> None:
+    """Analyze files whose audio metadata could not be read cleanly."""
+    config = _load(config_path, verbose)
+
+    with Database(config.database.path) as database:
+        summary = database.metadata_error_summary(root_name=root)
+        records = database.metadata_errors(
+            root_name=root,
+            category=category,
+            limit=limit,
+        )
+
+    summary_table = Table(title="Metadata Error Summary")
+    summary_table.add_column("Category")
+    summary_table.add_column("Files", justify="right")
+    for key, count in sorted(summary.items(), key=lambda item: (-item[1], item[0])):
+        summary_table.add_row(key, f"{count:,}")
+    console.print(summary_table)
+
+    if report_format == "table":
+        _render_metadata_errors(records)
+        return
+
+    if output is None:
+        output = Path(".musicclean/reports") / f"metadata-errors.{report_format}"
+
+    if report_format == "json":
+        write_metadata_errors_json(records, output)
+    else:
+        write_metadata_errors_csv(records, output)
+
+    console.print(f"[green]Report written:[/green] {output.resolve()}")
+
+
 @app.command()
 def stats(
     config_path: Annotated[
         Path,
-        typer.Option("--config", help="Path to the YAML configuration file."),
+        typer.Option("--config"),
     ] = DEFAULT_CONFIG,
     verbose: Annotated[
         bool,
-        typer.Option("--verbose", "-v", help="Enable debug logging."),
+        typer.Option("--verbose", "-v"),
     ] = False,
 ) -> None:
     """Display indexed-library, analysis, and duplicate statistics."""
@@ -370,8 +453,7 @@ def stats(
         data = database.stats()
         duplicate_data = database.duplicate_summary()
 
-    duration_seconds = float(data["duration"])
-    duration_hours = duration_seconds / 3600
+    duration_hours = float(data["duration"]) / 3600
 
     table = Table(title="MusicClean Inventory")
     table.add_column("Metric")
@@ -396,11 +478,11 @@ def stats(
 def optimize(
     config_path: Annotated[
         Path,
-        typer.Option("--config", help="Path to the YAML configuration file."),
+        typer.Option("--config"),
     ] = DEFAULT_CONFIG,
     verbose: Annotated[
         bool,
-        typer.Option("--verbose", "-v", help="Enable debug logging."),
+        typer.Option("--verbose", "-v"),
     ] = False,
 ) -> None:
     """Optimize and compact the SQLite database."""

@@ -76,3 +76,15 @@ class DuplicateGroup:
     @property
     def reclaimable_bytes(self) -> int:
         return max(0, self.size * (self.file_count - 1))
+
+
+@dataclass(frozen=True, slots=True)
+class MetadataErrorRecord:
+    path: Path
+    root_name: str
+    extension: str
+    size: int
+    codec: str | None
+    error: str
+    category: str
+    suggested_action: str
