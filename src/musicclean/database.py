@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 import sqlite3
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from pathlib import Path
 
-from musicclean.models import AnalyzedFile, FileRecord
+from musicclean.models import (
+    AnalyzedFile,
+    DuplicateFile,
+    DuplicateGroup,
+    FileRecord,
+)
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 BASE_SCHEMA = """
 PRAGMA foreign_keys = ON;
@@ -107,6 +112,8 @@ class Database:
             """
             CREATE INDEX IF NOT EXISTS idx_files_content_hash
                 ON files(content_hash);
+            CREATE INDEX IF NOT EXISTS idx_files_hash_size
+                ON files(content_hash, size);
             CREATE INDEX IF NOT EXISTS idx_files_album_artist_album
                 ON files(album_artist, album);
             CREATE INDEX IF NOT EXISTS idx_files_analyzed_state
@@ -282,6 +289,153 @@ class Database:
             ),
         )
         self.connection.commit()
+
+    def duplicate_summary(
+        self,
+        *,
+        root_name: str | None = None,
+        minimum_size: int = 1,
+    ) -> dict[str, int]:
+        parameters: list[object] = [minimum_size]
+        root_clause = ""
+        if root_name is not None:
+            root_clause = "AND root_name = ?"
+            parameters.append(root_name)
+
+        row = self.connection.execute(
+            f"""
+            WITH duplicate_groups AS (
+                SELECT
+                    content_hash,
+                    size,
+                    COUNT(*) AS file_count
+                FROM files
+                WHERE content_hash IS NOT NULL
+                  AND size >= ?
+                  {root_clause}
+                GROUP BY content_hash, size
+                HAVING COUNT(*) > 1
+            )
+            SELECT
+                COUNT(*) AS groups,
+                COALESCE(SUM(file_count), 0) AS duplicate_files,
+                COALESCE(SUM(size * (file_count - 1)), 0) AS reclaimable_bytes
+            FROM duplicate_groups
+            """,
+            parameters,
+        ).fetchone()
+        assert row is not None
+
+        return {
+            "groups": int(row["groups"]),
+            "duplicate_files": int(row["duplicate_files"]),
+            "reclaimable_bytes": int(row["reclaimable_bytes"]),
+        }
+
+    def iter_duplicate_groups(
+        self,
+        *,
+        root_name: str | None = None,
+        minimum_size: int = 1,
+        limit: int | None = None,
+    ) -> Iterator[DuplicateGroup]:
+        parameters: list[object] = [minimum_size]
+        root_filter = ""
+        member_filter = ""
+
+        if root_name is not None:
+            root_filter = "AND root_name = ?"
+            member_filter = "AND f.root_name = ?"
+            parameters.append(root_name)
+
+        limit_clause = ""
+        if limit is not None:
+            limit_clause = "LIMIT ?"
+            parameters.append(limit)
+
+        group_rows = self.connection.execute(
+            f"""
+            SELECT
+                content_hash,
+                COALESCE(hash_algorithm, 'unknown') AS hash_algorithm,
+                size,
+                COUNT(*) AS file_count
+            FROM files
+            WHERE content_hash IS NOT NULL
+              AND size >= ?
+              {root_filter}
+            GROUP BY content_hash, hash_algorithm, size
+            HAVING COUNT(*) > 1
+            ORDER BY (size * (COUNT(*) - 1)) DESC, content_hash
+            {limit_clause}
+            """,
+            parameters,
+        ).fetchall()
+
+        for group_row in group_rows:
+            content_hash = str(group_row["content_hash"])
+            size = int(group_row["size"])
+            member_parameters: list[object] = [content_hash, size]
+
+            if root_name is not None:
+                member_parameters.append(root_name)
+
+            file_rows = self.connection.execute(
+                f"""
+                SELECT
+                    f.path,
+                    f.root_name,
+                    f.filename,
+                    f.extension,
+                    f.size,
+                    f.modified_ns,
+                    f.codec,
+                    f.bitrate,
+                    f.sample_rate,
+                    f.bits_per_sample,
+                    f.duration
+                FROM files AS f
+                WHERE f.content_hash = ?
+                  AND f.size = ?
+                  {member_filter}
+                ORDER BY f.root_name, f.path
+                """,
+                member_parameters,
+            ).fetchall()
+
+            files = tuple(
+                DuplicateFile(
+                    path=Path(str(row["path"])),
+                    root_name=str(row["root_name"]),
+                    filename=str(row["filename"]),
+                    extension=str(row["extension"]),
+                    size=int(row["size"]),
+                    modified_ns=int(row["modified_ns"]),
+                    codec=str(row["codec"]) if row["codec"] is not None else None,
+                    bitrate=int(row["bitrate"]) if row["bitrate"] is not None else None,
+                    sample_rate=(
+                        int(row["sample_rate"])
+                        if row["sample_rate"] is not None
+                        else None
+                    ),
+                    bits_per_sample=(
+                        int(row["bits_per_sample"])
+                        if row["bits_per_sample"] is not None
+                        else None
+                    ),
+                    duration=(
+                        float(row["duration"]) if row["duration"] is not None else None
+                    ),
+                )
+                for row in file_rows
+            )
+
+            yield DuplicateGroup(
+                content_hash=content_hash,
+                hash_algorithm=str(group_row["hash_algorithm"]),
+                size=size,
+                files=files,
+            )
 
     def stats(self) -> dict[str, int | float]:
         row = self.connection.execute(

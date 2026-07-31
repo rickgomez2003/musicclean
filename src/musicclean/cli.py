@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 import typer
 from rich.console import Console
@@ -22,6 +22,8 @@ from musicclean import __version__
 from musicclean.config import AppConfig, ConfigError, ScannerConfig, load_config
 from musicclean.database import Database
 from musicclean.logging_setup import configure_logging
+from musicclean.models import DuplicateGroup
+from musicclean.reporting import write_csv_report, write_json_report
 from musicclean.scanner import scan_root
 
 app = typer.Typer(
@@ -33,6 +35,7 @@ console = Console()
 
 DEFAULT_CONFIG = Path("config.yaml")
 EXAMPLE_CONFIG = Path("config.example.yaml")
+ReportFormat = Literal["table", "json", "csv"]
 
 
 def _load(config_path: Path, verbose: bool) -> AppConfig:
@@ -63,7 +66,18 @@ def _scanner_overrides(
     )
 
 
-@app.callback()
+def _format_bytes(value: int) -> str:
+    units = ("B", "KiB", "MiB", "GiB", "TiB")
+    amount = float(value)
+
+    for unit in units:
+        if abs(amount) < 1024 or unit == units[-1]:
+            return f"{amount:,.2f} {unit}"
+        amount /= 1024
+
+    return f"{amount:,.2f} TiB"
+
+
 def version_callback(value: bool) -> None:
     """Print the version before Typer checks for a subcommand."""
     if value:
@@ -84,6 +98,7 @@ def main(
     ] = None,
 ) -> None:
     """MusicClean command-line interface."""
+
 
 @app.command()
 def init(
@@ -217,6 +232,126 @@ def scan(
     )
 
 
+def _render_duplicate_groups(groups: list[DuplicateGroup]) -> None:
+    if not groups:
+        console.print("[green]No exact duplicate groups found.[/green]")
+        return
+
+    for index, group in enumerate(groups, start=1):
+        table = Table(
+            title=(
+                f"Group {index} · {group.file_count} files · "
+                f"{_format_bytes(group.reclaimable_bytes)} reclaimable"
+            )
+        )
+        table.add_column("Root")
+        table.add_column("Path")
+        table.add_column("Codec")
+        table.add_column("Audio")
+        table.add_column("Size", justify="right")
+
+        for file in group.files:
+            audio_parts = []
+            if file.sample_rate is not None:
+                audio_parts.append(f"{file.sample_rate / 1000:g} kHz")
+            if file.bits_per_sample is not None:
+                audio_parts.append(f"{file.bits_per_sample}-bit")
+            if file.bitrate is not None:
+                audio_parts.append(f"{file.bitrate / 1000:,.0f} kbps")
+
+            table.add_row(
+                file.root_name,
+                str(file.path),
+                file.codec or "Unknown",
+                " / ".join(audio_parts) or "Unknown",
+                _format_bytes(file.size),
+            )
+
+        console.print(table)
+
+
+@app.command()
+def duplicates(
+    root: Annotated[
+        str | None,
+        typer.Option("--root", help="Limit results to one configured root name."),
+    ] = None,
+    minimum_size: Annotated[
+        int,
+        typer.Option(
+            "--minimum-size",
+            min=0,
+            help="Ignore files smaller than this many bytes.",
+        ),
+    ] = 1,
+    limit: Annotated[
+        int | None,
+        typer.Option("--limit", min=1, help="Maximum duplicate groups to return."),
+    ] = 50,
+    report_format: Annotated[
+        ReportFormat,
+        typer.Option(
+            "--format",
+            case_sensitive=False,
+            help="Output format: table, json, or csv.",
+        ),
+    ] = "table",
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Report output path for JSON or CSV."),
+    ] = None,
+    config_path: Annotated[
+        Path,
+        typer.Option("--config", help="Path to the YAML configuration file."),
+    ] = DEFAULT_CONFIG,
+    verbose: Annotated[
+        bool,
+        typer.Option("--verbose", "-v", help="Enable debug logging."),
+    ] = False,
+) -> None:
+    """Find exact duplicate files using stored BLAKE3 hashes."""
+    config = _load(config_path, verbose)
+
+    if root is not None and root not in config.paths:
+        console.print(f"[red]Unknown root group:[/red] {root}")
+        raise typer.Exit(code=2)
+
+    with Database(config.database.path) as database:
+        summary = database.duplicate_summary(
+            root_name=root,
+            minimum_size=minimum_size,
+        )
+        groups = list(
+            database.iter_duplicate_groups(
+                root_name=root,
+                minimum_size=minimum_size,
+                limit=limit,
+            )
+        )
+
+    console.print(
+        f"[bold]Exact duplicate summary:[/bold] "
+        f"{summary['groups']:,} groups, "
+        f"{summary['duplicate_files']:,} files, "
+        f"{_format_bytes(summary['reclaimable_bytes'])} reclaimable."
+    )
+
+    if report_format == "table":
+        _render_duplicate_groups(groups)
+        return
+
+    if output is None:
+        suffix = report_format
+        output = Path(".musicclean/reports") / f"exact-duplicates.{suffix}"
+
+    if report_format == "json":
+        write_json_report(groups, output)
+    else:
+        write_csv_report(groups, output)
+
+    console.print(f"[green]Report written:[/green] {output.resolve()}")
+
+
 @app.command()
 def stats(
     config_path: Annotated[
@@ -228,11 +363,12 @@ def stats(
         typer.Option("--verbose", "-v", help="Enable debug logging."),
     ] = False,
 ) -> None:
-    """Display indexed-library and analysis statistics."""
+    """Display indexed-library, analysis, and duplicate statistics."""
     config = _load(config_path, verbose)
 
     with Database(config.database.path) as database:
         data = database.stats()
+        duplicate_data = database.duplicate_summary()
 
     duration_seconds = float(data["duration"])
     duration_hours = duration_seconds / 3600
@@ -242,11 +378,17 @@ def stats(
     table.add_column("Value", justify="right")
     table.add_row("Audio files", f"{int(data['files']):,}")
     table.add_row("Directories", f"{int(data['directories']):,}")
-    table.add_row("Indexed GiB", f"{int(data['bytes']) / (1024 ** 3):,.2f}")
+    table.add_row("Indexed size", _format_bytes(int(data["bytes"])))
     table.add_row("Analyzed files", f"{int(data['analyzed']):,}")
     table.add_row("Hashed files", f"{int(data['hashed']):,}")
     table.add_row("Metadata errors", f"{int(data['metadata_errors']):,}")
     table.add_row("Total play time", f"{duration_hours:,.2f} hours")
+    table.add_row("Exact duplicate groups", f"{duplicate_data['groups']:,}")
+    table.add_row("Files in duplicate groups", f"{duplicate_data['duplicate_files']:,}")
+    table.add_row(
+        "Potentially reclaimable",
+        _format_bytes(duplicate_data["reclaimable_bytes"]),
+    )
     console.print(table)
 
 
