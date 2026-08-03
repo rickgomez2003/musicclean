@@ -6,10 +6,13 @@ from collections.abc import Iterable
 from typing import Protocol
 
 from musicclean.orion.domain import (
+    ActionPlan,
     Album,
     Artist,
     AudioFile,
+    AuthorizationGrant,
     Decision,
+    DecisionReview,
     Disc,
     Edition,
     EvidenceRecord,
@@ -85,8 +88,26 @@ class KnowledgeRepository(Protocol):
 
 
 class DecisionRepository(Protocol):
-    """Append-oriented persistence contract for recommendations."""
-
+    def get(self, decision_id: EntityId) -> Decision | None: ...
     def save(self, decision: Decision) -> None: ...
     def save_many(self, decisions: Iterable[Decision]) -> None: ...
     def list_for_subject(self, subject_id: EntityId) -> tuple[Decision, ...]: ...
+
+
+class ReviewRepository(Protocol):
+    def save(self, review: DecisionReview) -> None: ...
+    def latest_for_decision(self, decision_id: EntityId) -> DecisionReview | None: ...
+
+
+class AuthorizationRepository(Protocol):
+    def save(self, grant: AuthorizationGrant) -> None: ...
+    def latest_for_decision(
+        self,
+        decision_id: EntityId,
+    ) -> AuthorizationGrant | None: ...
+
+
+class ActionPlanRepository(Protocol):
+    def save(self, plan: ActionPlan) -> None: ...
+    def get(self, plan_id: EntityId) -> ActionPlan | None: ...
+    def list_for_decision(self, decision_id: EntityId) -> tuple[ActionPlan, ...]: ...

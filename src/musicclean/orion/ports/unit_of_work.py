@@ -6,9 +6,11 @@ from types import TracebackType
 from typing import Protocol, Self
 
 from musicclean.orion.ports.repositories import (
+    ActionPlanRepository,
     AlbumRepository,
     ArtistRepository,
     AudioFileRepository,
+    AuthorizationRepository,
     DecisionRepository,
     DiscRepository,
     EditionRepository,
@@ -16,6 +18,7 @@ from musicclean.orion.ports.repositories import (
     KnowledgeRepository,
     LibraryRepository,
     RecordingRepository,
+    ReviewRepository,
     TrackAppearanceRepository,
 )
 
@@ -32,6 +35,9 @@ class UnitOfWork(Protocol):
     evidence: EvidenceRepository
     knowledge: KnowledgeRepository
     decisions: DecisionRepository
+    reviews: ReviewRepository
+    authorizations: AuthorizationRepository
+    action_plans: ActionPlanRepository
 
     def __enter__(self) -> Self: ...
 

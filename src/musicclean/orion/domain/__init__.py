@@ -19,14 +19,25 @@ from musicclean.orion.domain.knowledge import (
 )
 from musicclean.orion.domain.library import Library
 from musicclean.orion.domain.recording import Recording
+from musicclean.orion.domain.review import (
+    ActionPlan,
+    AuthorizationGrant,
+    DecisionReview,
+    PlannedAction,
+    ReviewOutcome,
+    UndoDescriptor,
+)
 from musicclean.orion.domain.track_appearance import TrackAppearance
 
 __all__ = [
+    "ActionPlan",
     "Album",
     "Artist",
     "AudioFile",
+    "AuthorizationGrant",
     "Decision",
     "DecisionAction",
+    "DecisionReview",
     "Disc",
     "Edition",
     "EvidenceKind",
@@ -37,6 +48,9 @@ __all__ = [
     "KnowledgeKind",
     "KnowledgeValue",
     "Library",
+    "PlannedAction",
     "Recording",
+    "ReviewOutcome",
     "TrackAppearance",
+    "UndoDescriptor",
 ]

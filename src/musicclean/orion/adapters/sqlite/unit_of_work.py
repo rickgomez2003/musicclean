@@ -23,6 +23,11 @@ from musicclean.orion.adapters.sqlite.repositories import (
     SqliteRecordingRepository,
     SqliteTrackAppearanceRepository,
 )
+from musicclean.orion.adapters.sqlite.review_repositories import (
+    SqliteActionPlanRepository,
+    SqliteAuthorizationRepository,
+    SqliteReviewRepository,
+)
 
 
 class SqliteUnitOfWork:
@@ -47,6 +52,9 @@ class SqliteUnitOfWork:
         self.evidence = SqliteEvidenceRepository(connection)
         self.knowledge = SqliteKnowledgeRepository(connection)
         self.decisions = SqliteDecisionRepository(connection)
+        self.reviews = SqliteReviewRepository(connection)
+        self.authorizations = SqliteAuthorizationRepository(connection)
+        self.action_plans = SqliteActionPlanRepository(connection)
         return self
 
     def __exit__(

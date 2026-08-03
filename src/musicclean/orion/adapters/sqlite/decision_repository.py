@@ -11,10 +11,40 @@ from musicclean.orion.shared import Confidence, EntityId
 
 
 class SqliteDecisionRepository:
-    """Append-oriented SQLite repository for recommendations."""
-
     def __init__(self, connection: sqlite3.Connection) -> None:
         self._connection = connection
+
+    def _from_row(self, row: sqlite3.Row) -> Decision:
+        knowledge_rows = self._connection.execute(
+            """
+            SELECT knowledge_id
+              FROM orion_decision_knowledge
+             WHERE decision_id = ?
+             ORDER BY ordinal
+            """,
+            (str(row["id"]),),
+        ).fetchall()
+        return Decision(
+            id=EntityId.parse(str(row["id"])),
+            subject_id=EntityId.parse(str(row["subject_id"])),
+            action=DecisionAction(str(row["action"])),
+            confidence=Confidence(float(row["confidence"])),
+            rationale=str(row["rationale"]),
+            knowledge_ids=tuple(
+                EntityId.parse(str(item["knowledge_id"])) for item in knowledge_rows
+            ),
+            rule_id=str(row["rule_id"]),
+            rule_version=str(row["rule_version"]),
+            decided_at=datetime.fromisoformat(str(row["decided_at"])),
+            risk=str(row["risk"]) if row["risk"] is not None else None,
+        )
+
+    def get(self, decision_id: EntityId) -> Decision | None:
+        row = self._connection.execute(
+            "SELECT * FROM orion_decisions WHERE id = ?",
+            (str(decision_id),),
+        ).fetchone()
+        return None if row is None else self._from_row(row)
 
     def save(self, decision: Decision) -> None:
         self._connection.execute(
@@ -61,32 +91,4 @@ class SqliteDecisionRepository:
             """,
             (str(subject_id),),
         ).fetchall()
-
-        decisions: list[Decision] = []
-        for row in rows:
-            knowledge_rows = self._connection.execute(
-                """
-                SELECT knowledge_id
-                  FROM orion_decision_knowledge
-                 WHERE decision_id = ?
-                 ORDER BY ordinal
-                """,
-                (str(row["id"]),),
-            ).fetchall()
-            decisions.append(
-                Decision(
-                    id=EntityId.parse(str(row["id"])),
-                    subject_id=EntityId.parse(str(row["subject_id"])),
-                    action=DecisionAction(str(row["action"])),
-                    confidence=Confidence(float(row["confidence"])),
-                    rationale=str(row["rationale"]),
-                    knowledge_ids=tuple(
-                        EntityId.parse(str(item["knowledge_id"])) for item in knowledge_rows
-                    ),
-                    rule_id=str(row["rule_id"]),
-                    rule_version=str(row["rule_version"]),
-                    decided_at=datetime.fromisoformat(str(row["decided_at"])),
-                    risk=str(row["risk"]) if row["risk"] is not None else None,
-                )
-            )
-        return tuple(decisions)
+        return tuple(self._from_row(row) for row in rows)
