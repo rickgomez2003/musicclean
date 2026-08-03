@@ -17,5 +17,6 @@
 | Reconciliation | Complete (0.6.13) | Crash-gap detection |
 | Recovery Actions | Complete (0.6.14) | Approved audit recovery |
 | Operational Hardening | Complete (0.6.15) | Idempotency, leases, startup sweep |
-| Executor Coordination | Active (0.6.16) | Atomic leases + idempotent execution |
-| Reliability Harness | Next | Fault injection, concurrency stress, invariant tests |
+| Executor Coordination | Complete (0.6.16) | Atomic leases + idempotent execution |
+| Reliability Harness | Active (0.6.17) | Fault injection + invariant verification |
+| Service Boundary | Next | Stable orchestration/API-facing contracts |

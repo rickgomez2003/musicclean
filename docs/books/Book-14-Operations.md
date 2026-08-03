@@ -2,53 +2,24 @@
 
 **Status:** Active specification
 
-## Coordinated execution
+## Reliability harness
 
-0.6.16 connects operational-hardening primitives to real executor paths.
+0.6.17 intentionally adds no new production behavior.
 
-A coordinated command now follows:
+The milestone adds fault-injection and invariant tests around execution,
+reconciliation, idempotency, leases, and audit history.
 
-```text
-Idempotency Key
-    ↓
-Atomic ActionPlan Lease
-    ↓
-Executor / Recovery Use Case
-    ↓
-Persisted Result
-    ↓
-Idempotency Completion
-    ↓
-Lease Release
-```
+The acceptance target is stronger than "the command succeeds": safety
+invariants must remain true when operations fail, retry, overlap, restart, or
+encounter stale state.
 
-## Atomic lease acquisition
+## Verified invariants
 
-SQLite uses a single conditional UPSERT.
-
-A lease can be written when:
-
-- no lease exists;
-- the existing lease is expired; or
-- the existing lease belongs to the same owner.
-
-An active lease owned by another worker is not modified.
-
-## Idempotent result handling
-
-If an idempotency key is already COMPLETED, the coordinated path retrieves and
-returns the existing ExecutionRecord or RecoveryRecord.
-
-It does not repeat the filesystem mutation.
-
-An idempotency key is permanently associated with its operation and subject.
-A collision with another logical command is rejected.
-
-## Failure cleanup
-
-Lease release occurs in a `finally` block. This handles ordinary application
-exceptions.
-
-A hard process crash may still leave the lease persisted until expiration,
-which is intentional. Startup reconciliation and lease expiry provide the
-recovery path.
+- failed filesystem moves do not create execution audit records;
+- post-move/pre-audit crash state is detected without filesystem mutation;
+- completed idempotency keys remain stable under retry;
+- active leases exclude other workers;
+- expired leases can be taken over;
+- a previous lease owner cannot release the replacement lease;
+- a successful quarantine/restore lifecycle records exactly one event of each
+  kind and returns the file to its source location.
