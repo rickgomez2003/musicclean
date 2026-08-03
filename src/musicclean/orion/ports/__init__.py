@@ -18,6 +18,8 @@ from musicclean.orion.ports.repositories import (
     LibraryRepository,
     ReconciliationRepository,
     RecordingRepository,
+    RecoveryApprovalRepository,
+    RecoveryRepository,
     ReviewRepository,
     TrackAppearanceRepository,
 )
@@ -43,6 +45,8 @@ __all__ = [
     "MetadataSnapshot",
     "ReconciliationRepository",
     "RecordingRepository",
+    "RecoveryApprovalRepository",
+    "RecoveryRepository",
     "ReviewRepository",
     "TrackAppearanceRepository",
     "UnitOfWork",

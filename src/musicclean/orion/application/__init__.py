@@ -39,6 +39,12 @@ from musicclean.orion.application.reconcile_execution import (
     classify_reconciliation,
     reconcile_action_plan,
 )
+from musicclean.orion.application.recovery_actions import (
+    ApplyRecovery,
+    ApproveRecovery,
+    apply_recovery,
+    approve_recovery,
+)
 from musicclean.orion.application.register_audio_file import (
     RegisterAudioFile,
     register_audio_file,
@@ -66,6 +72,8 @@ from musicclean.orion.application.synchronize_filesystem import (
 
 __all__ = [
     "ApplicationError",
+    "ApplyRecovery",
+    "ApproveRecovery",
     "AuthorizeDecision",
     "CollectMetadataEvidence",
     "ConflictError",
@@ -93,6 +101,8 @@ __all__ = [
     "SyncDecision",
     "SynchronizationSummary",
     "SynchronizeFilesystem",
+    "apply_recovery",
+    "approve_recovery",
     "authorize_decision",
     "classify_observation",
     "classify_reconciliation",

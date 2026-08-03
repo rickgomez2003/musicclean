@@ -5,13 +5,15 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime
 
-from musicclean.orion.domain import ExecutionKind, ExecutionRecord
+from musicclean.orion.domain import (
+    ExecutionKind,
+    ExecutionOrigin,
+    ExecutionRecord,
+)
 from musicclean.orion.shared import EntityId
 
 
 class SqliteExecutionRepository:
-    """Append-only repository for completed filesystem operations."""
-
     def __init__(self, connection: sqlite3.Connection) -> None:
         self._connection = connection
 
@@ -25,6 +27,12 @@ class SqliteExecutionRepository:
             target_location=str(row["target_location"]),
             executed_by=str(row["executed_by"]),
             executed_at=datetime.fromisoformat(str(row["executed_at"])),
+            origin=ExecutionOrigin(str(row["origin"])),
+            recovery_finding_id=(
+                EntityId.parse(str(row["recovery_finding_id"]))
+                if row["recovery_finding_id"] is not None
+                else None
+            ),
         )
 
     def save(self, execution: ExecutionRecord) -> None:
@@ -32,9 +40,9 @@ class SqliteExecutionRepository:
             """
             INSERT INTO orion_executions(
                 id, action_plan_id, kind, source_location, target_location,
-                executed_by, executed_at
+                executed_by, executed_at, origin, recovery_finding_id
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 str(execution.id),
@@ -44,6 +52,12 @@ class SqliteExecutionRepository:
                 execution.target_location,
                 execution.executed_by,
                 execution.executed_at.isoformat(),
+                execution.origin.value,
+                (
+                    str(execution.recovery_finding_id)
+                    if execution.recovery_finding_id is not None
+                    else None
+                ),
             ),
         )
 
