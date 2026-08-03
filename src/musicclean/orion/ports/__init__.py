@@ -1,6 +1,7 @@
 """Abstract ports implemented by Orion adapters."""
 
 from musicclean.orion.ports.filesystem import FilesystemObserver
+from musicclean.orion.ports.filesystem_mutation import FilesystemMutator
 from musicclean.orion.ports.metadata import MetadataParser, MetadataProvider, MetadataSnapshot
 from musicclean.orion.ports.repositories import (
     ActionPlanRepository,
@@ -12,6 +13,7 @@ from musicclean.orion.ports.repositories import (
     DiscRepository,
     EditionRepository,
     EvidenceRepository,
+    ExecutionRepository,
     KnowledgeRepository,
     LibraryRepository,
     RecordingRepository,
@@ -30,6 +32,8 @@ __all__ = [
     "DiscRepository",
     "EditionRepository",
     "EvidenceRepository",
+    "ExecutionRepository",
+    "FilesystemMutator",
     "FilesystemObserver",
     "KnowledgeRepository",
     "LibraryRepository",

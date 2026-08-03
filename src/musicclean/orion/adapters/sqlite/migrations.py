@@ -158,7 +158,6 @@ MIGRATIONS: tuple[Migration, ...] = (
             note TEXT,
             FOREIGN KEY (decision_id) REFERENCES orion_decisions(id)
         );
-
         CREATE TABLE orion_authorizations (
             id TEXT PRIMARY KEY,
             decision_id TEXT NOT NULL,
@@ -168,7 +167,6 @@ MIGRATIONS: tuple[Migration, ...] = (
             FOREIGN KEY (decision_id) REFERENCES orion_decisions(id),
             FOREIGN KEY (review_id) REFERENCES orion_decision_reviews(id)
         );
-
         CREATE TABLE orion_action_plans (
             id TEXT PRIMARY KEY,
             decision_id TEXT NOT NULL,
@@ -180,13 +178,32 @@ MIGRATIONS: tuple[Migration, ...] = (
             FOREIGN KEY (decision_id) REFERENCES orion_decisions(id),
             FOREIGN KEY (authorization_id) REFERENCES orion_authorizations(id)
         );
-
         CREATE INDEX idx_orion_decision_reviews_decision
             ON orion_decision_reviews(decision_id, reviewed_at);
         CREATE INDEX idx_orion_authorizations_decision
             ON orion_authorizations(decision_id, granted_at);
         CREATE INDEX idx_orion_action_plans_decision
             ON orion_action_plans(decision_id, created_at);
+        """,
+    ),
+    Migration(
+        6,
+        "add filesystem execution audit records",
+        """
+        CREATE TABLE orion_executions (
+            id TEXT PRIMARY KEY,
+            action_plan_id TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            source_location TEXT NOT NULL,
+            target_location TEXT NOT NULL,
+            executed_by TEXT NOT NULL,
+            executed_at TEXT NOT NULL,
+            FOREIGN KEY (action_plan_id) REFERENCES orion_action_plans(id)
+        );
+        CREATE UNIQUE INDEX uq_orion_execution_plan_kind
+            ON orion_executions(action_plan_id, kind);
+        CREATE INDEX idx_orion_executions_plan
+            ON orion_executions(action_plan_id, executed_at);
         """,
     ),
 )

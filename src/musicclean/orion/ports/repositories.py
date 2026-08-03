@@ -16,6 +16,8 @@ from musicclean.orion.domain import (
     Disc,
     Edition,
     EvidenceRecord,
+    ExecutionKind,
+    ExecutionRecord,
     KnowledgeFact,
     Library,
     Recording,
@@ -100,6 +102,7 @@ class ReviewRepository(Protocol):
 
 
 class AuthorizationRepository(Protocol):
+    def get(self, authorization_id: EntityId) -> AuthorizationGrant | None: ...
     def save(self, grant: AuthorizationGrant) -> None: ...
     def latest_for_decision(
         self,
@@ -111,3 +114,17 @@ class ActionPlanRepository(Protocol):
     def save(self, plan: ActionPlan) -> None: ...
     def get(self, plan_id: EntityId) -> ActionPlan | None: ...
     def list_for_decision(self, decision_id: EntityId) -> tuple[ActionPlan, ...]: ...
+
+
+class ExecutionRepository(Protocol):
+    """Append-only audit repository for completed filesystem operations."""
+
+    def save(self, execution: ExecutionRecord) -> None: ...
+
+    def list_for_plan(self, plan_id: EntityId) -> tuple[ExecutionRecord, ...]: ...
+
+    def latest_for_plan_kind(
+        self,
+        plan_id: EntityId,
+        kind: ExecutionKind,
+    ) -> ExecutionRecord | None: ...

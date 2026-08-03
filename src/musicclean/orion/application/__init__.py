@@ -47,6 +47,12 @@ from musicclean.orion.application.review_execution import (
     plan_quarantine,
     review_decision,
 )
+from musicclean.orion.application.safe_executor import (
+    ExecuteQuarantine,
+    RestoreQuarantine,
+    execute_quarantine,
+    restore_quarantine,
+)
 from musicclean.orion.application.synchronize_filesystem import (
     SynchronizationSummary,
     SynchronizeFilesystem,
@@ -61,6 +67,7 @@ __all__ = [
     "CoreMetadataCompleteRule",
     "CreateLibrary",
     "DecisionRule",
+    "ExecuteQuarantine",
     "FileObservation",
     "GenerateDecisions",
     "HighResolutionFormatRule",
@@ -74,6 +81,7 @@ __all__ = [
     "PlannedQuarantine",
     "ReadMetadata",
     "RegisterAudioFile",
+    "RestoreQuarantine",
     "ReviewDecision",
     "SyncChange",
     "SyncDecision",
@@ -83,6 +91,7 @@ __all__ = [
     "classify_observation",
     "collect_metadata_evidence",
     "create_library",
+    "execute_quarantine",
     "generate_decisions",
     "infer_knowledge",
     "latest_evidence_by_kind",
@@ -91,6 +100,7 @@ __all__ = [
     "plan_quarantine",
     "read_metadata",
     "register_audio_file",
+    "restore_quarantine",
     "review_decision",
     "synchronize_filesystem",
 ]
