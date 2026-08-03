@@ -32,20 +32,43 @@ def begin_idempotent_operation(
     clock: Clock,
     uow_factory: UnitOfWorkFactory,
 ) -> IdempotencyRecord:
+    """Start or resolve a logical operation identified by a stable key."""
+    key = command.key
+    operation = command.operation
+    subject_id = command.subject_id
+
     with uow_factory() as uow:
-        existing = uow.idempotency.get(command.key)
+        existing = uow.idempotency.get(key)
         if existing is not None:
+            if existing.operation != operation or existing.subject_id != subject_id:
+                raise ConflictError("idempotency key is already bound to a different operation")
             return existing
 
         record = IdempotencyRecord(
-            key=command.key,
-            operation=command.operation,
-            subject_id=command.subject_id,
+            key=key,
+            operation=operation,
+            subject_id=subject_id,
             status=IdempotencyStatus.STARTED,
             created_at=clock.now(),
         )
-        uow.idempotency.save(record)
-        uow.commit()
+
+        try:
+            uow.idempotency.save(record)
+            uow.commit()
+        except Exception:
+            uow.rollback()
+            existing = uow.idempotency.get(key)
+
+            if existing is None:
+                raise
+
+            if existing.operation != operation or existing.subject_id != subject_id:
+                raise ConflictError(
+                    "idempotency key is already bound to a different operation"
+                ) from None
+
+            return existing
+
         return record
 
 
@@ -76,26 +99,26 @@ def acquire_plan_lease(
     clock: Clock,
     uow_factory: UnitOfWorkFactory,
 ) -> ActionPlanLease:
+    """Atomically acquire/renew a plan lease or fail if another owner holds it."""
     if command.ttl_seconds <= 0:
         raise ValueError("ttl_seconds must be positive")
 
     now = clock.now()
-    with uow_factory() as uow:
-        existing = uow.leases.get_for_plan(command.action_plan_id)
-        if existing is not None and existing.is_active_at(now):
-            if existing.owner == command.owner:
-                return existing
-            raise ConflictError(f"action plan is leased by another owner: {existing.owner}")
+    candidate = ActionPlanLease(
+        action_plan_id=command.action_plan_id,
+        owner=command.owner,
+        acquired_at=now,
+        expires_at=now + timedelta(seconds=command.ttl_seconds),
+    )
 
-        lease = ActionPlanLease(
-            action_plan_id=command.action_plan_id,
-            owner=command.owner,
-            acquired_at=now,
-            expires_at=now + timedelta(seconds=command.ttl_seconds),
-        )
-        uow.leases.acquire(lease)
+    with uow_factory() as uow:
+        acquired = uow.leases.try_acquire(candidate, now)
+        if acquired is None:
+            existing = uow.leases.get_for_plan(command.action_plan_id)
+            holder = existing.owner if existing is not None else "unknown"
+            raise ConflictError(f"action plan is leased by another owner: {holder}")
         uow.commit()
-        return lease
+        return acquired
 
 
 def release_plan_lease(

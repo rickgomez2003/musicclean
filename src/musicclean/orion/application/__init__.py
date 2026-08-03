@@ -4,6 +4,13 @@ from musicclean.orion.application.collect_metadata_evidence import (
     CollectMetadataEvidence,
     collect_metadata_evidence,
 )
+from musicclean.orion.application.coordination import (
+    CoordinatedExecution,
+    CoordinatedRecovery,
+    apply_recovery_coordinated,
+    execute_quarantine_coordinated,
+    restore_quarantine_coordinated,
+)
 from musicclean.orion.application.create_library import CreateLibrary, create_library
 from musicclean.orion.application.decision_rules import (
     DecisionRule,
@@ -80,6 +87,8 @@ __all__ = [
     "BeginIdempotentOperation",
     "CollectMetadataEvidence",
     "ConflictError",
+    "CoordinatedExecution",
+    "CoordinatedRecovery",
     "CoreMetadataCompleteRule",
     "CreateLibrary",
     "DecisionRule",
@@ -107,6 +116,7 @@ __all__ = [
     "SynchronizeFilesystem",
     "acquire_plan_lease",
     "apply_recovery",
+    "apply_recovery_coordinated",
     "approve_recovery",
     "authorize_decision",
     "begin_idempotent_operation",
@@ -116,6 +126,7 @@ __all__ = [
     "complete_idempotent_operation",
     "create_library",
     "execute_quarantine",
+    "execute_quarantine_coordinated",
     "generate_decisions",
     "infer_knowledge",
     "latest_evidence_by_kind",
@@ -127,6 +138,7 @@ __all__ = [
     "register_audio_file",
     "release_plan_lease",
     "restore_quarantine",
+    "restore_quarantine_coordinated",
     "review_decision",
     "startup_recovery_sweep",
     "synchronize_filesystem",
