@@ -72,16 +72,11 @@ MIGRATIONS: tuple[Migration, ...] = (
             size_bytes INTEGER NOT NULL CHECK (size_bytes >= 0),
             FOREIGN KEY (recording_id) REFERENCES orion_recordings(id)
         );
-        CREATE INDEX idx_orion_artists_name
-            ON orion_artists(name);
-        CREATE INDEX idx_orion_albums_title
-            ON orion_albums(title);
-        CREATE INDEX idx_orion_editions_album_id
-            ON orion_editions(album_id);
-        CREATE INDEX idx_orion_discs_edition_id
-            ON orion_discs(edition_id);
-        CREATE INDEX idx_orion_recordings_title
-            ON orion_recordings(title);
+        CREATE INDEX idx_orion_artists_name ON orion_artists(name);
+        CREATE INDEX idx_orion_albums_title ON orion_albums(title);
+        CREATE INDEX idx_orion_editions_album_id ON orion_editions(album_id);
+        CREATE INDEX idx_orion_discs_edition_id ON orion_discs(edition_id);
+        CREATE INDEX idx_orion_recordings_title ON orion_recordings(title);
         CREATE INDEX idx_orion_track_appearances_disc_id
             ON orion_track_appearances(disc_id);
         CREATE INDEX idx_orion_track_appearances_recording_id
@@ -136,7 +131,6 @@ MIGRATIONS: tuple[Migration, ...] = (
             rule_version TEXT NOT NULL,
             inferred_at TEXT NOT NULL
         );
-
         CREATE TABLE orion_knowledge_evidence (
             knowledge_id TEXT NOT NULL,
             evidence_id TEXT NOT NULL,
@@ -146,7 +140,6 @@ MIGRATIONS: tuple[Migration, ...] = (
                 ON DELETE CASCADE,
             FOREIGN KEY (evidence_id) REFERENCES orion_evidence(id)
         );
-
         CREATE INDEX idx_orion_knowledge_subject_id
             ON orion_knowledge(subject_id);
         CREATE INDEX idx_orion_knowledge_subject_kind
@@ -155,6 +148,44 @@ MIGRATIONS: tuple[Migration, ...] = (
             ON orion_knowledge(rule_id, rule_version);
         CREATE INDEX idx_orion_knowledge_evidence_evidence_id
             ON orion_knowledge_evidence(evidence_id);
+        """,
+    ),
+    Migration(
+        4,
+        "add explainable decision recommendations",
+        """
+        CREATE TABLE orion_decisions (
+            id TEXT PRIMARY KEY,
+            subject_id TEXT NOT NULL,
+            action TEXT NOT NULL,
+            confidence REAL NOT NULL CHECK (
+                confidence >= 0.0 AND confidence <= 1.0
+            ),
+            rationale TEXT NOT NULL,
+            rule_id TEXT NOT NULL,
+            rule_version TEXT NOT NULL,
+            decided_at TEXT NOT NULL,
+            risk TEXT
+        );
+
+        CREATE TABLE orion_decision_knowledge (
+            decision_id TEXT NOT NULL,
+            knowledge_id TEXT NOT NULL,
+            ordinal INTEGER NOT NULL CHECK (ordinal >= 0),
+            PRIMARY KEY (decision_id, knowledge_id),
+            FOREIGN KEY (decision_id) REFERENCES orion_decisions(id)
+                ON DELETE CASCADE,
+            FOREIGN KEY (knowledge_id) REFERENCES orion_knowledge(id)
+        );
+
+        CREATE INDEX idx_orion_decisions_subject_id
+            ON orion_decisions(subject_id);
+        CREATE INDEX idx_orion_decisions_subject_action
+            ON orion_decisions(subject_id, action);
+        CREATE INDEX idx_orion_decisions_rule
+            ON orion_decisions(rule_id, rule_version);
+        CREATE INDEX idx_orion_decision_knowledge_knowledge_id
+            ON orion_decision_knowledge(knowledge_id);
         """,
     ),
 )

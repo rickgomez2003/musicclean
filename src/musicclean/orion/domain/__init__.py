@@ -3,6 +3,7 @@
 from musicclean.orion.domain.album import Album
 from musicclean.orion.domain.artist import Artist
 from musicclean.orion.domain.audio_file import AudioFile
+from musicclean.orion.domain.decision import Decision, DecisionAction
 from musicclean.orion.domain.disc import Disc
 from musicclean.orion.domain.edition import Edition
 from musicclean.orion.domain.evidence import (
@@ -24,6 +25,8 @@ __all__ = [
     "Album",
     "Artist",
     "AudioFile",
+    "Decision",
+    "DecisionAction",
     "Disc",
     "Edition",
     "EvidenceKind",

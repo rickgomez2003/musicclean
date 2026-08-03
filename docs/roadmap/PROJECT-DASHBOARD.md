@@ -8,7 +8,8 @@
 | SQLite Adapter | Complete (0.6.4) | Schema/repositories/transactions |
 | Application | Complete (0.6.5) | First commands/queries |
 | Filesystem Sync | Complete (0.6.6) | Observe/classify/persist changes |
-| Metadata Providers | Complete (0.6.7) | Port, normalization, parser provenance |
-| Evidence | Complete (0.6.8) | Persistent observations + provenance |
-| Knowledge | Active (0.6.9) | Versioned facts + first inference rules |
-| Decisions | Next | Explainable recommendations/actions |
+| Metadata Providers | Complete (0.6.7) | Port, normalization, provenance |
+| Evidence | Complete (0.6.8) | Persistent observations |
+| Knowledge | Complete (0.6.9) | Versioned inference |
+| Decisions | Active (0.6.10) | Explainable non-destructive recommendations |
+| Review / Execution | Next | Approval, quarantine, undo, safe actions |

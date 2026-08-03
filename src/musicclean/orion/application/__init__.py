@@ -5,12 +5,22 @@ from musicclean.orion.application.collect_metadata_evidence import (
     collect_metadata_evidence,
 )
 from musicclean.orion.application.create_library import CreateLibrary, create_library
+from musicclean.orion.application.decision_rules import (
+    DecisionRule,
+    HighResolutionReviewRule,
+    MetadataRepairRecommendationRule,
+    latest_knowledge_by_kind,
+)
 from musicclean.orion.application.errors import ApplicationError, ConflictError, NotFoundError
 from musicclean.orion.application.filesystem_sync import (
     FileObservation,
     SyncChange,
     SyncDecision,
     classify_observation,
+)
+from musicclean.orion.application.generate_decisions import (
+    GenerateDecisions,
+    generate_decisions,
 )
 from musicclean.orion.application.infer_knowledge import InferKnowledge, infer_knowledge
 from musicclean.orion.application.knowledge_rules import (
@@ -40,11 +50,15 @@ __all__ = [
     "ConflictError",
     "CoreMetadataCompleteRule",
     "CreateLibrary",
+    "DecisionRule",
     "FileObservation",
+    "GenerateDecisions",
     "HighResolutionFormatRule",
+    "HighResolutionReviewRule",
     "InferKnowledge",
     "KnowledgeRule",
     "ListAlbumEditions",
+    "MetadataRepairRecommendationRule",
     "NotFoundError",
     "ReadMetadata",
     "RegisterAudioFile",
@@ -55,8 +69,10 @@ __all__ = [
     "classify_observation",
     "collect_metadata_evidence",
     "create_library",
+    "generate_decisions",
     "infer_knowledge",
     "latest_evidence_by_kind",
+    "latest_knowledge_by_kind",
     "list_album_editions",
     "read_metadata",
     "register_audio_file",

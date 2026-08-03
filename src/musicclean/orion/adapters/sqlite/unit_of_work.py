@@ -7,6 +7,7 @@ from pathlib import Path
 from types import TracebackType
 
 from musicclean.orion.adapters.sqlite.connection import connect_sqlite
+from musicclean.orion.adapters.sqlite.decision_repository import SqliteDecisionRepository
 from musicclean.orion.adapters.sqlite.evidence_repository import SqliteEvidenceRepository
 from musicclean.orion.adapters.sqlite.knowledge_repository import (
     SqliteKnowledgeRepository,
@@ -45,6 +46,7 @@ class SqliteUnitOfWork:
         self.audio_files = SqliteAudioFileRepository(connection)
         self.evidence = SqliteEvidenceRepository(connection)
         self.knowledge = SqliteKnowledgeRepository(connection)
+        self.decisions = SqliteDecisionRepository(connection)
         return self
 
     def __exit__(
