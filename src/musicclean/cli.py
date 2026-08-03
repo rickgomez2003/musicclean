@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Literal, SupportsIndex, SupportsInt
 
 import typer
 from rich.console import Console
@@ -19,6 +19,7 @@ from rich.progress import (
 from rich.table import Table
 
 from musicclean import __version__
+from musicclean.album_intelligence import build_album_editions
 from musicclean.config import AppConfig, ConfigError, ScannerConfig, load_config
 from musicclean.database import Database
 from musicclean.error_reporting import (
@@ -26,6 +27,7 @@ from musicclean.error_reporting import (
     write_metadata_errors_json,
 )
 from musicclean.logging_setup import configure_logging
+from musicclean.metadata import inspect_audio_file
 from musicclean.models import DuplicateGroup, MetadataErrorRecord
 from musicclean.reporting import write_csv_report, write_json_report
 from musicclean.scanner import scan_root
@@ -80,6 +82,22 @@ def _format_bytes(value: int) -> str:
         amount /= 1024
 
     return f"{amount:,.2f} TiB"
+
+
+def _safe_display_int(value: object) -> int:
+    if value is None:
+        return 0
+
+    if not isinstance(
+        value,
+        (str, bytes, bytearray, SupportsInt, SupportsIndex),
+    ):
+        return 0
+
+    try:
+        return int(value)
+    except (TypeError, ValueError, OverflowError):
+        return 0
 
 
 def version_callback(value: bool) -> None:
@@ -472,6 +490,109 @@ def stats(
         _format_bytes(duplicate_data["reclaimable_bytes"]),
     )
     console.print(table)
+
+
+@app.command(name="inspect")
+def inspect_command(
+    path: Annotated[Path, typer.Argument(help="Audio file to inspect.")],
+) -> None:
+    """Inspect one audio file and display parser and metadata diagnostics."""
+    diagnostic = inspect_audio_file(path)
+    if diagnostic.get("error"):
+        console.print(f"[bold red]Inspection failed:[/bold red] {diagnostic['error']}")
+        raise typer.Exit(code=1)
+
+    metadata = diagnostic.get("metadata")
+    metadata_map = metadata if isinstance(metadata, dict) else {}
+
+    table = Table(title=f"Audio Inspection · {path.name}")
+    table.add_column("Field")
+    table.add_column("Value")
+    table.add_row("Path", str(path.resolve()))
+    table.add_row("Size", _format_bytes(_safe_display_int(diagnostic.get("size"))))
+    table.add_row("Parser", str(diagnostic.get("parser") or "Unknown"))
+    table.add_row("Tag type", str(diagnostic.get("tag_type") or "None"))
+    table.add_row("Tag count", str(diagnostic.get("tag_count") or 0))
+
+    fields = (
+        ("Codec", "codec"),
+        ("Sample rate", "sample_rate"),
+        ("Bit depth", "bits_per_sample"),
+        ("Channels", "channels"),
+        ("Bitrate", "bitrate"),
+        ("Duration", "duration"),
+        ("Title", "title"),
+        ("Artist", "artist"),
+        ("Album", "album"),
+        ("Album artist", "album_artist"),
+        ("Track", "track_number"),
+        ("Disc", "disc_number"),
+        ("Date", "date"),
+        ("Artwork", "has_artwork"),
+        ("MusicBrainz track ID", "musicbrainz_track_id"),
+        ("MusicBrainz album ID", "musicbrainz_album_id"),
+        ("MusicBrainz artist ID", "musicbrainz_artist_id"),
+        ("Metadata error", "error"),
+    )
+    for label, key in fields:
+        value = metadata_map.get(key)
+        table.add_row(label, "" if value is None else str(value))
+
+    console.print(table)
+
+    warning = diagnostic.get("warning")
+    if warning:
+        console.print(f"[yellow]Parser warning:[/yellow] {warning}")
+
+    tag_keys = diagnostic.get("tag_keys")
+    if isinstance(tag_keys, list) and tag_keys:
+        console.print("[bold]Tag keys:[/bold] " + ", ".join(str(key) for key in tag_keys))
+
+
+@app.command(name="albums")
+def albums_command(
+    config_path: Annotated[Path, typer.Option("--config")] = DEFAULT_CONFIG,
+    root: Annotated[str | None, typer.Option("--root")] = None,
+    artist: Annotated[str | None, typer.Option("--artist")] = None,
+    album: Annotated[str | None, typer.Option("--album")] = None,
+    limit: Annotated[int, typer.Option("--limit", min=1)] = 50,
+    show_reasons: Annotated[bool, typer.Option("--reasons")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose", "-v")] = False,
+) -> None:
+    """Score album editions and recommend which copies to keep or review."""
+    config = _load(config_path, verbose)
+    with Database(config.database.path) as database:
+        rows = database.album_rows(root_name=root, artist=artist, album=album)
+    editions = build_album_editions(rows)[:limit]
+    if not editions:
+        console.print("[yellow]No indexed albums matched the filters.[/yellow]")
+        return
+
+    table = Table(title="Album Intelligence")
+    table.add_column("Rating")
+    table.add_column("Score", justify="right")
+    table.add_column("Recommendation")
+    table.add_column("Artist")
+    table.add_column("Album")
+    table.add_column("Tracks", justify="right")
+    table.add_column("Edition directory")
+    for edition in editions:
+        table.add_row(
+            edition.stars,
+            str(edition.score),
+            edition.recommendation,
+            edition.artist,
+            edition.album,
+            str(edition.track_count),
+            str(edition.directory),
+        )
+    console.print(table)
+    if show_reasons:
+        for edition in editions:
+            console.print(
+                f"[bold]{edition.artist} — {edition.album}[/bold] "
+                f"({edition.score}/100): " + "; ".join(edition.reasons)
+            )
 
 
 @app.command()

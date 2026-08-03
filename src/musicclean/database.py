@@ -542,6 +542,37 @@ class Database:
             "duration": float(row["duration"]),
         }
 
+    def album_rows(
+        self,
+        *,
+        root_name: str | None = None,
+        artist: str | None = None,
+        album: str | None = None,
+    ) -> list[dict[str, object]]:
+        clauses = ["album IS NOT NULL", "TRIM(album) <> ''"]
+        parameters: list[object] = []
+        if root_name is not None:
+            clauses.append("root_name = ?")
+            parameters.append(root_name)
+        if artist is not None:
+            clauses.append("LOWER(COALESCE(album_artist, artist, '')) LIKE LOWER(?)")
+            parameters.append(f"%{artist}%")
+        if album is not None:
+            clauses.append("LOWER(album) LIKE LOWER(?)")
+            parameters.append(f"%{album}%")
+        rows = self.connection.execute(
+            f"""
+            SELECT path, directory, extension, artist, album_artist, album, title,
+                   track_number, sample_rate, bits_per_sample, bitrate, has_artwork,
+                   musicbrainz_track_id, musicbrainz_album_id, metadata_error
+              FROM files
+             WHERE {' AND '.join(clauses)}
+             ORDER BY COALESCE(album_artist, artist), album, directory, track_number, path
+            """,
+            parameters,
+        ).fetchall()
+        return [dict(row) for row in rows]
+
     def optimize(self) -> None:
         self.connection.execute("PRAGMA optimize")
         self.connection.execute("VACUUM")
