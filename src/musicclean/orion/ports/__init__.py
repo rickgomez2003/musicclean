@@ -1,5 +1,6 @@
-"""Abstract ports implemented by Orion infrastructure adapters."""
+"""Abstract ports implemented by Orion adapters."""
 
+from musicclean.orion.ports.filesystem import FilesystemObserver
 from musicclean.orion.ports.repositories import (
     AlbumRepository,
     ArtistRepository,
@@ -18,6 +19,7 @@ __all__ = [
     "AudioFileRepository",
     "DiscRepository",
     "EditionRepository",
+    "FilesystemObserver",
     "LibraryRepository",
     "RecordingRepository",
     "TrackAppearanceRepository",
