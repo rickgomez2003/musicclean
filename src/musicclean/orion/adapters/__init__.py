@@ -1,1 +1,1 @@
-"""Concrete adapters for Orion ports."""
+"""Concrete adapters implementing Orion ports."""

@@ -2,8 +2,17 @@
 
 **Status:** Active specification
 
-`FilesystemObserver` is Orion's filesystem observation port. It yields
-lightweight `FileObservation` values for a configured root.
+## Persistence
 
-The observer reports current state. The application synchronizer owns comparison
-and persistence semantics.
+Repository and UnitOfWork ports define persistence needs.
+
+## Filesystem
+
+`FilesystemObserver` yields lightweight filesystem observations.
+
+## Metadata
+
+`MetadataProvider` reads a path and returns a normalized `MetadataSnapshot`.
+
+The contract deliberately exposes parser provenance but no Mutagen/FFprobe
+objects, subprocess details, or parser-specific exceptions.

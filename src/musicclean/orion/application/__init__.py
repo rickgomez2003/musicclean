@@ -8,8 +8,15 @@ from musicclean.orion.application.filesystem_sync import (
     SyncDecision,
     classify_observation,
 )
-from musicclean.orion.application.list_album_editions import ListAlbumEditions, list_album_editions
-from musicclean.orion.application.register_audio_file import RegisterAudioFile, register_audio_file
+from musicclean.orion.application.list_album_editions import (
+    ListAlbumEditions,
+    list_album_editions,
+)
+from musicclean.orion.application.read_metadata import ReadMetadata, read_metadata
+from musicclean.orion.application.register_audio_file import (
+    RegisterAudioFile,
+    register_audio_file,
+)
 from musicclean.orion.application.synchronize_filesystem import (
     SynchronizationSummary,
     SynchronizeFilesystem,
@@ -23,6 +30,7 @@ __all__ = [
     "FileObservation",
     "ListAlbumEditions",
     "NotFoundError",
+    "ReadMetadata",
     "RegisterAudioFile",
     "SyncChange",
     "SyncDecision",
@@ -31,6 +39,7 @@ __all__ = [
     "classify_observation",
     "create_library",
     "list_album_editions",
+    "read_metadata",
     "register_audio_file",
     "synchronize_filesystem",
 ]
