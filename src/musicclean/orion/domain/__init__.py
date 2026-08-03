@@ -12,7 +12,11 @@ from musicclean.orion.domain.evidence import (
     EvidenceRecord,
     EvidenceValue,
 )
-from musicclean.orion.domain.execution import ExecutionKind, ExecutionRecord
+from musicclean.orion.domain.execution import (
+    ExecutionKind,
+    ExecutionOrigin,
+    ExecutionRecord,
+)
 from musicclean.orion.domain.knowledge import (
     KnowledgeFact,
     KnowledgeKind,
@@ -25,6 +29,11 @@ from musicclean.orion.domain.reconciliation import (
     ReconciliationStatus,
 )
 from musicclean.orion.domain.recording import Recording
+from musicclean.orion.domain.recovery import (
+    RecoveryApproval,
+    RecoveryKind,
+    RecoveryRecord,
+)
 from musicclean.orion.domain.review import (
     ActionPlan,
     AuthorizationGrant,
@@ -51,6 +60,7 @@ __all__ = [
     "EvidenceRecord",
     "EvidenceValue",
     "ExecutionKind",
+    "ExecutionOrigin",
     "ExecutionRecord",
     "KnowledgeFact",
     "KnowledgeKind",
@@ -61,6 +71,9 @@ __all__ = [
     "ReconciliationFinding",
     "ReconciliationStatus",
     "Recording",
+    "RecoveryApproval",
+    "RecoveryKind",
+    "RecoveryRecord",
     "ReviewOutcome",
     "TrackAppearance",
     "UndoDescriptor",

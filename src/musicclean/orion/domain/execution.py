@@ -11,10 +11,13 @@ from musicclean.orion.shared import EntityId
 
 
 class ExecutionKind(StrEnum):
-    """Reversible execution kinds supported by Orion."""
-
     QUARANTINE = "quarantine"
     RESTORE = "restore"
+
+
+class ExecutionOrigin(StrEnum):
+    DIRECT = "direct"
+    RECOVERED = "recovered"
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,6 +30,8 @@ class ExecutionRecord:
     target_location: str
     executed_by: str
     executed_at: datetime
+    origin: ExecutionOrigin = ExecutionOrigin.DIRECT
+    recovery_finding_id: EntityId | None = None
     id: EntityId = field(default_factory=EntityId.new)
 
     def __post_init__(self) -> None:
@@ -50,3 +55,8 @@ class ExecutionRecord:
         if self.executed_at.tzinfo is None or self.executed_at.utcoffset() is None:
             raise ValueError("executed_at must be timezone-aware")
         object.__setattr__(self, "executed_at", self.executed_at.astimezone(UTC))
+
+        if self.origin is ExecutionOrigin.RECOVERED and self.recovery_finding_id is None:
+            raise ValueError("recovered execution requires recovery_finding_id")
+        if self.origin is ExecutionOrigin.DIRECT and self.recovery_finding_id is not None:
+            raise ValueError("direct execution cannot have recovery_finding_id")

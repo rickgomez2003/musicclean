@@ -22,6 +22,8 @@ from musicclean.orion.domain import (
     Library,
     ReconciliationFinding,
     Recording,
+    RecoveryApproval,
+    RecoveryRecord,
     TrackAppearance,
 )
 from musicclean.orion.shared import EntityId
@@ -128,7 +130,17 @@ class ExecutionRepository(Protocol):
 
 
 class ReconciliationRepository(Protocol):
-    """Append-only history of filesystem/database consistency checks."""
-
+    def get(self, finding_id: EntityId) -> ReconciliationFinding | None: ...
     def save(self, finding: ReconciliationFinding) -> None: ...
     def list_for_plan(self, plan_id: EntityId) -> tuple[ReconciliationFinding, ...]: ...
+
+
+class RecoveryApprovalRepository(Protocol):
+    def get(self, approval_id: EntityId) -> RecoveryApproval | None: ...
+    def save(self, approval: RecoveryApproval) -> None: ...
+
+
+class RecoveryRepository(Protocol):
+    def save(self, recovery: RecoveryRecord) -> None: ...
+    def get_by_approval(self, approval_id: EntityId) -> RecoveryRecord | None: ...
+    def list_for_finding(self, finding_id: EntityId) -> tuple[RecoveryRecord, ...]: ...

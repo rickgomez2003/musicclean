@@ -200,10 +200,8 @@ MIGRATIONS: tuple[Migration, ...] = (
         "add reconciliation findings",
         """
         CREATE TABLE orion_reconciliation_findings (
-            id TEXT PRIMARY KEY,
-            action_plan_id TEXT NOT NULL,
-            status TEXT NOT NULL,
-            proposed_action TEXT NOT NULL,
+            id TEXT PRIMARY KEY, action_plan_id TEXT NOT NULL,
+            status TEXT NOT NULL, proposed_action TEXT NOT NULL,
             source_exists INTEGER NOT NULL CHECK (source_exists IN (0, 1)),
             target_exists INTEGER NOT NULL CHECK (target_exists IN (0, 1)),
             has_quarantine_audit INTEGER NOT NULL CHECK (
@@ -212,14 +210,53 @@ MIGRATIONS: tuple[Migration, ...] = (
             has_restore_audit INTEGER NOT NULL CHECK (
                 has_restore_audit IN (0, 1)
             ),
-            detail TEXT NOT NULL,
-            checked_at TEXT NOT NULL,
+            detail TEXT NOT NULL, checked_at TEXT NOT NULL,
             FOREIGN KEY (action_plan_id) REFERENCES orion_action_plans(id)
         );
         CREATE INDEX idx_orion_reconciliation_plan
             ON orion_reconciliation_findings(action_plan_id, checked_at);
         CREATE INDEX idx_orion_reconciliation_status
             ON orion_reconciliation_findings(status);
+        """,
+    ),
+    Migration(
+        8,
+        "add operator-approved recovery audit metadata",
+        """
+        ALTER TABLE orion_executions
+            ADD COLUMN origin TEXT NOT NULL DEFAULT 'direct';
+        ALTER TABLE orion_executions
+            ADD COLUMN recovery_finding_id TEXT;
+
+        CREATE TABLE orion_recovery_approvals (
+            id TEXT PRIMARY KEY,
+            finding_id TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            approved_by TEXT NOT NULL,
+            approved_at TEXT NOT NULL,
+            note TEXT,
+            FOREIGN KEY (finding_id) REFERENCES orion_reconciliation_findings(id)
+        );
+
+        CREATE TABLE orion_recovery_records (
+            id TEXT PRIMARY KEY,
+            finding_id TEXT NOT NULL,
+            approval_id TEXT NOT NULL UNIQUE,
+            execution_id TEXT NOT NULL UNIQUE,
+            kind TEXT NOT NULL,
+            recovered_by TEXT NOT NULL,
+            recovered_at TEXT NOT NULL,
+            FOREIGN KEY (finding_id) REFERENCES orion_reconciliation_findings(id),
+            FOREIGN KEY (approval_id) REFERENCES orion_recovery_approvals(id),
+            FOREIGN KEY (execution_id) REFERENCES orion_executions(id)
+        );
+
+        CREATE INDEX idx_orion_recovery_approvals_finding
+            ON orion_recovery_approvals(finding_id, approved_at);
+        CREATE INDEX idx_orion_recovery_records_finding
+            ON orion_recovery_records(finding_id, recovered_at);
+        CREATE INDEX idx_orion_executions_recovery_finding
+            ON orion_executions(recovery_finding_id);
         """,
     ),
 )

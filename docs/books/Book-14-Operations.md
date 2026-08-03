@@ -9,38 +9,37 @@ Decision
   -> Review
   -> Authorization
   -> ActionPlan
-  -> Preconditions
-  -> Filesystem Move
+  -> Filesystem execution
   -> ExecutionRecord
   -> Reconciliation
+  -> Recovery Approval
+  -> Recovery Record
 ```
 
-## Crash-recovery gap
+## Recovery policy
 
-Filesystem operations and SQLite commits cannot be one atomic transaction.
-A process can therefore stop after a move but before its ExecutionRecord is
-committed.
+0.6.14 implements the repair side of reconciliation.
 
-0.6.13 introduces reconciliation to detect this gap.
+The governing rule is:
 
-## Reconciliation
+> detect automatically, repair deliberately.
 
-For a persisted ActionPlan Orion compares:
+A finding that proposes audit recovery cannot repair itself. An operator must
+approve that specific finding.
 
-- source existence
-- target existence
-- quarantine audit presence
-- restore audit presence
+Immediately before recovery Orion checks the filesystem again. If the live state
+no longer matches the approved recovery condition, the operation is refused.
 
-The result is persisted as a ReconciliationFinding.
+## Recovered audit history
 
-## Safety policy
+Recovery never moves the file.
 
-Reconciliation itself never mutates the filesystem and never fabricates an
-ExecutionRecord.
+It creates the missing ExecutionRecord with:
 
-Unambiguous missing-audit states can propose recovery. Contradictory or missing
-filesystem states require manual review.
+- `origin = recovered`
+- `recovery_finding_id = <finding>`
 
-This separation keeps detection observable and reviewable before any repair is
-attempted.
+A RecoveryRecord separately preserves the approval and repair history.
+
+This prevents reconstructed history from being indistinguishable from an audit
+record written during a normal direct execution.

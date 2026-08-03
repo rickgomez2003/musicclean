@@ -20,6 +20,8 @@ from musicclean.orion.ports.repositories import (
     LibraryRepository,
     ReconciliationRepository,
     RecordingRepository,
+    RecoveryApprovalRepository,
+    RecoveryRepository,
     ReviewRepository,
     TrackAppearanceRepository,
 )
@@ -42,6 +44,8 @@ class UnitOfWork(Protocol):
     action_plans: ActionPlanRepository
     executions: ExecutionRepository
     reconciliations: ReconciliationRepository
+    recovery_approvals: RecoveryApprovalRepository
+    recoveries: RecoveryRepository
 
     def __enter__(self) -> Self: ...
 

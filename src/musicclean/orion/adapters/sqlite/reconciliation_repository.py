@@ -14,8 +14,6 @@ from musicclean.orion.shared import EntityId
 
 
 class SqliteReconciliationRepository:
-    """Append-only persistence for reconciliation findings."""
-
     def __init__(self, connection: sqlite3.Connection) -> None:
         self._connection = connection
 
@@ -33,6 +31,13 @@ class SqliteReconciliationRepository:
             detail=str(row["detail"]),
             checked_at=datetime.fromisoformat(str(row["checked_at"])),
         )
+
+    def get(self, finding_id: EntityId) -> ReconciliationFinding | None:
+        row = self._connection.execute(
+            "SELECT * FROM orion_reconciliation_findings WHERE id = ?",
+            (str(finding_id),),
+        ).fetchone()
+        return None if row is None else self._from_row(row)
 
     def save(self, finding: ReconciliationFinding) -> None:
         self._connection.execute(

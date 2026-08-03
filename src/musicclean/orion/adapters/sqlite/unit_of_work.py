@@ -17,6 +17,10 @@ from musicclean.orion.adapters.sqlite.migrations import migrate
 from musicclean.orion.adapters.sqlite.reconciliation_repository import (
     SqliteReconciliationRepository,
 )
+from musicclean.orion.adapters.sqlite.recovery_repositories import (
+    SqliteRecoveryApprovalRepository,
+    SqliteRecoveryRepository,
+)
 from musicclean.orion.adapters.sqlite.repositories import (
     SqliteAlbumRepository,
     SqliteArtistRepository,
@@ -61,6 +65,8 @@ class SqliteUnitOfWork:
         self.action_plans = SqliteActionPlanRepository(connection)
         self.executions = SqliteExecutionRepository(connection)
         self.reconciliations = SqliteReconciliationRepository(connection)
+        self.recovery_approvals = SqliteRecoveryApprovalRepository(connection)
+        self.recoveries = SqliteRecoveryRepository(connection)
         return self
 
     def __exit__(

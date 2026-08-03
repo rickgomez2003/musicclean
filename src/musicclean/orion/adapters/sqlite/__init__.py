@@ -11,6 +11,10 @@ from musicclean.orion.adapters.sqlite.migrations import CURRENT_SCHEMA_VERSION, 
 from musicclean.orion.adapters.sqlite.reconciliation_repository import (
     SqliteReconciliationRepository,
 )
+from musicclean.orion.adapters.sqlite.recovery_repositories import (
+    SqliteRecoveryApprovalRepository,
+    SqliteRecoveryRepository,
+)
 from musicclean.orion.adapters.sqlite.review_repositories import (
     SqliteActionPlanRepository,
     SqliteAuthorizationRepository,
@@ -27,6 +31,8 @@ __all__ = [
     "SqliteExecutionRepository",
     "SqliteKnowledgeRepository",
     "SqliteReconciliationRepository",
+    "SqliteRecoveryApprovalRepository",
+    "SqliteRecoveryRepository",
     "SqliteReviewRepository",
     "SqliteUnitOfWork",
     "connect_sqlite",
