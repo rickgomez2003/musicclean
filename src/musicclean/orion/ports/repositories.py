@@ -13,9 +13,11 @@ from musicclean.orion.domain import (
     Album,
     Artist,
     AudioFile,
+    Disc,
     Edition,
     Library,
     Recording,
+    TrackAppearance,
 )
 from musicclean.orion.shared import EntityId
 
@@ -52,12 +54,29 @@ class EditionRepository(Protocol):
     def save(self, edition: Edition) -> None: ...
 
 
+class DiscRepository(Protocol):
+    """Persistence contract for Disc entities."""
+
+    def get(self, disc_id: EntityId) -> Disc | None: ...
+    def list_for_edition(self, edition_id: EntityId) -> tuple[Disc, ...]: ...
+    def save(self, disc: Disc) -> None: ...
+
+
 class RecordingRepository(Protocol):
     """Persistence contract for Recording entities."""
 
     def get(self, recording_id: EntityId) -> Recording | None: ...
     def find_by_title(self, title: str) -> tuple[Recording, ...]: ...
     def save(self, recording: Recording) -> None: ...
+
+
+class TrackAppearanceRepository(Protocol):
+    """Persistence contract for TrackAppearance entities."""
+
+    def get(self, track_appearance_id: EntityId) -> TrackAppearance | None: ...
+    def list_for_disc(self, disc_id: EntityId) -> tuple[TrackAppearance, ...]: ...
+    def list_for_recording(self, recording_id: EntityId) -> tuple[TrackAppearance, ...]: ...
+    def save(self, track_appearance: TrackAppearance) -> None: ...
 
 
 class AudioFileRepository(Protocol):

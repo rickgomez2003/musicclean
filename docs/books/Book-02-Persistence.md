@@ -4,50 +4,68 @@
 
 ## Persistence principle
 
-The database is an adapter-backed system of record, not the owner of the domain
-model. Domain entities must remain usable without a database session.
+Persistence is an adapter. The domain model is authoritative and remains usable
+without a database session.
 
-## Port boundary
+## Current implementation
 
-Application code depends on repository ports and a Unit of Work.
+Orion 0.6.4 introduces a standard-library `sqlite3` adapter.
 
 ```text
-Application Use Case
-        |
-        v
-    UnitOfWork
-        |
-        +-- AlbumRepository
-        +-- EditionRepository
-        +-- RecordingRepository
-        +-- AudioFileRepository
-        |
-        v
-Concrete Adapter (SQLite later)
+Application
+   |
+   v
+UnitOfWork + Repository Ports
+   |
+   v
+SQLite Adapter
+   |
+   v
+Versioned Orion Schema
 ```
 
-## Repository rules
+## Schema coexistence
 
-Repositories:
+Initial normalized tables use the `orion_` prefix. This prevents collision with
+the working prototype schema while Orion is developed beside it.
 
-- accept/return Orion domain entities or domain identifiers;
-- expose domain-oriented queries;
-- do not expose SQL, cursors, ORM entities, sessions, or query builders;
-- do not become a universal generic CRUD interface.
+Current tables:
 
-## Transaction rules
+- orion_schema_migrations
+- orion_libraries
+- orion_artists
+- orion_albums
+- orion_editions
+- orion_discs
+- orion_recordings
+- orion_track_appearances
+- orion_audio_files
 
-The Unit of Work defines an atomic application boundary. Concrete adapters must
-commit explicitly and roll back on failure.
+## Integrity
+
+SQLite foreign-key enforcement is explicitly enabled for every Orion
+connection.
+
+Schema constraints enforce durable persistence invariants such as positive disc
+and track positions and non-negative byte/duration values.
+
+## Transactions
+
+`SqliteUnitOfWork` opens a concrete transaction boundary.
+
+- `commit()` persists the current unit and begins a new transaction.
+- exiting without commit rolls back pending changes.
+- exceptions roll back pending changes.
+
+## Migration policy
+
+Schema changes are monotonic migrations tracked in
+`orion_schema_migrations`.
+
+Applied migrations are not silently rewritten. Corrections are expressed as new
+migrations.
 
 ## Deferred decisions
 
-Orion 0.6.3 intentionally does not choose:
-
-- SQLAlchemy versus direct SQLite;
-- Alembic versus a custom migration runner;
-- connection pooling;
-- async database access;
-- final schema shape.
-
-Those decisions follow from persistence requirements rather than preceding them.
+WAL mode, async database access, connection pooling, and ORM adoption remain
+deliberately deferred until workloads demonstrate a need.
