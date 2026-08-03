@@ -150,30 +150,22 @@ MIGRATIONS: tuple[Migration, ...] = (
         "add review authorization and quarantine planning",
         """
         CREATE TABLE orion_decision_reviews (
-            id TEXT PRIMARY KEY,
-            decision_id TEXT NOT NULL,
-            outcome TEXT NOT NULL,
-            reviewed_by TEXT NOT NULL,
-            reviewed_at TEXT NOT NULL,
-            note TEXT,
+            id TEXT PRIMARY KEY, decision_id TEXT NOT NULL,
+            outcome TEXT NOT NULL, reviewed_by TEXT NOT NULL,
+            reviewed_at TEXT NOT NULL, note TEXT,
             FOREIGN KEY (decision_id) REFERENCES orion_decisions(id)
         );
         CREATE TABLE orion_authorizations (
-            id TEXT PRIMARY KEY,
-            decision_id TEXT NOT NULL,
-            review_id TEXT NOT NULL,
-            granted_by TEXT NOT NULL,
+            id TEXT PRIMARY KEY, decision_id TEXT NOT NULL,
+            review_id TEXT NOT NULL, granted_by TEXT NOT NULL,
             granted_at TEXT NOT NULL,
             FOREIGN KEY (decision_id) REFERENCES orion_decisions(id),
             FOREIGN KEY (review_id) REFERENCES orion_decision_reviews(id)
         );
         CREATE TABLE orion_action_plans (
-            id TEXT PRIMARY KEY,
-            decision_id TEXT NOT NULL,
-            authorization_id TEXT NOT NULL,
-            action TEXT NOT NULL,
-            source_location TEXT NOT NULL,
-            target_location TEXT NOT NULL,
+            id TEXT PRIMARY KEY, decision_id TEXT NOT NULL,
+            authorization_id TEXT NOT NULL, action TEXT NOT NULL,
+            source_location TEXT NOT NULL, target_location TEXT NOT NULL,
             created_at TEXT NOT NULL,
             FOREIGN KEY (decision_id) REFERENCES orion_decisions(id),
             FOREIGN KEY (authorization_id) REFERENCES orion_authorizations(id)
@@ -191,12 +183,9 @@ MIGRATIONS: tuple[Migration, ...] = (
         "add filesystem execution audit records",
         """
         CREATE TABLE orion_executions (
-            id TEXT PRIMARY KEY,
-            action_plan_id TEXT NOT NULL,
-            kind TEXT NOT NULL,
-            source_location TEXT NOT NULL,
-            target_location TEXT NOT NULL,
-            executed_by TEXT NOT NULL,
+            id TEXT PRIMARY KEY, action_plan_id TEXT NOT NULL,
+            kind TEXT NOT NULL, source_location TEXT NOT NULL,
+            target_location TEXT NOT NULL, executed_by TEXT NOT NULL,
             executed_at TEXT NOT NULL,
             FOREIGN KEY (action_plan_id) REFERENCES orion_action_plans(id)
         );
@@ -204,6 +193,33 @@ MIGRATIONS: tuple[Migration, ...] = (
             ON orion_executions(action_plan_id, kind);
         CREATE INDEX idx_orion_executions_plan
             ON orion_executions(action_plan_id, executed_at);
+        """,
+    ),
+    Migration(
+        7,
+        "add reconciliation findings",
+        """
+        CREATE TABLE orion_reconciliation_findings (
+            id TEXT PRIMARY KEY,
+            action_plan_id TEXT NOT NULL,
+            status TEXT NOT NULL,
+            proposed_action TEXT NOT NULL,
+            source_exists INTEGER NOT NULL CHECK (source_exists IN (0, 1)),
+            target_exists INTEGER NOT NULL CHECK (target_exists IN (0, 1)),
+            has_quarantine_audit INTEGER NOT NULL CHECK (
+                has_quarantine_audit IN (0, 1)
+            ),
+            has_restore_audit INTEGER NOT NULL CHECK (
+                has_restore_audit IN (0, 1)
+            ),
+            detail TEXT NOT NULL,
+            checked_at TEXT NOT NULL,
+            FOREIGN KEY (action_plan_id) REFERENCES orion_action_plans(id)
+        );
+        CREATE INDEX idx_orion_reconciliation_plan
+            ON orion_reconciliation_findings(action_plan_id, checked_at);
+        CREATE INDEX idx_orion_reconciliation_status
+            ON orion_reconciliation_findings(status);
         """,
     ),
 )

@@ -13,5 +13,6 @@
 | Knowledge | Complete (0.6.9) | Versioned inference |
 | Decisions | Complete (0.6.10) | Explainable recommendations |
 | Review / Authorization | Complete (0.6.11) | Review and action planning |
-| Safe Executor | Active (0.6.12) | Preconditions, quarantine, restore, audit |
-| Recovery / Reconciliation | Next | Crash recovery and filesystem/DB reconciliation |
+| Safe Executor | Complete (0.6.12) | Quarantine, restore, execution audit |
+| Reconciliation | Active (0.6.13) | Crash-gap detection and persisted findings |
+| Recovery Actions | Next | Explicit operator-approved audit repair |

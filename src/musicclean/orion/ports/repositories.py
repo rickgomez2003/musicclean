@@ -20,6 +20,7 @@ from musicclean.orion.domain import (
     ExecutionRecord,
     KnowledgeFact,
     Library,
+    ReconciliationFinding,
     Recording,
     TrackAppearance,
 )
@@ -117,14 +118,17 @@ class ActionPlanRepository(Protocol):
 
 
 class ExecutionRepository(Protocol):
-    """Append-only audit repository for completed filesystem operations."""
-
     def save(self, execution: ExecutionRecord) -> None: ...
-
     def list_for_plan(self, plan_id: EntityId) -> tuple[ExecutionRecord, ...]: ...
-
     def latest_for_plan_kind(
         self,
         plan_id: EntityId,
         kind: ExecutionKind,
     ) -> ExecutionRecord | None: ...
+
+
+class ReconciliationRepository(Protocol):
+    """Append-only history of filesystem/database consistency checks."""
+
+    def save(self, finding: ReconciliationFinding) -> None: ...
+    def list_for_plan(self, plan_id: EntityId) -> tuple[ReconciliationFinding, ...]: ...
