@@ -10,7 +10,7 @@ from musicclean.orion.ports.repositories import (
     RecordingRepository,
     TrackAppearanceRepository,
 )
-from musicclean.orion.ports.unit_of_work import UnitOfWork
+from musicclean.orion.ports.unit_of_work import UnitOfWork, UnitOfWorkFactory
 
 __all__ = [
     "AlbumRepository",
@@ -22,4 +22,5 @@ __all__ = [
     "RecordingRepository",
     "TrackAppearanceRepository",
     "UnitOfWork",
+    "UnitOfWorkFactory",
 ]

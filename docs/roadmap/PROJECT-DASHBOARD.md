@@ -6,9 +6,9 @@
 | Shared Kernel | Complete (0.6.1) | Stable primitives and value objects |
 | Domain | Complete (0.6.2) | Core entities and relationships |
 | Persistence Ports | Complete (0.6.3) | Repository + Unit-of-Work contracts |
-| SQLite Adapter | Active (0.6.4) | Schema, migrations, repositories, transactions |
-| Application | Next | First use cases and application services |
-| Scanner | Prototype | Rebuild as synchronizer |
+| SQLite Adapter | Complete (0.6.4) | Schema, migrations, repositories, transactions |
+| Application | Active (0.6.5) | First commands, queries, transaction orchestration |
+| Scanner | Next | Rebuild as synchronizer |
 | Metadata | Prototype | Move behind provider ports |
 | Evidence | Planned | Provenance model |
 | Knowledge | Planned | Versioned inference |
