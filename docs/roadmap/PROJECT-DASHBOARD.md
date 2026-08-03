@@ -9,6 +9,6 @@
 | Application | Complete (0.6.5) | First commands/queries |
 | Filesystem Sync | Complete (0.6.6) | Observe/classify/persist changes |
 | Metadata Providers | Complete (0.6.7) | Port, normalization, parser provenance |
-| Evidence | Active (0.6.8) | Persistent typed observations + provenance |
-| Knowledge | Next | Versioned inference facts |
-| Decisions | Planned | Explainable decisions |
+| Evidence | Complete (0.6.8) | Persistent observations + provenance |
+| Knowledge | Active (0.6.9) | Versioned facts + first inference rules |
+| Decisions | Next | Explainable recommendations/actions |

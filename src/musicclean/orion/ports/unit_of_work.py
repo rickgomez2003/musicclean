@@ -12,6 +12,7 @@ from musicclean.orion.ports.repositories import (
     DiscRepository,
     EditionRepository,
     EvidenceRepository,
+    KnowledgeRepository,
     LibraryRepository,
     RecordingRepository,
     TrackAppearanceRepository,
@@ -28,6 +29,7 @@ class UnitOfWork(Protocol):
     track_appearances: TrackAppearanceRepository
     audio_files: AudioFileRepository
     evidence: EvidenceRepository
+    knowledge: KnowledgeRepository
 
     def __enter__(self) -> Self: ...
 

@@ -11,6 +11,11 @@ from musicclean.orion.domain.evidence import (
     EvidenceRecord,
     EvidenceValue,
 )
+from musicclean.orion.domain.knowledge import (
+    KnowledgeFact,
+    KnowledgeKind,
+    KnowledgeValue,
+)
 from musicclean.orion.domain.library import Library
 from musicclean.orion.domain.recording import Recording
 from musicclean.orion.domain.track_appearance import TrackAppearance
@@ -25,6 +30,9 @@ __all__ = [
     "EvidenceProvenance",
     "EvidenceRecord",
     "EvidenceValue",
+    "KnowledgeFact",
+    "KnowledgeKind",
+    "KnowledgeValue",
     "Library",
     "Recording",
     "TrackAppearance",

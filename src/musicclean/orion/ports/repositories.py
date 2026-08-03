@@ -12,6 +12,7 @@ from musicclean.orion.domain import (
     Disc,
     Edition,
     EvidenceRecord,
+    KnowledgeFact,
     Library,
     Recording,
     TrackAppearance,
@@ -71,8 +72,14 @@ class AudioFileRepository(Protocol):
 
 
 class EvidenceRepository(Protocol):
-    """Append-oriented persistence contract for Evidence records."""
-
     def save(self, evidence: EvidenceRecord) -> None: ...
     def save_many(self, evidence: Iterable[EvidenceRecord]) -> None: ...
     def list_for_subject(self, subject_id: EntityId) -> tuple[EvidenceRecord, ...]: ...
+
+
+class KnowledgeRepository(Protocol):
+    """Append-oriented persistence contract for inferred Knowledge."""
+
+    def save(self, fact: KnowledgeFact) -> None: ...
+    def save_many(self, facts: Iterable[KnowledgeFact]) -> None: ...
+    def list_for_subject(self, subject_id: EntityId) -> tuple[KnowledgeFact, ...]: ...

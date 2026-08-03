@@ -8,6 +8,9 @@ from types import TracebackType
 
 from musicclean.orion.adapters.sqlite.connection import connect_sqlite
 from musicclean.orion.adapters.sqlite.evidence_repository import SqliteEvidenceRepository
+from musicclean.orion.adapters.sqlite.knowledge_repository import (
+    SqliteKnowledgeRepository,
+)
 from musicclean.orion.adapters.sqlite.migrations import migrate
 from musicclean.orion.adapters.sqlite.repositories import (
     SqliteAlbumRepository,
@@ -31,6 +34,7 @@ class SqliteUnitOfWork:
         migrate(connection)
         connection.execute("BEGIN")
         self._connection = connection
+
         self.libraries = SqliteLibraryRepository(connection)
         self.artists = SqliteArtistRepository(connection)
         self.albums = SqliteAlbumRepository(connection)
@@ -40,6 +44,7 @@ class SqliteUnitOfWork:
         self.track_appearances = SqliteTrackAppearanceRepository(connection)
         self.audio_files = SqliteAudioFileRepository(connection)
         self.evidence = SqliteEvidenceRepository(connection)
+        self.knowledge = SqliteKnowledgeRepository(connection)
         return self
 
     def __exit__(
