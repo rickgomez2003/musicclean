@@ -38,6 +38,15 @@ from musicclean.orion.application.register_audio_file import (
     RegisterAudioFile,
     register_audio_file,
 )
+from musicclean.orion.application.review_execution import (
+    AuthorizeDecision,
+    PlannedQuarantine,
+    PlanQuarantine,
+    ReviewDecision,
+    authorize_decision,
+    plan_quarantine,
+    review_decision,
+)
 from musicclean.orion.application.synchronize_filesystem import (
     SynchronizationSummary,
     SynchronizeFilesystem,
@@ -46,6 +55,7 @@ from musicclean.orion.application.synchronize_filesystem import (
 
 __all__ = [
     "ApplicationError",
+    "AuthorizeDecision",
     "CollectMetadataEvidence",
     "ConflictError",
     "CoreMetadataCompleteRule",
@@ -60,12 +70,16 @@ __all__ = [
     "ListAlbumEditions",
     "MetadataRepairRecommendationRule",
     "NotFoundError",
+    "PlanQuarantine",
+    "PlannedQuarantine",
     "ReadMetadata",
     "RegisterAudioFile",
+    "ReviewDecision",
     "SyncChange",
     "SyncDecision",
     "SynchronizationSummary",
     "SynchronizeFilesystem",
+    "authorize_decision",
     "classify_observation",
     "collect_metadata_evidence",
     "create_library",
@@ -74,7 +88,9 @@ __all__ = [
     "latest_evidence_by_kind",
     "latest_knowledge_by_kind",
     "list_album_editions",
+    "plan_quarantine",
     "read_metadata",
     "register_audio_file",
+    "review_decision",
     "synchronize_filesystem",
 ]

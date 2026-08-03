@@ -2,62 +2,22 @@
 
 **Status:** Active specification
 
-## Purpose
+Decisions are explainable recommendations, not commands.
 
-The Decision Engine transforms Knowledge into explicit, explainable
-recommendations.
+The safety chain is now:
 
 ```text
 Evidence
-   ↓
-Knowledge
-   ↓
-Decision
-   ↓
-Future Review / Authorization / Execution
+  -> Knowledge
+  -> Decision
+  -> Review
+  -> Authorization
+  -> ActionPlan
+  -> future Execution
 ```
 
-## Safety boundary
+A rejected review cannot be authorized. An unreviewed Decision cannot be
+authorized. A quarantine ActionPlan cannot be created without explicit
+authorization.
 
-A Decision is not an execution request.
-
-0.6.10 deliberately excludes DELETE or other destructive actions. The initial
-actions are:
-
-- KEEP
-- REVIEW
-- REPAIR_METADATA
-- REANALYZE
-- IGNORE
-
-## Traceability
-
-Every Decision records its supporting Knowledge IDs and rule version. Each
-KnowledgeFact already links to Evidence IDs, producing a complete explanation
-chain:
-
-```text
-Decision
-  └── KnowledgeFact
-        └── EvidenceRecord
-              └── provider + timestamp + warning
-```
-
-## First rules
-
-### decision.metadata-repair v1
-
-- core metadata incomplete -> REPAIR_METADATA
-- core metadata complete -> KEEP
-
-### decision.high-resolution-review v1
-
-A technically high-resolution format -> REVIEW.
-
-The recommendation does not claim better sound or genuine high-resolution
-provenance. Future spectral/provenance analysis may refine it.
-
-## Future execution model
-
-Execution will be a separate application boundary requiring explicit
-authorization, safeguards, audit history, and undo/quarantine where applicable.
+Destructive execution remains outside the 0.6.11 scope.

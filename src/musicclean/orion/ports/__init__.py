@@ -3,9 +3,11 @@
 from musicclean.orion.ports.filesystem import FilesystemObserver
 from musicclean.orion.ports.metadata import MetadataParser, MetadataProvider, MetadataSnapshot
 from musicclean.orion.ports.repositories import (
+    ActionPlanRepository,
     AlbumRepository,
     ArtistRepository,
     AudioFileRepository,
+    AuthorizationRepository,
     DecisionRepository,
     DiscRepository,
     EditionRepository,
@@ -13,14 +15,17 @@ from musicclean.orion.ports.repositories import (
     KnowledgeRepository,
     LibraryRepository,
     RecordingRepository,
+    ReviewRepository,
     TrackAppearanceRepository,
 )
 from musicclean.orion.ports.unit_of_work import UnitOfWork, UnitOfWorkFactory
 
 __all__ = [
+    "ActionPlanRepository",
     "AlbumRepository",
     "ArtistRepository",
     "AudioFileRepository",
+    "AuthorizationRepository",
     "DecisionRepository",
     "DiscRepository",
     "EditionRepository",
@@ -32,6 +37,7 @@ __all__ = [
     "MetadataProvider",
     "MetadataSnapshot",
     "RecordingRepository",
+    "ReviewRepository",
     "TrackAppearanceRepository",
     "UnitOfWork",
     "UnitOfWorkFactory",
