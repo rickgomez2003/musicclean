@@ -1,0 +1,70 @@
+"""Repository ports for Orion persistence.
+
+These interfaces express what the application/domain need from persistence.
+They intentionally avoid generic CRUD abstractions and ORM-specific concepts.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Iterable
+from typing import Protocol
+
+from musicclean.orion.domain import (
+    Album,
+    Artist,
+    AudioFile,
+    Edition,
+    Library,
+    Recording,
+)
+from musicclean.orion.shared import EntityId
+
+
+class LibraryRepository(Protocol):
+    """Persistence contract for Library entities."""
+
+    def get(self, library_id: EntityId) -> Library | None: ...
+    def list_all(self) -> tuple[Library, ...]: ...
+    def save(self, library: Library) -> None: ...
+
+
+class ArtistRepository(Protocol):
+    """Persistence contract for Artist entities."""
+
+    def get(self, artist_id: EntityId) -> Artist | None: ...
+    def find_by_name(self, name: str) -> tuple[Artist, ...]: ...
+    def save(self, artist: Artist) -> None: ...
+
+
+class AlbumRepository(Protocol):
+    """Persistence contract for Album entities."""
+
+    def get(self, album_id: EntityId) -> Album | None: ...
+    def find_by_title(self, title: str) -> tuple[Album, ...]: ...
+    def save(self, album: Album) -> None: ...
+
+
+class EditionRepository(Protocol):
+    """Persistence contract for Edition entities."""
+
+    def get(self, edition_id: EntityId) -> Edition | None: ...
+    def list_for_album(self, album_id: EntityId) -> tuple[Edition, ...]: ...
+    def save(self, edition: Edition) -> None: ...
+
+
+class RecordingRepository(Protocol):
+    """Persistence contract for Recording entities."""
+
+    def get(self, recording_id: EntityId) -> Recording | None: ...
+    def find_by_title(self, title: str) -> tuple[Recording, ...]: ...
+    def save(self, recording: Recording) -> None: ...
+
+
+class AudioFileRepository(Protocol):
+    """Persistence contract for discovered audio-file representations."""
+
+    def get(self, audio_file_id: EntityId) -> AudioFile | None: ...
+    def get_by_location(self, location: str) -> AudioFile | None: ...
+    def list_for_recording(self, recording_id: EntityId) -> tuple[AudioFile, ...]: ...
+    def save(self, audio_file: AudioFile) -> None: ...
+    def save_many(self, audio_files: Iterable[AudioFile]) -> None: ...
