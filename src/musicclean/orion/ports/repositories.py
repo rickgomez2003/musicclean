@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from datetime import datetime
 from typing import Protocol
 
 from musicclean.orion.domain import (
     ActionPlan,
+    ActionPlanLease,
     Album,
     Artist,
     AudioFile,
@@ -18,6 +20,7 @@ from musicclean.orion.domain import (
     EvidenceRecord,
     ExecutionKind,
     ExecutionRecord,
+    IdempotencyRecord,
     KnowledgeFact,
     Library,
     ReconciliationFinding,
@@ -117,6 +120,7 @@ class ActionPlanRepository(Protocol):
     def save(self, plan: ActionPlan) -> None: ...
     def get(self, plan_id: EntityId) -> ActionPlan | None: ...
     def list_for_decision(self, decision_id: EntityId) -> tuple[ActionPlan, ...]: ...
+    def list_all(self) -> tuple[ActionPlan, ...]: ...
 
 
 class ExecutionRepository(Protocol):
@@ -144,3 +148,15 @@ class RecoveryRepository(Protocol):
     def save(self, recovery: RecoveryRecord) -> None: ...
     def get_by_approval(self, approval_id: EntityId) -> RecoveryRecord | None: ...
     def list_for_finding(self, finding_id: EntityId) -> tuple[RecoveryRecord, ...]: ...
+
+
+class IdempotencyRepository(Protocol):
+    def get(self, key: str) -> IdempotencyRecord | None: ...
+    def save(self, record: IdempotencyRecord) -> None: ...
+    def complete(self, key: str, completed_at: datetime) -> None: ...
+
+
+class LeaseRepository(Protocol):
+    def get_for_plan(self, plan_id: EntityId) -> ActionPlanLease | None: ...
+    def acquire(self, lease: ActionPlanLease) -> None: ...
+    def release(self, plan_id: EntityId, owner: str) -> None: ...
