@@ -1,17 +1,14 @@
 """Abstract ports implemented by Orion adapters."""
 
 from musicclean.orion.ports.filesystem import FilesystemObserver
-from musicclean.orion.ports.metadata import (
-    MetadataParser,
-    MetadataProvider,
-    MetadataSnapshot,
-)
+from musicclean.orion.ports.metadata import MetadataParser, MetadataProvider, MetadataSnapshot
 from musicclean.orion.ports.repositories import (
     AlbumRepository,
     ArtistRepository,
     AudioFileRepository,
     DiscRepository,
     EditionRepository,
+    EvidenceRepository,
     LibraryRepository,
     RecordingRepository,
     TrackAppearanceRepository,
@@ -24,6 +21,7 @@ __all__ = [
     "AudioFileRepository",
     "DiscRepository",
     "EditionRepository",
+    "EvidenceRepository",
     "FilesystemObserver",
     "LibraryRepository",
     "MetadataParser",

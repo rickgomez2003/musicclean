@@ -7,6 +7,7 @@ from pathlib import Path
 from types import TracebackType
 
 from musicclean.orion.adapters.sqlite.connection import connect_sqlite
+from musicclean.orion.adapters.sqlite.evidence_repository import SqliteEvidenceRepository
 from musicclean.orion.adapters.sqlite.migrations import migrate
 from musicclean.orion.adapters.sqlite.repositories import (
     SqliteAlbumRepository,
@@ -21,8 +22,6 @@ from musicclean.orion.adapters.sqlite.repositories import (
 
 
 class SqliteUnitOfWork:
-    """Concrete SQLite transaction boundary."""
-
     def __init__(self, path: str | Path) -> None:
         self._path = path
         self._connection: sqlite3.Connection | None = None
@@ -32,7 +31,6 @@ class SqliteUnitOfWork:
         migrate(connection)
         connection.execute("BEGIN")
         self._connection = connection
-
         self.libraries = SqliteLibraryRepository(connection)
         self.artists = SqliteArtistRepository(connection)
         self.albums = SqliteAlbumRepository(connection)
@@ -41,6 +39,7 @@ class SqliteUnitOfWork:
         self.recordings = SqliteRecordingRepository(connection)
         self.track_appearances = SqliteTrackAppearanceRepository(connection)
         self.audio_files = SqliteAudioFileRepository(connection)
+        self.evidence = SqliteEvidenceRepository(connection)
         return self
 
     def __exit__(
@@ -51,24 +50,20 @@ class SqliteUnitOfWork:
     ) -> bool | None:
         if self._connection is None:
             return None
-
         try:
-            if exc_type is not None:
-                self.rollback()
-            else:
-                self.rollback()
+            self.rollback()
         finally:
             self._connection.close()
             self._connection = None
         return None
 
     def commit(self) -> None:
-        self._require_connection().commit()
-        self._require_connection().execute("BEGIN")
+        connection = self._require_connection()
+        connection.commit()
+        connection.execute("BEGIN")
 
     def rollback(self) -> None:
-        connection = self._require_connection()
-        connection.rollback()
+        self._require_connection().rollback()
 
     def _require_connection(self) -> sqlite3.Connection:
         if self._connection is None:

@@ -11,6 +11,7 @@ from musicclean.orion.ports.repositories import (
     AudioFileRepository,
     DiscRepository,
     EditionRepository,
+    EvidenceRepository,
     LibraryRepository,
     RecordingRepository,
     TrackAppearanceRepository,
@@ -18,8 +19,6 @@ from musicclean.orion.ports.repositories import (
 
 
 class UnitOfWork(Protocol):
-    """Atomic persistence boundary for one application use case."""
-
     libraries: LibraryRepository
     artists: ArtistRepository
     albums: AlbumRepository
@@ -28,6 +27,7 @@ class UnitOfWork(Protocol):
     recordings: RecordingRepository
     track_appearances: TrackAppearanceRepository
     audio_files: AudioFileRepository
+    evidence: EvidenceRepository
 
     def __enter__(self) -> Self: ...
 
@@ -43,6 +43,4 @@ class UnitOfWork(Protocol):
 
 
 class UnitOfWorkFactory(Protocol):
-    """Factory for creating a fresh UnitOfWork per application operation."""
-
     def __call__(self) -> UnitOfWork: ...

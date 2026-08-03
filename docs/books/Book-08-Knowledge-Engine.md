@@ -1,7 +1,28 @@
 # Book 08 — Knowledge Engine
 
-**Status:** Living specification
+**Status:** Active foundation
 
-This book is part of the MusicClean Orion Engineering Manual. It will mature in reviewable increments as its subsystem enters design and implementation.
+The Knowledge Engine consumes Evidence; it does not call parsers directly.
 
-Mature sections: purpose/scope, terminology, boundaries, contracts, data model, events, failure modes, observability, performance budgets, safety, tests, compatibility/migration, limitations, future considerations.
+## Pipeline
+
+```text
+Provider / Analyzer
+      |
+      v
+EvidenceRecord
+      |
+      v
+Knowledge Rule
+      |
+      v
+Knowledge Fact
+      |
+      v
+Decision Engine
+```
+
+Evidence is observation. Knowledge is inference.
+
+0.6.8 establishes the Evidence side of this boundary with immutable typed values
+and explicit provenance.
