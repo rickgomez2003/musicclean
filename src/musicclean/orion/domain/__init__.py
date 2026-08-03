@@ -19,6 +19,11 @@ from musicclean.orion.domain.knowledge import (
     KnowledgeValue,
 )
 from musicclean.orion.domain.library import Library
+from musicclean.orion.domain.reconciliation import (
+    ReconciliationAction,
+    ReconciliationFinding,
+    ReconciliationStatus,
+)
 from musicclean.orion.domain.recording import Recording
 from musicclean.orion.domain.review import (
     ActionPlan,
@@ -52,6 +57,9 @@ __all__ = [
     "KnowledgeValue",
     "Library",
     "PlannedAction",
+    "ReconciliationAction",
+    "ReconciliationFinding",
+    "ReconciliationStatus",
     "Recording",
     "ReviewOutcome",
     "TrackAppearance",

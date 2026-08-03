@@ -34,6 +34,11 @@ from musicclean.orion.application.list_album_editions import (
     list_album_editions,
 )
 from musicclean.orion.application.read_metadata import ReadMetadata, read_metadata
+from musicclean.orion.application.reconcile_execution import (
+    ReconcileActionPlan,
+    classify_reconciliation,
+    reconcile_action_plan,
+)
 from musicclean.orion.application.register_audio_file import (
     RegisterAudioFile,
     register_audio_file,
@@ -80,6 +85,7 @@ __all__ = [
     "PlanQuarantine",
     "PlannedQuarantine",
     "ReadMetadata",
+    "ReconcileActionPlan",
     "RegisterAudioFile",
     "RestoreQuarantine",
     "ReviewDecision",
@@ -89,6 +95,7 @@ __all__ = [
     "SynchronizeFilesystem",
     "authorize_decision",
     "classify_observation",
+    "classify_reconciliation",
     "collect_metadata_evidence",
     "create_library",
     "execute_quarantine",
@@ -99,6 +106,7 @@ __all__ = [
     "list_album_editions",
     "plan_quarantine",
     "read_metadata",
+    "reconcile_action_plan",
     "register_audio_file",
     "restore_quarantine",
     "review_decision",

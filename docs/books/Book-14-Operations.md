@@ -12,51 +12,35 @@ Decision
   -> Preconditions
   -> Filesystem Move
   -> ExecutionRecord
+  -> Reconciliation
 ```
 
-0.6.12 introduces the first real filesystem mutation boundary.
+## Crash-recovery gap
 
-## Supported execution
+Filesystem operations and SQLite commits cannot be one atomic transaction.
+A process can therefore stop after a move but before its ExecutionRecord is
+committed.
 
-Only reversible operations are implemented:
+0.6.13 introduces reconciliation to detect this gap.
 
-- quarantine move
-- restore from quarantine
+## Reconciliation
 
-There is no delete executor.
+For a persisted ActionPlan Orion compares:
 
-## Preconditions
+- source existence
+- target existence
+- quarantine audit presence
+- restore audit presence
 
-The executor verifies immediately before mutation:
+The result is persisted as a ReconciliationFinding.
 
-- ActionPlan exists;
-- plan action is QUARANTINE;
-- referenced authorization exists;
-- authorization belongs to the same Decision;
-- source exists;
-- target does not exist;
-- the plan has not already been executed for that operation kind.
+## Safety policy
 
-## No-overwrite rule
+Reconciliation itself never mutates the filesystem and never fabricates an
+ExecutionRecord.
 
-The filesystem adapter independently refuses to overwrite a target, even if an
-application-layer precondition check previously passed.
+Unambiguous missing-audit states can propose recovery. Contradictory or missing
+filesystem states require manual review.
 
-## Audit
-
-Every successful move creates an immutable ExecutionRecord containing:
-
-- ActionPlan ID
-- operation kind
-- source and target
-- operator
-- timestamp
-
-## Compensation
-
-SQLite and filesystem mutation cannot share one atomic transaction. If the file
-move succeeds but persistence of its audit record fails, Orion attempts a
-compensating move back to the original location.
-
-A later milestone will strengthen crash recovery and reconciliation for failures
-that occur between filesystem mutation and audit persistence.
+This separation keeps detection observable and reviewable before any repair is
+attempted.
