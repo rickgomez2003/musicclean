@@ -1,7 +1,23 @@
 # Book 05 — Service Contracts
 
-**Status:** Living specification
+**Status:** Active specification
 
-This book is part of the MusicClean Orion Engineering Manual. It will mature in reviewable increments as its subsystem enters design and implementation.
+## Persistence ports
 
-Mature sections: purpose/scope, terminology, boundaries, contracts, data model, events, failure modes, observability, performance budgets, safety, tests, compatibility/migration, limitations, future considerations.
+The first Orion service contracts are repository and Unit-of-Work ports.
+
+### Why ports first
+
+Application behavior should be specified independently from its eventual
+persistence implementation.
+
+### Contract style
+
+Ports use Python `Protocol` interfaces. Implementations may be:
+
+- SQLite adapters;
+- test in-memory adapters;
+- future server/remote adapters where appropriate.
+
+The contracts describe behavior needed by Orion. They are not mirrors of
+database tables.
