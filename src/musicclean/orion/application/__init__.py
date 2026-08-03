@@ -18,10 +18,7 @@ from musicclean.orion.application.filesystem_sync import (
     SyncDecision,
     classify_observation,
 )
-from musicclean.orion.application.generate_decisions import (
-    GenerateDecisions,
-    generate_decisions,
-)
+from musicclean.orion.application.generate_decisions import GenerateDecisions, generate_decisions
 from musicclean.orion.application.infer_knowledge import InferKnowledge, infer_knowledge
 from musicclean.orion.application.knowledge_rules import (
     CoreMetadataCompleteRule,
@@ -29,9 +26,16 @@ from musicclean.orion.application.knowledge_rules import (
     KnowledgeRule,
     latest_evidence_by_kind,
 )
-from musicclean.orion.application.list_album_editions import (
-    ListAlbumEditions,
-    list_album_editions,
+from musicclean.orion.application.list_album_editions import ListAlbumEditions, list_album_editions
+from musicclean.orion.application.operational_hardening import (
+    AcquirePlanLease,
+    BeginIdempotentOperation,
+    StartupRecoverySweep,
+    acquire_plan_lease,
+    begin_idempotent_operation,
+    complete_idempotent_operation,
+    release_plan_lease,
+    startup_recovery_sweep,
 )
 from musicclean.orion.application.read_metadata import ReadMetadata, read_metadata
 from musicclean.orion.application.reconcile_execution import (
@@ -45,10 +49,7 @@ from musicclean.orion.application.recovery_actions import (
     apply_recovery,
     approve_recovery,
 )
-from musicclean.orion.application.register_audio_file import (
-    RegisterAudioFile,
-    register_audio_file,
-)
+from musicclean.orion.application.register_audio_file import RegisterAudioFile, register_audio_file
 from musicclean.orion.application.review_execution import (
     AuthorizeDecision,
     PlannedQuarantine,
@@ -71,10 +72,12 @@ from musicclean.orion.application.synchronize_filesystem import (
 )
 
 __all__ = [
+    "AcquirePlanLease",
     "ApplicationError",
     "ApplyRecovery",
     "ApproveRecovery",
     "AuthorizeDecision",
+    "BeginIdempotentOperation",
     "CollectMetadataEvidence",
     "ConflictError",
     "CoreMetadataCompleteRule",
@@ -97,16 +100,20 @@ __all__ = [
     "RegisterAudioFile",
     "RestoreQuarantine",
     "ReviewDecision",
+    "StartupRecoverySweep",
     "SyncChange",
     "SyncDecision",
     "SynchronizationSummary",
     "SynchronizeFilesystem",
+    "acquire_plan_lease",
     "apply_recovery",
     "approve_recovery",
     "authorize_decision",
+    "begin_idempotent_operation",
     "classify_observation",
     "classify_reconciliation",
     "collect_metadata_evidence",
+    "complete_idempotent_operation",
     "create_library",
     "execute_quarantine",
     "generate_decisions",
@@ -118,7 +125,9 @@ __all__ = [
     "read_metadata",
     "reconcile_action_plan",
     "register_audio_file",
+    "release_plan_lease",
     "restore_quarantine",
     "review_decision",
+    "startup_recovery_sweep",
     "synchronize_filesystem",
 ]

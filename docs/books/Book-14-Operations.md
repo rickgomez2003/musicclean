@@ -2,44 +2,33 @@
 
 **Status:** Active specification
 
-## Safe action lifecycle
+## Operational hardening
 
-```text
-Decision
-  -> Review
-  -> Authorization
-  -> ActionPlan
-  -> Filesystem execution
-  -> ExecutionRecord
-  -> Reconciliation
-  -> Recovery Approval
-  -> Recovery Record
-```
+0.6.15 adds coordination primitives for real-world retries, concurrency, and
+startup recovery.
 
-## Recovery policy
+### Idempotency
 
-0.6.14 implements the repair side of reconciliation.
+Persisted idempotency keys allow callers to retry a command without creating a
+new logical operation each time.
 
-The governing rule is:
+### Per-plan leases
 
-> detect automatically, repair deliberately.
+A time-bounded lease coordinates work against one ActionPlan.
 
-A finding that proposes audit recovery cannot repair itself. An operator must
-approve that specific finding.
+- same owner may observe its existing active lease
+- different owner is blocked while the lease is active
+- an expired lease may be replaced
+- only the lease owner may release it
 
-Immediately before recovery Orion checks the filesystem again. If the live state
-no longer matches the approved recovery condition, the operation is refused.
+### Startup reconciliation sweep
 
-## Recovered audit history
+At startup Orion can enumerate ActionPlans and run reconciliation for each one.
 
-Recovery never moves the file.
+The startup sweep is detection-only. It never performs filesystem mutation or
+audit recovery automatically.
 
-It creates the missing ExecutionRecord with:
+## Next hardening step
 
-- `origin = recovered`
-- `recovery_finding_id = <finding>`
-
-A RecoveryRecord separately preserves the approval and repair history.
-
-This prevents reconstructed history from being indistinguishable from an audit
-record written during a normal direct execution.
+Executor/recovery use cases can now be wrapped with leases and idempotency so
+all externally retried commands share the same operational guarantees.

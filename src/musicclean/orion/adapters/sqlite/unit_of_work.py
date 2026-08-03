@@ -10,10 +10,12 @@ from musicclean.orion.adapters.sqlite.connection import connect_sqlite
 from musicclean.orion.adapters.sqlite.decision_repository import SqliteDecisionRepository
 from musicclean.orion.adapters.sqlite.evidence_repository import SqliteEvidenceRepository
 from musicclean.orion.adapters.sqlite.execution_repository import SqliteExecutionRepository
-from musicclean.orion.adapters.sqlite.knowledge_repository import (
-    SqliteKnowledgeRepository,
-)
+from musicclean.orion.adapters.sqlite.knowledge_repository import SqliteKnowledgeRepository
 from musicclean.orion.adapters.sqlite.migrations import migrate
+from musicclean.orion.adapters.sqlite.operational_repositories import (
+    SqliteIdempotencyRepository,
+    SqliteLeaseRepository,
+)
 from musicclean.orion.adapters.sqlite.reconciliation_repository import (
     SqliteReconciliationRepository,
 )
@@ -67,6 +69,8 @@ class SqliteUnitOfWork:
         self.reconciliations = SqliteReconciliationRepository(connection)
         self.recovery_approvals = SqliteRecoveryApprovalRepository(connection)
         self.recoveries = SqliteRecoveryRepository(connection)
+        self.idempotency = SqliteIdempotencyRepository(connection)
+        self.leases = SqliteLeaseRepository(connection)
         return self
 
     def __exit__(

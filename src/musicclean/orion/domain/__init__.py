@@ -23,6 +23,11 @@ from musicclean.orion.domain.knowledge import (
     KnowledgeValue,
 )
 from musicclean.orion.domain.library import Library
+from musicclean.orion.domain.operations import (
+    ActionPlanLease,
+    IdempotencyRecord,
+    IdempotencyStatus,
+)
 from musicclean.orion.domain.reconciliation import (
     ReconciliationAction,
     ReconciliationFinding,
@@ -46,6 +51,7 @@ from musicclean.orion.domain.track_appearance import TrackAppearance
 
 __all__ = [
     "ActionPlan",
+    "ActionPlanLease",
     "Album",
     "Artist",
     "AudioFile",
@@ -62,6 +68,8 @@ __all__ = [
     "ExecutionKind",
     "ExecutionOrigin",
     "ExecutionRecord",
+    "IdempotencyRecord",
+    "IdempotencyStatus",
     "KnowledgeFact",
     "KnowledgeKind",
     "KnowledgeValue",

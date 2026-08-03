@@ -166,3 +166,9 @@ class SqliteActionPlanRepository:
             (str(decision_id),),
         ).fetchall()
         return tuple(self._from_row(row) for row in rows)
+
+    def list_all(self) -> tuple[ActionPlan, ...]:
+        rows = self._connection.execute(
+            "SELECT * FROM orion_action_plans ORDER BY created_at, id"
+        ).fetchall()
+        return tuple(self._from_row(row) for row in rows)

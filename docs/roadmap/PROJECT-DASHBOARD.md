@@ -15,5 +15,6 @@
 | Review / Authorization | Complete (0.6.11) | Review and action planning |
 | Safe Executor | Complete (0.6.12) | Quarantine, restore, execution audit |
 | Reconciliation | Complete (0.6.13) | Crash-gap detection |
-| Recovery Actions | Active (0.6.14) | Explicit approval + recovered audit history |
-| Operational Hardening | Next | Idempotency, concurrency, leases, startup recovery |
+| Recovery Actions | Complete (0.6.14) | Approved audit recovery |
+| Operational Hardening | Active (0.6.15) | Idempotency, leases, startup sweep |
+| Executor Coordination | Next | Integrate leases/idempotency into execution paths |

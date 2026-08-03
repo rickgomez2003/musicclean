@@ -16,7 +16,9 @@ from musicclean.orion.ports.repositories import (
     EditionRepository,
     EvidenceRepository,
     ExecutionRepository,
+    IdempotencyRepository,
     KnowledgeRepository,
+    LeaseRepository,
     LibraryRepository,
     ReconciliationRepository,
     RecordingRepository,
@@ -46,16 +48,16 @@ class UnitOfWork(Protocol):
     reconciliations: ReconciliationRepository
     recovery_approvals: RecoveryApprovalRepository
     recoveries: RecoveryRepository
+    idempotency: IdempotencyRepository
+    leases: LeaseRepository
 
     def __enter__(self) -> Self: ...
-
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
         traceback: TracebackType | None,
     ) -> bool | None: ...
-
     def commit(self) -> None: ...
     def rollback(self) -> None: ...
 
