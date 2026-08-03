@@ -12,6 +12,7 @@ from musicclean.orion.domain.evidence import (
     EvidenceRecord,
     EvidenceValue,
 )
+from musicclean.orion.domain.execution import ExecutionKind, ExecutionRecord
 from musicclean.orion.domain.knowledge import (
     KnowledgeFact,
     KnowledgeKind,
@@ -44,6 +45,8 @@ __all__ = [
     "EvidenceProvenance",
     "EvidenceRecord",
     "EvidenceValue",
+    "ExecutionKind",
+    "ExecutionRecord",
     "KnowledgeFact",
     "KnowledgeKind",
     "KnowledgeValue",

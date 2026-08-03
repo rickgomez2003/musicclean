@@ -12,5 +12,6 @@
 | Evidence | Complete (0.6.8) | Persistent observations |
 | Knowledge | Complete (0.6.9) | Versioned inference |
 | Decisions | Complete (0.6.10) | Explainable recommendations |
-| Review / Authorization | Active (0.6.11) | Review, approval, action planning, undo metadata |
-| Safe Executor | Next | Preconditions, quarantine execution, audit, restore |
+| Review / Authorization | Complete (0.6.11) | Review and action planning |
+| Safe Executor | Active (0.6.12) | Preconditions, quarantine, restore, audit |
+| Recovery / Reconciliation | Next | Crash recovery and filesystem/DB reconciliation |

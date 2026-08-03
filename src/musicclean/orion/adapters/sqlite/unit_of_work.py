@@ -9,6 +9,9 @@ from types import TracebackType
 from musicclean.orion.adapters.sqlite.connection import connect_sqlite
 from musicclean.orion.adapters.sqlite.decision_repository import SqliteDecisionRepository
 from musicclean.orion.adapters.sqlite.evidence_repository import SqliteEvidenceRepository
+from musicclean.orion.adapters.sqlite.execution_repository import (
+    SqliteExecutionRepository,
+)
 from musicclean.orion.adapters.sqlite.knowledge_repository import (
     SqliteKnowledgeRepository,
 )
@@ -55,6 +58,7 @@ class SqliteUnitOfWork:
         self.reviews = SqliteReviewRepository(connection)
         self.authorizations = SqliteAuthorizationRepository(connection)
         self.action_plans = SqliteActionPlanRepository(connection)
+        self.executions = SqliteExecutionRepository(connection)
         return self
 
     def __exit__(

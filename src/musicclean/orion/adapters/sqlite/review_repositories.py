@@ -63,6 +63,23 @@ class SqliteAuthorizationRepository:
     def __init__(self, connection: sqlite3.Connection) -> None:
         self._connection = connection
 
+    @staticmethod
+    def _from_row(row: sqlite3.Row) -> AuthorizationGrant:
+        return AuthorizationGrant(
+            id=EntityId.parse(str(row["id"])),
+            decision_id=EntityId.parse(str(row["decision_id"])),
+            review_id=EntityId.parse(str(row["review_id"])),
+            granted_by=str(row["granted_by"]),
+            granted_at=datetime.fromisoformat(str(row["granted_at"])),
+        )
+
+    def get(self, authorization_id: EntityId) -> AuthorizationGrant | None:
+        row = self._connection.execute(
+            "SELECT * FROM orion_authorizations WHERE id = ?",
+            (str(authorization_id),),
+        ).fetchone()
+        return None if row is None else self._from_row(row)
+
     def save(self, grant: AuthorizationGrant) -> None:
         self._connection.execute(
             """
@@ -93,15 +110,7 @@ class SqliteAuthorizationRepository:
             """,
             (str(decision_id),),
         ).fetchone()
-        if row is None:
-            return None
-        return AuthorizationGrant(
-            id=EntityId.parse(str(row["id"])),
-            decision_id=EntityId.parse(str(row["decision_id"])),
-            review_id=EntityId.parse(str(row["review_id"])),
-            granted_by=str(row["granted_by"]),
-            granted_at=datetime.fromisoformat(str(row["granted_at"])),
-        )
+        return None if row is None else self._from_row(row)
 
 
 class SqliteActionPlanRepository:

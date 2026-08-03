@@ -15,6 +15,7 @@ from musicclean.orion.ports.repositories import (
     DiscRepository,
     EditionRepository,
     EvidenceRepository,
+    ExecutionRepository,
     KnowledgeRepository,
     LibraryRepository,
     RecordingRepository,
@@ -38,6 +39,7 @@ class UnitOfWork(Protocol):
     reviews: ReviewRepository
     authorizations: AuthorizationRepository
     action_plans: ActionPlanRepository
+    executions: ExecutionRepository
 
     def __enter__(self) -> Self: ...
 
