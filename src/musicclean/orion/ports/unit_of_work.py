@@ -1,4 +1,4 @@
-"""Unit-of-work port for atomic application use cases."""
+"""Unit-of-work ports for atomic application use cases."""
 
 from __future__ import annotations
 
@@ -40,3 +40,9 @@ class UnitOfWork(Protocol):
 
     def commit(self) -> None: ...
     def rollback(self) -> None: ...
+
+
+class UnitOfWorkFactory(Protocol):
+    """Factory for creating a fresh UnitOfWork per application operation."""
+
+    def __call__(self) -> UnitOfWork: ...
