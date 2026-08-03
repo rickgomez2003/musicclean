@@ -1,0 +1,16 @@
+name: Bug report
+description: Report reproducible incorrect behavior
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes: {label: Summary}
+    validations: {required: true}
+  - type: textarea
+    id: reproduce
+    attributes: {label: Steps to reproduce}
+    validations: {required: true}
+  - type: textarea
+    id: environment
+    attributes: {label: Environment, description: "OS, MusicClean/Python/tool versions, filesystem/NAS details."}

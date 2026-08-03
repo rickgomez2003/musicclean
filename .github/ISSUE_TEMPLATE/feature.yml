@@ -1,0 +1,16 @@
+name: Feature request
+description: Propose a MusicClean capability
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes: {label: Problem}
+    validations: {required: true}
+  - type: textarea
+    id: outcome
+    attributes: {label: Desired outcome}
+    validations: {required: true}
+  - type: textarea
+    id: architecture
+    attributes: {label: Architecture considerations}

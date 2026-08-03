@@ -1,0 +1,9 @@
+erDiagram
+ ALBUM ||--o{ EDITION : has
+ EDITION ||--o{ DISC : contains
+ DISC ||--o{ TRACK_APPEARANCE : orders
+ RECORDING ||--o{ TRACK_APPEARANCE : appears_as
+ RECORDING ||--o{ AUDIO_FILE : represented_by
+ AUDIO_FILE ||--o{ EVIDENCE : produces
+ EVIDENCE }o--o{ KNOWLEDGE : supports
+ KNOWLEDGE }o--o{ DECISION : supports
