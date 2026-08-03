@@ -1,4 +1,4 @@
-"""SQLite repositories for idempotency and action-plan leases."""
+"""SQLite repositories for idempotency and atomic action-plan leases."""
 
 from __future__ import annotations
 
@@ -74,13 +74,8 @@ class SqliteLeaseRepository:
     def __init__(self, connection: sqlite3.Connection) -> None:
         self._connection = connection
 
-    def get_for_plan(self, plan_id: EntityId) -> ActionPlanLease | None:
-        row = self._connection.execute(
-            "SELECT * FROM orion_action_plan_leases WHERE action_plan_id = ?",
-            (str(plan_id),),
-        ).fetchone()
-        if row is None:
-            return None
+    @staticmethod
+    def _from_row(row: sqlite3.Row) -> ActionPlanLease:
         return ActionPlanLease(
             id=EntityId.parse(str(row["id"])),
             action_plan_id=EntityId.parse(str(row["action_plan_id"])),
@@ -89,8 +84,19 @@ class SqliteLeaseRepository:
             expires_at=datetime.fromisoformat(str(row["expires_at"])),
         )
 
-    def acquire(self, lease: ActionPlanLease) -> None:
-        self._connection.execute(
+    def get_for_plan(self, plan_id: EntityId) -> ActionPlanLease | None:
+        row = self._connection.execute(
+            "SELECT * FROM orion_action_plan_leases WHERE action_plan_id = ?",
+            (str(plan_id),),
+        ).fetchone()
+        return None if row is None else self._from_row(row)
+
+    def try_acquire(
+        self,
+        lease: ActionPlanLease,
+        now: datetime,
+    ) -> ActionPlanLease | None:
+        cursor = self._connection.execute(
             """
             INSERT INTO orion_action_plan_leases(
                 id, action_plan_id, owner, acquired_at, expires_at
@@ -101,6 +107,9 @@ class SqliteLeaseRepository:
                 owner = excluded.owner,
                 acquired_at = excluded.acquired_at,
                 expires_at = excluded.expires_at
+            WHERE
+                orion_action_plan_leases.expires_at <= ?
+                OR orion_action_plan_leases.owner = excluded.owner
             """,
             (
                 str(lease.id),
@@ -108,8 +117,12 @@ class SqliteLeaseRepository:
                 lease.owner,
                 lease.acquired_at.isoformat(),
                 lease.expires_at.isoformat(),
+                now.isoformat(),
             ),
         )
+        if cursor.rowcount == 0:
+            return None
+        return lease
 
     def release(self, plan_id: EntityId, owner: str) -> None:
         self._connection.execute(

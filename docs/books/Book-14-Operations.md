@@ -2,33 +2,53 @@
 
 **Status:** Active specification
 
-## Operational hardening
+## Coordinated execution
 
-0.6.15 adds coordination primitives for real-world retries, concurrency, and
-startup recovery.
+0.6.16 connects operational-hardening primitives to real executor paths.
 
-### Idempotency
+A coordinated command now follows:
 
-Persisted idempotency keys allow callers to retry a command without creating a
-new logical operation each time.
+```text
+Idempotency Key
+    ↓
+Atomic ActionPlan Lease
+    ↓
+Executor / Recovery Use Case
+    ↓
+Persisted Result
+    ↓
+Idempotency Completion
+    ↓
+Lease Release
+```
 
-### Per-plan leases
+## Atomic lease acquisition
 
-A time-bounded lease coordinates work against one ActionPlan.
+SQLite uses a single conditional UPSERT.
 
-- same owner may observe its existing active lease
-- different owner is blocked while the lease is active
-- an expired lease may be replaced
-- only the lease owner may release it
+A lease can be written when:
 
-### Startup reconciliation sweep
+- no lease exists;
+- the existing lease is expired; or
+- the existing lease belongs to the same owner.
 
-At startup Orion can enumerate ActionPlans and run reconciliation for each one.
+An active lease owned by another worker is not modified.
 
-The startup sweep is detection-only. It never performs filesystem mutation or
-audit recovery automatically.
+## Idempotent result handling
 
-## Next hardening step
+If an idempotency key is already COMPLETED, the coordinated path retrieves and
+returns the existing ExecutionRecord or RecoveryRecord.
 
-Executor/recovery use cases can now be wrapped with leases and idempotency so
-all externally retried commands share the same operational guarantees.
+It does not repeat the filesystem mutation.
+
+An idempotency key is permanently associated with its operation and subject.
+A collision with another logical command is rejected.
+
+## Failure cleanup
+
+Lease release occurs in a `finally` block. This handles ordinary application
+exceptions.
+
+A hard process crash may still leave the lease persisted until expiration,
+which is intentional. Startup reconciliation and lease expiry provide the
+recovery path.
