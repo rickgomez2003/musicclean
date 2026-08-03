@@ -4,9 +4,11 @@ from musicclean.orion.ports.repositories import (
     AlbumRepository,
     ArtistRepository,
     AudioFileRepository,
+    DiscRepository,
     EditionRepository,
     LibraryRepository,
     RecordingRepository,
+    TrackAppearanceRepository,
 )
 from musicclean.orion.ports.unit_of_work import UnitOfWork
 
@@ -14,8 +16,10 @@ __all__ = [
     "AlbumRepository",
     "ArtistRepository",
     "AudioFileRepository",
+    "DiscRepository",
     "EditionRepository",
     "LibraryRepository",
     "RecordingRepository",
+    "TrackAppearanceRepository",
     "UnitOfWork",
 ]

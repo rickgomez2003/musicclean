@@ -9,24 +9,24 @@ from musicclean.orion.ports.repositories import (
     AlbumRepository,
     ArtistRepository,
     AudioFileRepository,
+    DiscRepository,
     EditionRepository,
     LibraryRepository,
     RecordingRepository,
+    TrackAppearanceRepository,
 )
 
 
 class UnitOfWork(Protocol):
-    """Atomic persistence boundary for one application use case.
-
-    Concrete adapters may use SQLite transactions, another relational database,
-    or an in-memory implementation for tests.
-    """
+    """Atomic persistence boundary for one application use case."""
 
     libraries: LibraryRepository
     artists: ArtistRepository
     albums: AlbumRepository
     editions: EditionRepository
+    discs: DiscRepository
     recordings: RecordingRepository
+    track_appearances: TrackAppearanceRepository
     audio_files: AudioFileRepository
 
     def __enter__(self) -> Self: ...

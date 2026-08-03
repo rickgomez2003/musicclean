@@ -5,9 +5,9 @@
 | Architecture | Active | ADRs and dependency rules |
 | Shared Kernel | Complete (0.6.1) | Stable primitives and value objects |
 | Domain | Complete (0.6.2) | Core entities and relationships |
-| Persistence Ports | Active (0.6.3) | Repository + Unit-of-Work contracts |
-| Persistence Adapter | Next | SQLite schema, migrations, repositories |
-| Application | Planned | Use cases, commands, queries |
+| Persistence Ports | Complete (0.6.3) | Repository + Unit-of-Work contracts |
+| SQLite Adapter | Active (0.6.4) | Schema, migrations, repositories, transactions |
+| Application | Next | First use cases and application services |
 | Scanner | Prototype | Rebuild as synchronizer |
 | Metadata | Prototype | Move behind provider ports |
 | Evidence | Planned | Provenance model |
