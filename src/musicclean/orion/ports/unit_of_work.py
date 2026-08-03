@@ -9,6 +9,7 @@ from musicclean.orion.ports.repositories import (
     AlbumRepository,
     ArtistRepository,
     AudioFileRepository,
+    DecisionRepository,
     DiscRepository,
     EditionRepository,
     EvidenceRepository,
@@ -30,6 +31,7 @@ class UnitOfWork(Protocol):
     audio_files: AudioFileRepository
     evidence: EvidenceRepository
     knowledge: KnowledgeRepository
+    decisions: DecisionRepository
 
     def __enter__(self) -> Self: ...
 

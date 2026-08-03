@@ -1,6 +1,7 @@
 """SQLite persistence adapter for Orion."""
 
 from musicclean.orion.adapters.sqlite.connection import connect_sqlite
+from musicclean.orion.adapters.sqlite.decision_repository import SqliteDecisionRepository
 from musicclean.orion.adapters.sqlite.evidence_repository import SqliteEvidenceRepository
 from musicclean.orion.adapters.sqlite.knowledge_repository import (
     SqliteKnowledgeRepository,
@@ -10,6 +11,7 @@ from musicclean.orion.adapters.sqlite.unit_of_work import SqliteUnitOfWork
 
 __all__ = [
     "CURRENT_SCHEMA_VERSION",
+    "SqliteDecisionRepository",
     "SqliteEvidenceRepository",
     "SqliteKnowledgeRepository",
     "SqliteUnitOfWork",
