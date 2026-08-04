@@ -2,5 +2,10 @@
 
 from musicclean.orion.adapters.http_host.app import create_fastapi_app
 from musicclean.orion.adapters.http_host.config import HttpHostConfig
+from musicclean.orion.adapters.http_host.security import OrionSecurityMiddleware
 
-__all__ = ["HttpHostConfig", "create_fastapi_app"]
+__all__ = [
+    "HttpHostConfig",
+    "OrionSecurityMiddleware",
+    "create_fastapi_app",
+]

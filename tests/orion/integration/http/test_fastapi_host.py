@@ -17,7 +17,10 @@ class FakeService:
 
 def _client() -> TestClient:
     service = cast(OrionService, cast(Any, FakeService()))
-    return TestClient(create_fastapi_app(service))
+    return TestClient(
+        create_fastapi_app(service),
+        base_url="http://localhost",
+    )
 
 
 def test_fastapi_health_route() -> None:

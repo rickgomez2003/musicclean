@@ -5,20 +5,25 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import Body, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from musicclean.orion.adapters.http import HttpRequest, HttpResponse, RestApiAdapter
 from musicclean.orion.adapters.http_host.config import HttpHostConfig
 from musicclean.orion.adapters.http_host.models import ActionRequestBody
+from musicclean.orion.adapters.http_host.security import OrionSecurityMiddleware
+from musicclean.orion.adapters.http_host.security_policy import RuntimeSecurityPolicy
 from musicclean.orion.application import OrionService
 
 
 def create_fastapi_app(
     service: OrionService,
     config: HttpHostConfig | None = None,
+    security: RuntimeSecurityPolicy | None = None,
 ) -> FastAPI:
-    """Create an ASGI application around the framework-neutral REST adapter."""
     resolved = config or HttpHostConfig()
+    policy = security or RuntimeSecurityPolicy(api_key=None)
     adapter = RestApiAdapter(service)
 
     app = FastAPI(
@@ -28,6 +33,19 @@ def create_fastapi_app(
         redoc_url=resolved.redoc_url,
         openapi_url=resolved.openapi_url,
     )
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=list(policy.allowed_hosts),
+    )
+    if policy.allowed_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=list(policy.allowed_origins),
+            allow_credentials=False,
+            allow_methods=["GET", "POST"],
+            allow_headers=["content-type", "x-api-key"],
+        )
+    app.add_middleware(OrionSecurityMiddleware, policy=policy)
 
     def convert(response: HttpResponse) -> JSONResponse:
         return JSONResponse(

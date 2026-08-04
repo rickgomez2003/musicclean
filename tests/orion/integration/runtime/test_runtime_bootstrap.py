@@ -20,7 +20,10 @@ def test_runtime_bootstrap_migrates_database_and_serves_health(
     assert db_path.exists()
     assert runtime.schema_version == CURRENT_SCHEMA_VERSION
 
-    response = TestClient(runtime.app).get("/v1/health")
+    response = TestClient(
+        runtime.app,
+        base_url="http://localhost",
+    ).get("/v1/health")
     assert response.status_code == 200
     assert response.json()["schema_version"] == CURRENT_SCHEMA_VERSION
 
