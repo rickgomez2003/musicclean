@@ -1,0 +1,116 @@
+name: Orion Release Candidate
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-candidate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install validation tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,orion-runtime,opentelemetry]"
+          python -m pip install build twine
+
+      - name: Verify source version
+        run: python tools/release/verify_version.py --expected 0.6.29
+
+      - name: Quality gate
+        run: |
+          ruff check .
+          mypy src
+          pytest
+
+      - name: Build candidate artifacts
+        run: |
+          rm -rf dist
+          python -m build
+
+      - name: Verify artifact metadata
+        run: python -m twine check dist/*
+
+      - name: Generate checksums
+        run: python tools/release/checksums.py dist
+
+      - name: Validate candidate artifacts
+        run: python tools/release/validate_candidate.py --dist dist --expected 0.6.29
+
+      - name: Install wheel into clean environment
+        run: |
+          python -m venv release-candidate-smoke
+          release-candidate-smoke/bin/python -m pip install --upgrade pip
+          release-candidate-smoke/bin/python -m pip install "dist/musicclean-0.6.29-py3-none-any.whl[orion-runtime]"
+
+      - name: Verify installed version
+        run: |
+          release-candidate-smoke/bin/python -c "import musicclean; assert musicclean.__version__ == '0.6.29'; print(musicclean.__version__)"
+
+      - name: Runtime health smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          export MUSICCLEAN_ORION_DATABASE="$RUNNER_TEMP/orion-rc.db"
+          export MUSICCLEAN_ORION_HOST="127.0.0.1"
+          export MUSICCLEAN_ORION_PORT="8765"
+
+          release-candidate-smoke/bin/python -m musicclean.orion.runtime &
+          ORION_PID=$!
+
+          cleanup() {
+            kill "$ORION_PID" 2>/dev/null || true
+            wait "$ORION_PID" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          release-candidate-smoke/bin/python - <<'PY'
+          import time
+          import urllib.error
+          import urllib.request
+
+          url = "http://127.0.0.1:8765/v1/health"
+          last_error = None
+
+          for _ in range(30):
+              try:
+                  with urllib.request.urlopen(url, timeout=2) as response:
+                      if response.status != 200:
+                          raise SystemExit(
+                              f"health endpoint returned HTTP {response.status}"
+                          )
+                      print(response.read().decode("utf-8"))
+                      break
+              except (OSError, urllib.error.URLError) as exc:
+                  last_error = exc
+                  time.sleep(1)
+          else:
+              raise SystemExit(f"Orion did not become healthy: {last_error}")
+          PY
+
+      - name: Upload candidate artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: musicclean-0.6.29-release-candidate
+          path: |
+            dist/musicclean-0.6.29-py3-none-any.whl
+            dist/musicclean-0.6.29.tar.gz
+            dist/SHA256SUMS
+          if-no-files-found: error
