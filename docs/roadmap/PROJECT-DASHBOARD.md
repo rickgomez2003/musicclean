@@ -10,5 +10,6 @@
 | Runtime Packaging & Deployment | Complete (0.6.26) |
 | Deployment Automation | Complete (0.6.27) |
 | Release Engineering | Complete (0.6.28) |
-| Release Candidate Validation | Active (0.6.29) |
-| First Controlled Release | Next |
+| Release Candidate Validation | Complete (0.6.29) |
+| First Controlled Release | Active (0.6.30) |
+| Post-Release Verification | Next |
