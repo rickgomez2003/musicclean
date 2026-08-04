@@ -31,3 +31,9 @@ desktop.ini
 # Orion local runtime databases
 orion-test.db
 orion.db
+
+# Python coverage artifacts
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
