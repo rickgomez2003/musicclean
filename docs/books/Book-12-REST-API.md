@@ -2,20 +2,41 @@
 
 **Status:** Active specification
 
-Initial routes:
+## Layering
+
+```text
+ASGI / FastAPI
+      ↓
+RestApiAdapter
+      ↓
+OrionService
+      ↓
+Application
+      ↓
+Ports / Adapters
+```
+
+## Version 1 routes
 
 - `GET /v1/health`
-- `POST /v1/action-plans/{id}/quarantine`
-- `POST /v1/action-plans/{id}/restore`
-- `POST /v1/action-plans/{id}/reconcile`
+- `POST /v1/action-plans/{action_plan_id}/quarantine`
+- `POST /v1/action-plans/{action_plan_id}/restore`
+- `POST /v1/action-plans/{action_plan_id}/reconcile`
 
-The REST adapter maps transport concerns to `OrionService` and never accesses
-SQLite, repositories, UnitOfWork, or the filesystem directly.
+## OpenAPI
 
-Error mapping:
+The FastAPI host exposes:
 
-- 400 invalid request
-- 404 missing route/resource
-- 405 unsupported method
-- 409 state/idempotency/lease conflict
-- 422 other application rejection
+- `/openapi.json`
+- `/docs`
+- `/redoc`
+
+OpenAPI describes only the HTTP contract. Business rules remain behind
+`RestApiAdapter` and `OrionService`.
+
+## Hosting
+
+The ASGI app is created with `create_fastapi_app(service)`.
+
+Production process management and full bootstrap wiring are intentionally
+separate from the host adapter.
