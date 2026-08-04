@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: python -m pip install -U pip
-      - run: python -m pip install -e ".[dev]"
+      - run: python -m pip install -e ".[dev,opentelemetry]"
       - run: ruff check .
       - run: mypy src
       - run: pytest
