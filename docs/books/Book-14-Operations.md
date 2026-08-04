@@ -1,16 +1,19 @@
 # Book 14 — Operations
 
-0.6.25 adds optional OpenTelemetry export over the provider-neutral telemetry
-boundary.
+0.6.26 adds repeatable runtime packaging and deployment artifacts.
 
-Configuration:
+Supported deployment wrappers include:
 
-- `MUSICCLEAN_ORION_OTEL_ENDPOINT`
-- `MUSICCLEAN_ORION_OTEL_SERVICE_NAME`
+- Docker;
+- Linux systemd;
+- Windows PowerShell service wrapper.
 
-OpenTelemetry dependencies remain optional. With no endpoint configured, Orion
-does not import or initialize the OpenTelemetry SDK.
+All deployment forms invoke the same runtime composition root:
 
-Install optional packages with:
+`python -m musicclean.orion.runtime`
 
-`pip install -r requirements/orion-opentelemetry.txt`
+Production runtime dependencies are available through the `orion-runtime`
+optional package extra. OpenTelemetry remains independently optional.
+
+Deployment configuration is environment-driven. Writable database, log, and
+telemetry locations must be explicitly provisioned for the service identity.

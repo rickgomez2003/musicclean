@@ -6,5 +6,6 @@
 | Runtime Security | Complete (0.6.22) |
 | Observability | Complete (0.6.23) |
 | External Telemetry Export | Complete (0.6.24) |
-| OpenTelemetry Integration | Active (0.6.25) |
-| Runtime Packaging & Deployment | Next |
+| OpenTelemetry Integration | Complete (0.6.25) |
+| Runtime Packaging & Deployment | Active (0.6.26) |
+| Deployment Automation | Next |
