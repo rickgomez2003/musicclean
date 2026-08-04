@@ -30,35 +30,77 @@ from musicclean.orion.ports.repositories import (
 
 
 class UnitOfWork(Protocol):
-    libraries: LibraryRepository
-    artists: ArtistRepository
-    albums: AlbumRepository
-    editions: EditionRepository
-    discs: DiscRepository
-    recordings: RecordingRepository
-    track_appearances: TrackAppearanceRepository
-    audio_files: AudioFileRepository
-    evidence: EvidenceRepository
-    knowledge: KnowledgeRepository
-    decisions: DecisionRepository
-    reviews: ReviewRepository
-    authorizations: AuthorizationRepository
-    action_plans: ActionPlanRepository
-    executions: ExecutionRepository
-    reconciliations: ReconciliationRepository
-    recovery_approvals: RecoveryApprovalRepository
-    recoveries: RecoveryRepository
-    idempotency: IdempotencyRepository
-    leases: LeaseRepository
+    @property
+    def libraries(self) -> LibraryRepository: ...
+
+    @property
+    def artists(self) -> ArtistRepository: ...
+
+    @property
+    def albums(self) -> AlbumRepository: ...
+
+    @property
+    def editions(self) -> EditionRepository: ...
+
+    @property
+    def discs(self) -> DiscRepository: ...
+
+    @property
+    def recordings(self) -> RecordingRepository: ...
+
+    @property
+    def track_appearances(self) -> TrackAppearanceRepository: ...
+
+    @property
+    def audio_files(self) -> AudioFileRepository: ...
+
+    @property
+    def evidence(self) -> EvidenceRepository: ...
+
+    @property
+    def knowledge(self) -> KnowledgeRepository: ...
+
+    @property
+    def decisions(self) -> DecisionRepository: ...
+
+    @property
+    def reviews(self) -> ReviewRepository: ...
+
+    @property
+    def authorizations(self) -> AuthorizationRepository: ...
+
+    @property
+    def action_plans(self) -> ActionPlanRepository: ...
+
+    @property
+    def executions(self) -> ExecutionRepository: ...
+
+    @property
+    def reconciliations(self) -> ReconciliationRepository: ...
+
+    @property
+    def recovery_approvals(self) -> RecoveryApprovalRepository: ...
+
+    @property
+    def recoveries(self) -> RecoveryRepository: ...
+
+    @property
+    def idempotency(self) -> IdempotencyRepository: ...
+
+    @property
+    def leases(self) -> LeaseRepository: ...
 
     def __enter__(self) -> Self: ...
+
     def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
         traceback: TracebackType | None,
     ) -> bool | None: ...
+
     def commit(self) -> None: ...
+
     def rollback(self) -> None: ...
 
 

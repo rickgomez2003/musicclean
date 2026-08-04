@@ -2,24 +2,60 @@
 
 **Status:** Active specification
 
-## Reliability harness
+## Runtime composition
 
-0.6.17 intentionally adds no new production behavior.
+0.6.21 introduces Orion's runtime composition root.
 
-The milestone adds fault-injection and invariant tests around execution,
-reconciliation, idempotency, leases, and audit history.
+```text
+RuntimeConfig
+     ↓
+SQLite Migration
+     ↓
+LocalFilesystemMutator
+     ↓
+UtcSystemClock
+     ↓
+SqliteUnitOfWork Factory
+     ↓
+OrionService
+     ↓
+FastAPI Host
+     ↓
+Uvicorn
+```
 
-The acceptance target is stronger than "the command succeeds": safety
-invariants must remain true when operations fail, retry, overlap, restart, or
-encounter stale state.
+## Launch
 
-## Verified invariants
+```powershell
+python -m musicclean.orion.runtime `
+    --database .\orion.db `
+    --host 127.0.0.1 `
+    --port 8765
+```
 
-- failed filesystem moves do not create execution audit records;
-- post-move/pre-audit crash state is detected without filesystem mutation;
-- completed idempotency keys remain stable under retry;
-- active leases exclude other workers;
-- expired leases can be taken over;
-- a previous lease owner cannot release the replacement lease;
-- a successful quarantine/restore lifecycle records exactly one event of each
-  kind and returns the file to its source location.
+The default listener is localhost-only.
+
+## Environment configuration
+
+Supported environment variables:
+
+- `MUSICCLEAN_ORION_DATABASE`
+- `MUSICCLEAN_ORION_HOST`
+- `MUSICCLEAN_ORION_PORT`
+- `MUSICCLEAN_ORION_LOG_LEVEL`
+- `MUSICCLEAN_ORION_STARTUP_RECONCILE`
+
+## Startup sequence
+
+Before serving HTTP, runtime bootstrap:
+
+1. creates the database parent directory when required;
+2. connects to SQLite;
+3. applies all Orion migrations;
+4. verifies the resulting schema version;
+5. constructs concrete adapters;
+6. constructs `OrionService`;
+7. optionally performs the detection-only startup reconciliation sweep;
+8. constructs the FastAPI application.
+
+No recovery action is automatically approved or applied during startup.
