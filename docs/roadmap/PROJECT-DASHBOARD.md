@@ -21,5 +21,6 @@
 | Reliability Harness | Complete (0.6.17) | Fault invariants |
 | Service Boundary | Complete (0.6.18) | Stable facade |
 | REST API Adapter | Complete (0.6.19) | Versioned HTTP contract |
-| HTTP Host / OpenAPI | Active (0.6.20) | FastAPI ASGI host |
-| Runtime Bootstrap | Next | Config, DB, filesystem, startup/shutdown wiring |
+| HTTP Host / OpenAPI | Complete (0.6.20) | FastAPI ASGI host |
+| Runtime Bootstrap | Active (0.6.21) | Runnable composition root |
+| Runtime Security | Next | Authentication, CORS, binding policy, API protection |
