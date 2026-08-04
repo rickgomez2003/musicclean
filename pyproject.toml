@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "musicclean"
-version = "0.5.0"
+dynamic = ["version"]
 description = "Intelligent music library cleanup, duplicate detection, and metadata analysis."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -46,6 +46,9 @@ opentelemetry = [
 
 [project.scripts]
 musicclean = "musicclean.cli:app"
+
+[tool.hatch.version]
+path = "src/musicclean/version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/musicclean"]

@@ -1,15 +1,16 @@
 # Book 14 — Operations
 
-0.6.27 adds deployment automation over the existing runtime packaging layer.
+0.6.28 adds release engineering around the packaged Orion runtime.
 
-Automation now covers:
+Release engineering now provides:
 
-- Linux installation/update with systemd;
-- Windows runtime provisioning;
-- deployment preflight validation;
-- post-start health verification;
-- Docker build validation in CI.
+- one package/runtime version source;
+- semantic release-tag validation;
+- wheel and source-distribution builds;
+- metadata verification;
+- SHA-256 artifact checksums;
+- built-wheel smoke testing;
+- GitHub Release automation.
 
-Deployment scripts are intended to be idempotent. Existing configuration is
-preserved where possible, and a deployment is not considered successful until
-the Orion health endpoint responds successfully.
+Release tags must match the authoritative package version before artifacts can
+be published as a GitHub Release.

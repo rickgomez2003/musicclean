@@ -8,6 +8,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 
+from musicclean import __version__
 from musicclean.orion.adapters.filesystem import LocalFilesystemMutator
 from musicclean.orion.adapters.http_host import HttpHostConfig, create_fastapi_app
 from musicclean.orion.adapters.http_host.security_policy import RuntimeSecurityPolicy
@@ -37,7 +38,7 @@ from musicclean.orion.ports import UnitOfWork
 from musicclean.orion.runtime.clock import UtcSystemClock
 from musicclean.orion.runtime.config import RuntimeConfig
 
-ORION_RUNTIME_VERSION = "0.6.25"
+ORION_RUNTIME_VERSION = __version__
 
 
 class SqliteUnitOfWorkFactory:

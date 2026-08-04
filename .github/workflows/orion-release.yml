@@ -1,0 +1,60 @@
+name: Orion Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install release tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,orion-runtime,opentelemetry]"
+          python -m pip install build twine
+
+      - name: Verify tag matches package version
+        run: python tools/release/verify_version.py --tag "${GITHUB_REF_NAME}"
+
+      - name: Run quality gate
+        run: |
+          ruff check .
+          mypy src
+          pytest
+
+      - name: Build wheel and source distribution
+        run: python -m build
+
+      - name: Verify package metadata
+        run: python -m twine check dist/*
+
+      - name: Generate SHA-256 checksums
+        run: python tools/release/checksums.py dist
+
+      - name: Smoke test built wheel
+        run: |
+          python -m venv release-smoke
+          release-smoke/bin/python -m pip install --upgrade pip
+          release-smoke/bin/python -m pip install dist/*.whl
+          release-smoke/bin/python -c "import musicclean; print(musicclean.__version__)"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}"             dist/*             --verify-tag             --generate-notes             --title "MusicClean ${GITHUB_REF_NAME}"

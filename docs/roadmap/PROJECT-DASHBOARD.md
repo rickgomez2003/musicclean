@@ -8,5 +8,6 @@
 | External Telemetry Export | Complete (0.6.24) |
 | OpenTelemetry Integration | Complete (0.6.25) |
 | Runtime Packaging & Deployment | Complete (0.6.26) |
-| Deployment Automation | Active (0.6.27) |
-| Release Engineering | Next |
+| Deployment Automation | Complete (0.6.27) |
+| Release Engineering | Active (0.6.28) |
+| Release Candidate Validation | Next |
