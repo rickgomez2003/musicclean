@@ -31,7 +31,10 @@ jobs:
           python -m pip install build twine
 
       - name: Verify source version
-        run: python tools/release/verify_version.py --expected 0.6.29
+        run: python tools/release/verify_version.py --expected 0.6.30
+
+      - name: Verify controlled-release readiness
+        run: python tools/release/verify_controlled_release.py --expected 0.6.30
 
       - name: Quality gate
         run: |
@@ -51,17 +54,17 @@ jobs:
         run: python tools/release/checksums.py dist
 
       - name: Validate candidate artifacts
-        run: python tools/release/validate_candidate.py --dist dist --expected 0.6.29
+        run: python tools/release/validate_candidate.py --dist dist --expected 0.6.30
 
       - name: Install wheel into clean environment
         run: |
           python -m venv release-candidate-smoke
           release-candidate-smoke/bin/python -m pip install --upgrade pip
-          release-candidate-smoke/bin/python -m pip install "dist/musicclean-0.6.29-py3-none-any.whl[orion-runtime]"
+          release-candidate-smoke/bin/python -m pip install "dist/musicclean-0.6.30-py3-none-any.whl[orion-runtime]"
 
       - name: Verify installed version
         run: |
-          release-candidate-smoke/bin/python -c "import musicclean; assert musicclean.__version__ == '0.6.29'; print(musicclean.__version__)"
+          release-candidate-smoke/bin/python -c "import musicclean; assert musicclean.__version__ == '0.6.30'; print(musicclean.__version__)"
 
       - name: Runtime health smoke test
         shell: bash
@@ -108,9 +111,9 @@ jobs:
       - name: Upload candidate artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: musicclean-0.6.29-release-candidate
+          name: musicclean-0.6.30-release-candidate
           path: |
-            dist/musicclean-0.6.29-py3-none-any.whl
-            dist/musicclean-0.6.29.tar.gz
+            dist/musicclean-0.6.30-py3-none-any.whl
+            dist/musicclean-0.6.30.tar.gz
             dist/SHA256SUMS
           if-no-files-found: error

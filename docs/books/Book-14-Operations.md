@@ -1,17 +1,16 @@
 # Book 14 — Operations
 
-0.6.29 adds release-candidate validation from built artifacts.
+0.6.30 establishes the first controlled release procedure.
 
-Before a release tag is created, CI now proves that the candidate wheel and
-source distribution are internally consistent and operational.
+A release tag may be created only from the exact merged commit that has passed
+release-candidate validation.
 
-Validation includes:
+The controlled release procedure requires:
 
-- version and metadata checks;
-- SHA-256 checksum coverage;
-- clean-environment wheel installation;
-- installed-package version verification;
-- Orion startup from the installed wheel;
-- `/v1/health` verification.
-
-The release-candidate workflow does not publish artifacts as a GitHub Release.
+- one authoritative version;
+- a clean merged repository state;
+- successful release-candidate validation;
+- an annotated semantic version tag;
+- immutable published tags;
+- release artifact verification;
+- rollback by forward-fixing to a new version rather than moving an old tag.
