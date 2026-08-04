@@ -18,5 +18,6 @@
 | Recovery Actions | Complete (0.6.14) | Approved audit recovery |
 | Operational Hardening | Complete (0.6.15) | Idempotency, leases, startup sweep |
 | Executor Coordination | Complete (0.6.16) | Atomic leases + idempotent execution |
-| Reliability Harness | Active (0.6.17) | Fault injection + invariant verification |
-| Service Boundary | Next | Stable orchestration/API-facing contracts |
+| Reliability Harness | Complete (0.6.17) | Fault injection + invariant verification |
+| Service Boundary | Active (0.6.18) | Stable transport-neutral facade |
+| API Adapter | Next | HTTP/REST mapping over OrionService |

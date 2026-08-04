@@ -18,14 +18,21 @@ from musicclean.orion.application.decision_rules import (
     MetadataRepairRecommendationRule,
     latest_knowledge_by_kind,
 )
-from musicclean.orion.application.errors import ApplicationError, ConflictError, NotFoundError
+from musicclean.orion.application.errors import (
+    ApplicationError,
+    ConflictError,
+    NotFoundError,
+)
 from musicclean.orion.application.filesystem_sync import (
     FileObservation,
     SyncChange,
     SyncDecision,
     classify_observation,
 )
-from musicclean.orion.application.generate_decisions import GenerateDecisions, generate_decisions
+from musicclean.orion.application.generate_decisions import (
+    GenerateDecisions,
+    generate_decisions,
+)
 from musicclean.orion.application.infer_knowledge import InferKnowledge, infer_knowledge
 from musicclean.orion.application.knowledge_rules import (
     CoreMetadataCompleteRule,
@@ -33,7 +40,10 @@ from musicclean.orion.application.knowledge_rules import (
     KnowledgeRule,
     latest_evidence_by_kind,
 )
-from musicclean.orion.application.list_album_editions import ListAlbumEditions, list_album_editions
+from musicclean.orion.application.list_album_editions import (
+    ListAlbumEditions,
+    list_album_editions,
+)
 from musicclean.orion.application.operational_hardening import (
     AcquirePlanLease,
     BeginIdempotentOperation,
@@ -56,7 +66,10 @@ from musicclean.orion.application.recovery_actions import (
     apply_recovery,
     approve_recovery,
 )
-from musicclean.orion.application.register_audio_file import RegisterAudioFile, register_audio_file
+from musicclean.orion.application.register_audio_file import (
+    RegisterAudioFile,
+    register_audio_file,
+)
 from musicclean.orion.application.review_execution import (
     AuthorizeDecision,
     PlannedQuarantine,
@@ -71,6 +84,17 @@ from musicclean.orion.application.safe_executor import (
     RestoreQuarantine,
     execute_quarantine,
     restore_quarantine,
+)
+from musicclean.orion.application.service import (
+    OrionService,
+    QuarantineRequest,
+    ReconcileRequest,
+    RestoreRequest,
+)
+from musicclean.orion.application.service_models import (
+    ServiceExecutionResult,
+    ServiceHealth,
+    ServiceReconciliationResult,
 )
 from musicclean.orion.application.synchronize_filesystem import (
     SynchronizationSummary,
@@ -102,13 +126,20 @@ __all__ = [
     "ListAlbumEditions",
     "MetadataRepairRecommendationRule",
     "NotFoundError",
+    "OrionService",
     "PlanQuarantine",
     "PlannedQuarantine",
+    "QuarantineRequest",
     "ReadMetadata",
     "ReconcileActionPlan",
+    "ReconcileRequest",
     "RegisterAudioFile",
     "RestoreQuarantine",
+    "RestoreRequest",
     "ReviewDecision",
+    "ServiceExecutionResult",
+    "ServiceHealth",
+    "ServiceReconciliationResult",
     "StartupRecoverySweep",
     "SyncChange",
     "SyncDecision",
