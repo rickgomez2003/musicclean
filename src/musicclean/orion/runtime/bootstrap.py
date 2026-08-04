@@ -17,7 +17,12 @@ from musicclean.orion.adapters.sqlite import (
     connect_sqlite,
     migrate,
 )
-from musicclean.orion.application import OrionService, StartupRecoverySweep, startup_recovery_sweep
+from musicclean.orion.application import (
+    OrionService,
+    StartupRecoverySweep,
+    startup_recovery_sweep,
+)
+from musicclean.orion.observability import RuntimeMetrics, StructuredEventLogger
 from musicclean.orion.ports import UnitOfWork
 from musicclean.orion.runtime.clock import UtcSystemClock
 from musicclean.orion.runtime.config import RuntimeConfig
@@ -37,10 +42,21 @@ class OrionRuntime:
     service: OrionService
     app: FastAPI
     schema_version: int
+    metrics: RuntimeMetrics
 
 
 def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
     config.database_path.parent.mkdir(parents=True, exist_ok=True)
+
+    logger = StructuredEventLogger()
+    logger.info(
+        "runtime_starting",
+        database_path=str(config.database_path),
+        host=config.host,
+        port=config.port,
+        api_key=config.api_key,
+    )
+
     connection = connect_sqlite(config.database_path)
     try:
         schema_version = migrate(connection)
@@ -53,6 +69,7 @@ def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
     filesystem = LocalFilesystemMutator()
     clock = UtcSystemClock()
     uow_factory = SqliteUnitOfWorkFactory(config.database_path)
+
     service = OrionService(
         filesystem=filesystem,
         clock=clock,
@@ -75,8 +92,31 @@ def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
         allowed_origins=config.allowed_origins,
         allowed_hosts=config.allowed_hosts,
     )
-    app = create_fastapi_app(service, HttpHostConfig(version="0.6.22"), security)
-    return OrionRuntime(config, service, app, schema_version)
+
+    metrics = RuntimeMetrics()
+
+    app = create_fastapi_app(
+        service,
+        HttpHostConfig(version="0.6.23"),
+        security,
+        metrics,
+        logger,
+    )
+
+    logger.info(
+        "runtime_started",
+        schema_version=schema_version,
+        host=config.host,
+        port=config.port,
+    )
+
+    return OrionRuntime(
+        config=config,
+        service=service,
+        app=app,
+        schema_version=schema_version,
+        metrics=metrics,
+    )
 
 
 def create_runtime_app(config: RuntimeConfig | None = None) -> FastAPI:

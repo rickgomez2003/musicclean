@@ -1,7 +1,6 @@
 # Book 14 — Operations
 
-0.6.22 adds runtime security.
+0.6.23 adds correlated, secret-safe runtime observability.
 
-Defaults remain localhost-only. Non-local binding requires an API key. CORS is
-disabled unless explicitly configured. Trusted hosts default to localhost and
-127.0.0.1. Request bodies default to a 1 MiB limit.
+Operational telemetry includes request IDs, method/path/status/duration,
+runtime lifecycle events, and in-process request/error metrics.
