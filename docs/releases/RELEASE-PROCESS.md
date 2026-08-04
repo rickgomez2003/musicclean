@@ -2,25 +2,40 @@
 
 MusicClean uses `src/musicclean/version.py` as the authoritative version source.
 
-## Prepare a release
+## Release-candidate validation
 
-1. Update `__version__`.
-2. Update release notes/documentation.
-3. Run the complete local quality and packaging gate.
-4. Merge the release-engineering changes to `develop`.
-5. Promote the intended release commit according to repository policy.
-6. Create an annotated tag matching the package version, for example:
+Before creating a release tag, the intended release commit must pass the
+`Orion Release Candidate` workflow.
 
-   `git tag -a v0.6.28 -m "MusicClean 0.6.28"`
+The workflow:
 
-7. Push the tag:
+1. runs Ruff, MyPy, and Pytest;
+2. builds a wheel and source distribution;
+3. validates package metadata;
+4. generates SHA-256 checksums;
+5. validates artifact names and versions;
+6. installs the wheel into a clean virtual environment;
+7. verifies the installed package version;
+8. starts Orion from the installed wheel;
+9. requires `/v1/health` to return HTTP 200;
+10. uploads the candidate artifacts for inspection.
 
-   `git push origin v0.6.28`
+The release-candidate workflow does not publish a GitHub Release.
 
-The `Orion Release` workflow verifies that the tag matches the package version,
-runs the quality gate, builds wheel/sdist artifacts, validates metadata,
-generates SHA-256 checksums, smoke-tests the built wheel, and creates the GitHub
-Release.
+## Publish a release
 
-A release is never created from a tag whose semantic version disagrees with the
-package version.
+After the release candidate passes:
+
+1. Confirm `src/musicclean/version.py` contains the intended release version.
+2. Confirm the release-candidate workflow is green on the merged release commit.
+3. Create an annotated tag matching the package version, for example:
+
+   `git tag -a v0.6.29 -m "MusicClean 0.6.29"`
+
+4. Push the tag:
+
+   `git push origin v0.6.29`
+
+The `Orion Release` workflow verifies the tag, reruns the quality gate, builds
+wheel/sdist artifacts, validates metadata, generates SHA-256 checksums,
+smoke-tests the built wheel, and creates the GitHub Release.
