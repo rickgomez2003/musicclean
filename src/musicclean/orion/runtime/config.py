@@ -23,6 +23,9 @@ class RuntimeConfig:
     max_request_bytes: int = 1_048_576
     allowed_origins: tuple[str, ...] = ()
     allowed_hosts: tuple[str, ...] = ("127.0.0.1", "localhost")
+    telemetry_jsonl_path: Path | None = None
+    otel_endpoint: str | None = None
+    otel_service_name: str = "musicclean-orion"
 
     def __post_init__(self) -> None:
         if not self.host.strip():
@@ -37,9 +40,14 @@ class RuntimeConfig:
             raise ValueError("allowed_hosts cannot be empty")
         if self.host not in _LOCAL_HOSTS and self.api_key is None:
             raise ValueError("non-local HTTP binding requires an API key")
+        if self.otel_endpoint is not None and not self.otel_endpoint.strip():
+            raise ValueError("otel_endpoint cannot be blank")
+        if not self.otel_service_name.strip():
+            raise ValueError("otel_service_name cannot be blank")
 
     @classmethod
     def from_environment(cls) -> RuntimeConfig:
+        telemetry_path = _optional(os.environ.get("MUSICCLEAN_ORION_TELEMETRY_JSONL"))
         return cls(
             database_path=Path(os.environ.get("MUSICCLEAN_ORION_DATABASE", "orion.db")),
             host=os.environ.get("MUSICCLEAN_ORION_HOST", "127.0.0.1"),
@@ -57,6 +65,12 @@ class RuntimeConfig:
                     "MUSICCLEAN_ORION_ALLOWED_HOSTS",
                     "127.0.0.1,localhost",
                 )
+            ),
+            telemetry_jsonl_path=Path(telemetry_path) if telemetry_path else None,
+            otel_endpoint=_optional(os.environ.get("MUSICCLEAN_ORION_OTEL_ENDPOINT")),
+            otel_service_name=os.environ.get(
+                "MUSICCLEAN_ORION_OTEL_SERVICE_NAME",
+                "musicclean-orion",
             ),
         )
 
