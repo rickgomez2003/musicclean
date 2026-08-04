@@ -27,3 +27,7 @@ reports/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Orion local runtime databases
+orion-test.db
+orion.db

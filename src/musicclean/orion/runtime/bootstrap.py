@@ -10,17 +10,14 @@ from fastapi import FastAPI
 
 from musicclean.orion.adapters.filesystem import LocalFilesystemMutator
 from musicclean.orion.adapters.http_host import HttpHostConfig, create_fastapi_app
+from musicclean.orion.adapters.http_host.security_policy import RuntimeSecurityPolicy
 from musicclean.orion.adapters.sqlite import (
     CURRENT_SCHEMA_VERSION,
     SqliteUnitOfWork,
     connect_sqlite,
     migrate,
 )
-from musicclean.orion.application import (
-    OrionService,
-    StartupRecoverySweep,
-    startup_recovery_sweep,
-)
+from musicclean.orion.application import OrionService, StartupRecoverySweep, startup_recovery_sweep
 from musicclean.orion.ports import UnitOfWork
 from musicclean.orion.runtime.clock import UtcSystemClock
 from musicclean.orion.runtime.config import RuntimeConfig
@@ -43,9 +40,7 @@ class OrionRuntime:
 
 
 def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
-    """Build concrete Orion infrastructure and validate persistence."""
     config.database_path.parent.mkdir(parents=True, exist_ok=True)
-
     connection = connect_sqlite(config.database_path)
     try:
         schema_version = migrate(connection)
@@ -57,9 +52,7 @@ def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
 
     filesystem = LocalFilesystemMutator()
     clock = UtcSystemClock()
-
     uow_factory = SqliteUnitOfWorkFactory(config.database_path)
-
     service = OrionService(
         filesystem=filesystem,
         clock=clock,
@@ -75,20 +68,18 @@ def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
             uow_factory,
         )
 
-    app = create_fastapi_app(
-        service,
-        HttpHostConfig(version="0.6.21"),
+    security = RuntimeSecurityPolicy(
+        api_key=config.api_key,
+        public_health=config.public_health,
+        max_request_bytes=config.max_request_bytes,
+        allowed_origins=config.allowed_origins,
+        allowed_hosts=config.allowed_hosts,
     )
-    return OrionRuntime(
-        config=config,
-        service=service,
-        app=app,
-        schema_version=schema_version,
-    )
+    app = create_fastapi_app(service, HttpHostConfig(version="0.6.22"), security)
+    return OrionRuntime(config, service, app, schema_version)
 
 
 def create_runtime_app(config: RuntimeConfig | None = None) -> FastAPI:
-    """ASGI factory-friendly entry point."""
     return bootstrap_runtime(config or RuntimeConfig.from_environment()).app
 
 
