@@ -40,7 +40,7 @@ jobs:
         run: python -m pip install --upgrade pip
 
       - name: Install project
-        run: python -m pip install -e ".[dev]"
+        run: python -m pip install -e ".[dev,opentelemetry]"
 
       - name: Ruff
         run: ruff check .

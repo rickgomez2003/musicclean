@@ -23,16 +23,21 @@ from musicclean.orion.application import (
     startup_recovery_sweep,
 )
 from musicclean.orion.observability import (
+    CompositeTelemetryExporter,
     JsonlTelemetryExporter,
     NullTelemetryExporter,
+    OpenTelemetryTelemetryExporter,
     RuntimeMetrics,
     SafeTelemetryExporter,
     StructuredEventLogger,
     TelemetryExporter,
+    create_otlp_http_emitter,
 )
 from musicclean.orion.ports import UnitOfWork
 from musicclean.orion.runtime.clock import UtcSystemClock
 from musicclean.orion.runtime.config import RuntimeConfig
+
+ORION_RUNTIME_VERSION = "0.6.25"
 
 
 class SqliteUnitOfWorkFactory:
@@ -53,10 +58,24 @@ class OrionRuntime:
 
 
 def _build_exporter(config: RuntimeConfig) -> TelemetryExporter:
-    telemetry_path = getattr(config, "telemetry_jsonl_path", None)
-    if telemetry_path is None:
+    exporters: list[TelemetryExporter] = []
+
+    if config.telemetry_jsonl_path is not None:
+        exporters.append(SafeTelemetryExporter(JsonlTelemetryExporter(config.telemetry_jsonl_path)))
+
+    if config.otel_endpoint is not None:
+        emitter = create_otlp_http_emitter(
+            endpoint=config.otel_endpoint,
+            service_name=config.otel_service_name,
+            service_version=ORION_RUNTIME_VERSION,
+        )
+        exporters.append(SafeTelemetryExporter(OpenTelemetryTelemetryExporter(emitter)))
+
+    if not exporters:
         return NullTelemetryExporter()
-    return SafeTelemetryExporter(JsonlTelemetryExporter(Path(telemetry_path)))
+    if len(exporters) == 1:
+        return exporters[0]
+    return CompositeTelemetryExporter(tuple(exporters))
 
 
 def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
@@ -111,7 +130,7 @@ def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
     metrics = RuntimeMetrics()
     app = create_fastapi_app(
         service,
-        HttpHostConfig(version="0.6.24"),
+        HttpHostConfig(version=ORION_RUNTIME_VERSION),
         security,
         metrics,
         logger,

@@ -1,9 +1,16 @@
 # Book 14 — Operations
 
-0.6.24 adds provider-neutral external telemetry export.
+0.6.25 adds optional OpenTelemetry export over the provider-neutral telemetry
+boundary.
 
-Runtime observability can now export structured, already-redacted events through
-a pluggable exporter boundary.
+Configuration:
 
-The initial concrete adapter is append-only JSONL. Export failures are isolated
-from normal Orion request and runtime processing.
+- `MUSICCLEAN_ORION_OTEL_ENDPOINT`
+- `MUSICCLEAN_ORION_OTEL_SERVICE_NAME`
+
+OpenTelemetry dependencies remain optional. With no endpoint configured, Orion
+does not import or initialize the OpenTelemetry SDK.
+
+Install optional packages with:
+
+`pip install -r requirements/orion-opentelemetry.txt`
