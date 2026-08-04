@@ -7,5 +7,6 @@
 | Observability | Complete (0.6.23) |
 | External Telemetry Export | Complete (0.6.24) |
 | OpenTelemetry Integration | Complete (0.6.25) |
-| Runtime Packaging & Deployment | Active (0.6.26) |
-| Deployment Automation | Next |
+| Runtime Packaging & Deployment | Complete (0.6.26) |
+| Deployment Automation | Active (0.6.27) |
+| Release Engineering | Next |
