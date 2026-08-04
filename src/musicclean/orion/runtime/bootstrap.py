@@ -22,7 +22,14 @@ from musicclean.orion.application import (
     StartupRecoverySweep,
     startup_recovery_sweep,
 )
-from musicclean.orion.observability import RuntimeMetrics, StructuredEventLogger
+from musicclean.orion.observability import (
+    JsonlTelemetryExporter,
+    NullTelemetryExporter,
+    RuntimeMetrics,
+    SafeTelemetryExporter,
+    StructuredEventLogger,
+    TelemetryExporter,
+)
 from musicclean.orion.ports import UnitOfWork
 from musicclean.orion.runtime.clock import UtcSystemClock
 from musicclean.orion.runtime.config import RuntimeConfig
@@ -45,10 +52,18 @@ class OrionRuntime:
     metrics: RuntimeMetrics
 
 
+def _build_exporter(config: RuntimeConfig) -> TelemetryExporter:
+    telemetry_path = getattr(config, "telemetry_jsonl_path", None)
+    if telemetry_path is None:
+        return NullTelemetryExporter()
+    return SafeTelemetryExporter(JsonlTelemetryExporter(Path(telemetry_path)))
+
+
 def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
     config.database_path.parent.mkdir(parents=True, exist_ok=True)
 
-    logger = StructuredEventLogger()
+    exporter = _build_exporter(config)
+    logger = StructuredEventLogger(exporter=exporter)
     logger.info(
         "runtime_starting",
         database_path=str(config.database_path),
@@ -94,10 +109,9 @@ def bootstrap_runtime(config: RuntimeConfig) -> OrionRuntime:
     )
 
     metrics = RuntimeMetrics()
-
     app = create_fastapi_app(
         service,
-        HttpHostConfig(version="0.6.23"),
+        HttpHostConfig(version="0.6.24"),
         security,
         metrics,
         logger,
