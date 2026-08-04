@@ -2,17 +2,38 @@
 
 **Status:** Active specification
 
-## Persistence
+## Orion service boundary
 
-Repository and UnitOfWork ports define persistence needs.
+0.6.18 introduces `OrionService`, a transport-neutral facade over application
+orchestration.
 
-## Filesystem
+Initial capabilities:
 
-`FilesystemObserver` yields lightweight filesystem observations.
+- health
+- coordinated quarantine
+- coordinated restore
+- reconciliation
 
-## Metadata
+The boundary uses explicit request and response objects.
 
-`MetadataProvider` reads a path and returns a normalized `MetadataSnapshot`.
+It does not expose:
 
-The contract deliberately exposes parser provenance but no Mutagen/FFprobe
-objects, subprocess details, or parser-specific exceptions.
+- SQLite connections
+- repositories
+- UnitOfWork implementation details
+- filesystem adapter implementation details
+
+## Interface layering
+
+```text
+CLI / REST / Desktop / Automation
+              ↓
+         OrionService
+              ↓
+       Application Layer
+              ↓
+       Ports / Adapters
+```
+
+Future transports should adapt to this service boundary instead of duplicating
+business orchestration.
