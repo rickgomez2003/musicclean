@@ -5,19 +5,20 @@
 | Shared Kernel | Complete (0.6.1) | Stable primitives |
 | Domain | Complete (0.6.2) | Core entities |
 | Persistence Ports | Complete (0.6.3) | Repository/UoW contracts |
-| SQLite Adapter | Complete (0.6.4) | Schema/repositories/transactions |
-| Application | Complete (0.6.5) | First commands/queries |
-| Filesystem Sync | Complete (0.6.6) | Observe/classify/persist changes |
-| Metadata Providers | Complete (0.6.7) | Port, normalization, provenance |
-| Evidence | Complete (0.6.8) | Persistent observations |
-| Knowledge | Complete (0.6.9) | Versioned inference |
-| Decisions | Complete (0.6.10) | Explainable recommendations |
-| Review / Authorization | Complete (0.6.11) | Review and action planning |
-| Safe Executor | Complete (0.6.12) | Quarantine, restore, execution audit |
+| SQLite Adapter | Complete (0.6.4) | Persistence |
+| Application | Complete (0.6.5) | Use cases |
+| Filesystem Sync | Complete (0.6.6) | Change detection |
+| Metadata Providers | Complete (0.6.7) | Metadata boundary |
+| Evidence | Complete (0.6.8) | Observations |
+| Knowledge | Complete (0.6.9) | Inference |
+| Decisions | Complete (0.6.10) | Recommendations |
+| Review / Authorization | Complete (0.6.11) | Safe approval |
+| Safe Executor | Complete (0.6.12) | Reversible mutation |
 | Reconciliation | Complete (0.6.13) | Crash-gap detection |
-| Recovery Actions | Complete (0.6.14) | Approved audit recovery |
-| Operational Hardening | Complete (0.6.15) | Idempotency, leases, startup sweep |
-| Executor Coordination | Complete (0.6.16) | Atomic leases + idempotent execution |
-| Reliability Harness | Complete (0.6.17) | Fault injection + invariant verification |
-| Service Boundary | Active (0.6.18) | Stable transport-neutral facade |
-| API Adapter | Next | HTTP/REST mapping over OrionService |
+| Recovery Actions | Complete (0.6.14) | Approved recovery |
+| Operational Hardening | Complete (0.6.15) | Idempotency/leasing |
+| Executor Coordination | Complete (0.6.16) | Coordinated execution |
+| Reliability Harness | Complete (0.6.17) | Fault invariants |
+| Service Boundary | Complete (0.6.18) | Stable facade |
+| REST API Adapter | Active (0.6.19) | Versioned HTTP contract |
+| HTTP Host | Next | ASGI/FastAPI + OpenAPI |

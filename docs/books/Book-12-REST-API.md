@@ -1,7 +1,21 @@
 # Book 12 — REST API
 
-**Status:** Living specification
+**Status:** Active specification
 
-This book is part of the MusicClean Orion Engineering Manual. It will mature in reviewable increments as its subsystem enters design and implementation.
+Initial routes:
 
-Mature sections: purpose/scope, terminology, boundaries, contracts, data model, events, failure modes, observability, performance budgets, safety, tests, compatibility/migration, limitations, future considerations.
+- `GET /v1/health`
+- `POST /v1/action-plans/{id}/quarantine`
+- `POST /v1/action-plans/{id}/restore`
+- `POST /v1/action-plans/{id}/reconcile`
+
+The REST adapter maps transport concerns to `OrionService` and never accesses
+SQLite, repositories, UnitOfWork, or the filesystem directly.
+
+Error mapping:
+
+- 400 invalid request
+- 404 missing route/resource
+- 405 unsupported method
+- 409 state/idempotency/lease conflict
+- 422 other application rejection
