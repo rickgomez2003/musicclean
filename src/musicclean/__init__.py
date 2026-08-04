@@ -1,3 +1,5 @@
 """MusicClean package."""
 
-__version__ = "0.5.0"
+from musicclean.version import __version__
+
+__all__ = ["__version__"]
