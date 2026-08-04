@@ -1,10 +1,8 @@
 # Book 12 — REST API
 
-HTTP security is enforced before requests reach `RestApiAdapter`.
+HTTP requests are correlated with `X-Request-ID`.
 
-Protected requests use:
+A valid caller-provided ID is preserved. If absent or invalid, Orion generates
+an opaque request ID and returns it on the response.
 
-`X-API-Key: <secret>`
-
-The health endpoint may remain public for monitoring. Responses include
-`nosniff`, `DENY` frame protection, `no-referrer`, and `no-store`.
+API keys and secret-bearing fields are never emitted in structured telemetry.
