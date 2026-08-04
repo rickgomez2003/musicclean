@@ -1,19 +1,15 @@
 # Book 14 — Operations
 
-0.6.26 adds repeatable runtime packaging and deployment artifacts.
+0.6.27 adds deployment automation over the existing runtime packaging layer.
 
-Supported deployment wrappers include:
+Automation now covers:
 
-- Docker;
-- Linux systemd;
-- Windows PowerShell service wrapper.
+- Linux installation/update with systemd;
+- Windows runtime provisioning;
+- deployment preflight validation;
+- post-start health verification;
+- Docker build validation in CI.
 
-All deployment forms invoke the same runtime composition root:
-
-`python -m musicclean.orion.runtime`
-
-Production runtime dependencies are available through the `orion-runtime`
-optional package extra. OpenTelemetry remains independently optional.
-
-Deployment configuration is environment-driven. Writable database, log, and
-telemetry locations must be explicitly provisioned for the service identity.
+Deployment scripts are intended to be idempotent. Existing configuration is
+preserved where possible, and a deployment is not considered successful until
+the Orion health endpoint responds successfully.
