@@ -9,7 +9,7 @@ Before creating a release tag, the intended release commit must pass the
 
 ## Publish a controlled release
 
-A release tag is created only from the exact merged commit that passed
+An annotated tag is created only from the exact merged commit that passed
 release-candidate validation.
 
 Example:
