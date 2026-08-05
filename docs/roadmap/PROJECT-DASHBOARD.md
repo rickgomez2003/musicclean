@@ -21,5 +21,6 @@
 | Automated Dependency Merge Policy | Complete (0.6.37) |
 | Release Promotion & Channels | Complete (0.6.38) |
 | Release Rollback & Recovery | Complete (0.6.39) |
-| Release Audit Trail & Evidence | Active (0.6.40) |
-| Release Retention & Archival | Next |
+| Release Audit Trail & Evidence | Complete (0.6.40) |
+| Release Retention & Archival | Active (0.6.41) |
+| Durable Archive Export | Next |

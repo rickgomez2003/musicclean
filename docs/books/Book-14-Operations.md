@@ -1,15 +1,18 @@
 # Book 14 — Operations
 
-0.6.40 adds release audit trail and evidence collection.
+0.6.41 adds release retention and archival.
 
-A manually dispatched read-only workflow resolves an existing published release,
-checks out the exact tag, downloads release assets, verifies SHA256SUMS, records
-release/workflow identity, confirms the expected wheel/source distribution/SBOM,
-and uploads a machine-readable evidence bundle.
+Verified release audit evidence can now be transformed into a deterministic
+archive bundle containing the original evidence files, an archive manifest, and
+SHA-256 integrity metadata.
 
-Audit evidence collection is separated from release creation, promotion, and
-rollback. The evidence workflow cannot edit or replace the audited release.
+Two retention classes are defined:
 
-GitHub Actions retains the generated evidence artifact for 90 days. Export
-evidence to an external durable archive when organizational retention
-requirements exceed that period.
+- operational: at least 90 days;
+- long-term: at least 2555 days.
+
+GitHub Actions retains the generated archive artifact for 90 days. Long-term
+archives therefore require export to an external durable records system before
+that temporary artifact expires.
+
+The archive workflow is read-only with respect to published releases.
