@@ -22,5 +22,6 @@
 | Release Promotion & Channels | Complete (0.6.38) |
 | Release Rollback & Recovery | Complete (0.6.39) |
 | Release Audit Trail & Evidence | Complete (0.6.40) |
-| Release Retention & Archival | Active (0.6.41) |
-| Durable Archive Export | Next |
+| Release Retention & Archival | Complete (0.6.41) |
+| Durable Archive Export | Active (0.6.42) |
+| Archive Restore & Disaster Recovery | Next |

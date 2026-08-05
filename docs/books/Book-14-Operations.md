@@ -1,18 +1,17 @@
 # Book 14 — Operations
 
-0.6.41 adds release retention and archival.
+0.6.42 adds durable archive export.
 
-Verified release audit evidence can now be transformed into a deterministic
-archive bundle containing the original evidence files, an archive manifest, and
-SHA-256 integrity metadata.
+Verified 0.6.41 release archive bundles can be exported to AWS S3 through a
+protected GitHub Environment. Authentication uses GitHub OIDC and a short-lived
+AWS role session instead of static AWS access keys.
 
-Two retention classes are defined:
+The archive is verified before export. Its SHA-256 is written to S3 object
+metadata and read back after transfer. Export succeeds only when the remote
+metadata matches the local verified archive digest.
 
-- operational: at least 90 days;
-- long-term: at least 2555 days.
+A machine-readable export receipt records the durable destination and integrity
+result.
 
-GitHub Actions retains the generated archive artifact for 90 days. Long-term
-archives therefore require export to an external durable records system before
-that temporary artifact expires.
-
-The archive workflow is read-only with respect to published releases.
+The export workflow has read-only access to GitHub release/repository contents
+and does not alter published releases or tags.
