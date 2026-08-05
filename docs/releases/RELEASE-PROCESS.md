@@ -20,14 +20,11 @@ MusicClean version. Published tags are immutable.
 ## Recovery operations
 
 Recovery drills exercise durable archive restoration without mutating release
-state.
+state. Historical evidence supports recovery SLO and trend evaluation.
 
-Recovery objectives evaluate drill evidence for duration, successful-drill
-freshness, and success ratio.
-
-0.6.46 collects prior drill artifacts using `actions: read`, builds bounded
-cross-run history, and generates rolling recovery trend evidence. No release,
-tag, promotion, or archive mutation permission is introduced.
+0.6.47 maps SLO/trend evidence into provider-neutral alerts and GitHub Actions
+summaries. External alert delivery remains disabled. No release, tag,
+promotion, archive, issue, or pull-request mutation permission is introduced.
 
 ## Post-release verification
 

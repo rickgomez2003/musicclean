@@ -10,8 +10,5 @@ Orion evaluates recovery drill evidence against explicit recovery objectives.
 | Last successful drill age | <=10 d | >10 and <=14 d | >14 d |
 | Successful drill ratio | >=98% | >=95% and <98% | <95% |
 
-Success-ratio evaluation requires at least four drill samples. 0.6.46 supplies
-that history from prior Recovery Drill artifacts when sufficient runs exist.
-
-`recovery-slo-report.json` contains point-in-time SLO evaluation, while
-`recovery-slo-trend.json` contains rolling historical analysis.
+SLO evaluation is combined with historical trend evidence to feed the
+provider-neutral alert policy introduced in 0.6.47.
