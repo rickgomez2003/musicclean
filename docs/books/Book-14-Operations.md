@@ -1,16 +1,9 @@
 # Book 14 — Operations
 
-0.6.30 establishes the first controlled release procedure.
+0.6.31 adds post-release verification of the published `v0.6.30` GitHub Release.
 
-A release tag may be created only from the exact merged commit that has passed
-release-candidate validation.
+Verification downloads the published wheel, source distribution, and
+SHA256SUMS, verifies integrity, installs the wheel into a clean environment,
+starts Orion, and verifies `/v1/health`.
 
-The controlled release procedure requires:
-
-- one authoritative version;
-- a clean merged repository state;
-- successful release-candidate validation;
-- an annotated semantic version tag;
-- immutable published tags;
-- release artifact verification;
-- rollback by forward-fixing to a new version rather than moving an old tag.
+Published tags are never moved in response to a verification failure.

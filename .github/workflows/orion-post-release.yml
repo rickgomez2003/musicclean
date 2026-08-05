@@ -1,0 +1,107 @@
+name: Orion Post Release Verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published release tag to verify
+        required: true
+        default: v0.6.30
+  pull_request:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify-published-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install repository test tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,orion-runtime,opentelemetry]"
+
+      - name: Resolve release tag
+        id: release
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=v0.6.30" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download published release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p published-release
+          gh release download "${{ steps.release.outputs.tag }}"             --repo "${{ github.repository }}"             --dir published-release             --pattern "musicclean-*.whl"             --pattern "musicclean-*.tar.gz"             --pattern "SHA256SUMS"
+
+      - name: Verify published checksums
+        run: |
+          python tools/release/verify_published_release.py             --directory published-release             --tag "${{ steps.release.outputs.tag }}"
+
+      - name: Create clean verification environment
+        run: python -m venv published-release-smoke
+
+      - name: Install published wheel
+        run: |
+          published-release-smoke/bin/python -m pip install --upgrade pip
+          published-release-smoke/bin/python -m pip install             "published-release/musicclean-0.6.30-py3-none-any.whl[orion-runtime]"
+
+      - name: Verify installed published version
+        run: |
+          published-release-smoke/bin/python -c             "import musicclean; assert musicclean.__version__ == '0.6.30'; print(musicclean.__version__)"
+
+      - name: Start published Orion runtime and verify health
+        shell: bash
+        run: |
+          set -euo pipefail
+          export MUSICCLEAN_ORION_DATABASE="$RUNNER_TEMP/orion-post-release.db"
+          export MUSICCLEAN_ORION_HOST="127.0.0.1"
+          export MUSICCLEAN_ORION_PORT="8765"
+
+          published-release-smoke/bin/python -m musicclean.orion.runtime &
+          ORION_PID=$!
+          cleanup() {
+            kill "$ORION_PID" 2>/dev/null || true
+            wait "$ORION_PID" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          published-release-smoke/bin/python - <<'PY'
+          import time
+          import urllib.error
+          import urllib.request
+
+          url = "http://127.0.0.1:8765/v1/health"
+          last_error = None
+          for _ in range(30):
+              try:
+                  with urllib.request.urlopen(url, timeout=2) as response:
+                      if response.status != 200:
+                          raise SystemExit(
+                              f"health endpoint returned HTTP {response.status}"
+                          )
+                      print(response.read().decode("utf-8"))
+                      break
+              except (OSError, urllib.error.URLError) as exc:
+                  last_error = exc
+                  time.sleep(1)
+          else:
+              raise SystemExit(
+                  f"published Orion did not become healthy: {last_error}"
+              )
+          PY

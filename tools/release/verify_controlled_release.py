@@ -12,8 +12,8 @@ from musicclean import __version__
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def _read(path: str) -> str:
-    return (ROOT / path).read_text(encoding="utf-8")
+def _read(root: Path, path: str) -> str:
+    return (root / path).read_text(encoding="utf-8")
 
 
 def _candidate_workflow_version(text: str) -> str | None:
@@ -24,25 +24,44 @@ def _candidate_workflow_version(text: str) -> str | None:
     return match.group(1) if match else None
 
 
-def verify(expected: str) -> tuple[str, ...]:
+def verify(
+    expected: str,
+    *,
+    package_version: str = __version__,
+    root: Path = ROOT,
+) -> tuple[str, ...]:
+    """Verify that a repository snapshot is ready for a controlled release."""
     errors: list[str] = []
 
-    if __version__ != expected:
-        errors.append(f"package version mismatch: package={__version__} expected={expected}")
+    if package_version != expected:
+        errors.append(f"package version mismatch: package={package_version} expected={expected}")
 
-    candidate = _read(".github/workflows/orion-release-candidate.yml")
+    candidate = _read(
+        root,
+        ".github/workflows/orion-release-candidate.yml",
+    )
     candidate_version = _candidate_workflow_version(candidate)
+
     if candidate_version != expected:
         errors.append("release-candidate workflow version does not match expected release")
 
-    release = _read(".github/workflows/orion-release.yml")
+    release = _read(
+        root,
+        ".github/workflows/orion-release.yml",
+    )
     if 'tags:\n      - "v*.*.*"' not in release:
         errors.append("release workflow is not restricted to semantic version tags")
 
-    process = _read("docs/releases/RELEASE-PROCESS.md")
-    if "annotated tag" not in process.lower():
+    process = _read(
+        root,
+        "docs/releases/RELEASE-PROCESS.md",
+    )
+    normalized_process = process.lower().replace("-", " ")
+
+    if "annotated tag" not in normalized_process:
         errors.append("release process does not require an annotated tag")
-    if "release candidate" not in process.lower():
+
+    if "release candidate" not in normalized_process:
         errors.append("release process does not require release-candidate validation")
 
     return tuple(errors)
@@ -54,6 +73,7 @@ def main() -> int:
     args = parser.parse_args()
 
     errors = verify(args.expected)
+
     if errors:
         for error in errors:
             print(error, file=sys.stderr)

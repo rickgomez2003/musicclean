@@ -11,5 +11,6 @@
 | Deployment Automation | Complete (0.6.27) |
 | Release Engineering | Complete (0.6.28) |
 | Release Candidate Validation | Complete (0.6.29) |
-| First Controlled Release | Active (0.6.30) |
-| Post-Release Verification | Next |
+| First Controlled Release | Complete (0.6.30) |
+| Post-Release Verification | Active (0.6.31) |
+| Stable Release Operations | Next |
