@@ -14,5 +14,6 @@
 | First Controlled Release | Complete (0.6.30) |
 | Post-Release Verification | Complete (0.6.31) |
 | Stable Release Operations | Complete (0.6.32) |
-| Release Provenance & Attestations | Active (0.6.33) |
-| SBOM Generation & Attestation | Next |
+| Release Provenance & Attestations | Complete (0.6.33) |
+| SBOM Generation & Attestation | Active (0.6.34) |
+| Dependency & Vulnerability Policy | Next |

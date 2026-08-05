@@ -46,6 +46,24 @@ jobs:
       - name: Verify package metadata
         run: python -m twine check dist/*
 
+      - name: Resolve authoritative version
+        id: version
+        run: python tools/release/current_version.py --github-output "$GITHUB_OUTPUT"
+
+      - name: Generate SPDX JSON SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          file: dist/musicclean-${{ steps.version.outputs.version }}-py3-none-any.whl
+          format: spdx-json
+          output-file: dist/musicclean-${{ steps.version.outputs.version }}.sbom.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Validate generated SBOM
+        run: |
+          python tools/release/verify_sbom.py \
+            --sbom "dist/musicclean-${{ steps.version.outputs.version }}.sbom.spdx.json"
+
       - name: Generate SHA-256 checksums
         run: python tools/release/checksums.py dist
 
@@ -62,7 +80,14 @@ jobs:
           subject-path: |
             dist/*.whl
             dist/*.tar.gz
+            dist/*.sbom.spdx.json
             dist/SHA256SUMS
+
+      - name: Attest wheel SBOM
+        uses: actions/attest@v4
+        with:
+          subject-path: dist/musicclean-${{ steps.version.outputs.version }}-py3-none-any.whl
+          sbom-path: dist/musicclean-${{ steps.version.outputs.version }}.sbom.spdx.json
 
       - name: Create GitHub Release
         env:
