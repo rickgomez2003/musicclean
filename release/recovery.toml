@@ -1,0 +1,8 @@
+[rollback]
+environment = "release-stable"
+require_current_latest = true
+demote_current_to_prerelease = true
+restore_target_as_latest = true
+restore_target_as_prerelease = false
+preserve_artifacts = true
+preserve_tags = true

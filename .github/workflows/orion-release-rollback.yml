@@ -1,0 +1,69 @@
+name: Orion Release Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      current_tag:
+        description: Current stable/latest release tag
+        required: true
+        type: string
+      recovery_tag:
+        description: Previously published release tag to restore as stable
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  rollback:
+    name: Restore Stable Release
+    runs-on: ubuntu-latest
+    environment:
+      name: release-stable
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Verify rollback request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python tools/release/verify_rollback_recovery.py \
+            --current-tag "${{ inputs.current_tag }}" \
+            --recovery-tag "${{ inputs.recovery_tag }}" \
+            --repository "${GITHUB_REPOSITORY}"
+
+      - name: Restore recovery release as stable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit "${{ inputs.recovery_tag }}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --prerelease=false \
+            --latest
+
+      - name: Demote previous stable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit "${{ inputs.current_tag }}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --prerelease \
+            --latest=false
+
+      - name: Verify rollback result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python tools/release/verify_rollback_recovery.py \
+            --current-tag "${{ inputs.current_tag }}" \
+            --recovery-tag "${{ inputs.recovery_tag }}" \
+            --repository "${GITHUB_REPOSITORY}" \
+            --verify-result
