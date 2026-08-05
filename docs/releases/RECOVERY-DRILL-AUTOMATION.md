@@ -1,12 +1,8 @@
 # Recovery Drill Automation
 
-The **Orion Recovery Drill** workflow proves durable archive recovery,
-evaluates SLOs, computes historical trends, generates alerts, and delivers
-required alerts externally.
+The Orion Recovery Drill proves durable archive recovery, evaluates SLOs,
+computes historical trends, and generates provider-neutral alert evidence.
 
-Outputs include recovery drill, history, SLO, trend, alert, delivery-receipt,
-and restore evidence.
-
-External delivery is protected by the `release-archive-export` GitHub
-Environment. The workflow remains read-only with respect to repository and
-published release state.
+0.6.49 separates webhook delivery from the recovery job. The recovery job
+uploads a short-lived alert handoff artifact; a dedicated downstream job
+performs external delivery without inheriting AWS OIDC capability.
