@@ -1,0 +1,12 @@
+[export]
+schema_version = 1
+provider = "aws-s3"
+environment = "release-archive-export"
+authentication = "github-oidc"
+default_prefix = "musicclean/releases"
+verify_local_archive = true
+write_sha256_metadata = true
+verify_remote_sha256_metadata = true
+upload_receipt = true
+preserve_github_release = true
+preserve_archive_bundle = true
