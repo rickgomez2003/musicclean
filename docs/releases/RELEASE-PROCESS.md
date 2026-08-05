@@ -4,22 +4,14 @@ MusicClean uses `src/musicclean/version.py` as the authoritative version source.
 
 ## Dependency maintenance and merge policy
 
-Dependabot proposes scheduled updates for Python packages, GitHub Actions, and
-the runtime Dockerfile.
-
-PATCH and MINOR Dependabot version updates targeting `develop` may have GitHub
-auto-merge enabled automatically. MAJOR updates remain manual.
-
-Auto-merge does not bypass branch protections. The repository must require the
-CI/security checks that define merge readiness.
+Dependabot proposes scheduled dependency updates. Eligible PATCH and MINOR
+Dependabot version updates targeting `develop` may have GitHub auto-merge
+enabled, while MAJOR updates remain manual.
 
 ## Dependency security gate
 
-Before a dependency change can merge:
-
-1. GitHub Dependency Review evaluates introduced vulnerability risk.
-2. `pip-audit` audits the resolved MusicClean Orion runtime environment.
-3. normal CI and quality checks remain required according to branch policy.
+Dependency changes remain subject to Dependency Review, runtime `pip-audit`,
+normal CI, and repository branch protections.
 
 ## Release-candidate validation
 
@@ -31,14 +23,26 @@ Before creating a release tag, the intended release commit must pass the
 Controlled releases require an annotated tag matching the authoritative
 MusicClean version.
 
-Example:
-
-git tag -a v<version> -m "MusicClean <version>"
-git push origin v<version>
-
-The production release path continues to build and validate artifacts, generate
-the SPDX SBOM and checksums, smoke-test the wheel, create provenance/SBOM
-attestations, publish the GitHub Release, and perform post-release
-verification.
+The production release workflow builds and validates distribution artifacts,
+generates checksums and the SPDX SBOM, smoke-tests the wheel, creates
+provenance/SBOM attestations, and publishes the GitHub Release.
 
 Published tags are immutable.
+
+## Promotion
+
+Release creation and release promotion are separate operations.
+
+An existing published release may be promoted through the `preview` or `stable`
+channel using the `Orion Release Promotion` workflow.
+
+Promotion changes GitHub Release metadata only. It never rebuilds, replaces, or
+re-attests release artifacts.
+
+GitHub Environments named `release-preview` and `release-stable` form the
+repository-side protection boundary for channel promotion.
+
+## Post-release verification
+
+Post-release verification validates actual published artifacts rather than
+only source-tree state.

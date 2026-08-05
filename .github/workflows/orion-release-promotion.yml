@@ -1,0 +1,64 @@
+name: Orion Release Promotion
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing published release tag, for example v0.6.38
+        required: true
+        type: string
+      channel:
+        description: Promotion channel
+        required: true
+        type: choice
+        options:
+          - preview
+          - stable
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    name: Promote Release
+    runs-on: ubuntu-latest
+    environment:
+      name: release-${{ inputs.channel }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Verify requested promotion
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python tools/release/verify_promotion_channels.py \
+            --tag "${{ inputs.tag }}" \
+            --channel "${{ inputs.channel }}" \
+            --repository "${GITHUB_REPOSITORY}"
+
+      - name: Promote preview release
+        if: inputs.channel == 'preview'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit "${{ inputs.tag }}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --prerelease \
+            --latest=false
+
+      - name: Promote stable release
+        if: inputs.channel == 'stable'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit "${{ inputs.tag }}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --prerelease=false \
+            --latest

@@ -18,5 +18,6 @@
 | SBOM Generation & Attestation | Complete (0.6.34) |
 | Dependency & Vulnerability Policy | Complete (0.6.35) |
 | Dependency Update Automation | Complete (0.6.36) |
-| Automated Dependency Merge Policy | Active (0.6.37) |
-| Release Promotion & Channels | Next |
+| Automated Dependency Merge Policy | Complete (0.6.37) |
+| Release Promotion & Channels | Active (0.6.38) |
+| Release Rollback & Recovery | Next |

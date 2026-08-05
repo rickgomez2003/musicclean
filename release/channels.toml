@@ -1,0 +1,9 @@
+[channels.preview]
+environment = "release-preview"
+prerelease = true
+latest = false
+
+[channels.stable]
+environment = "release-stable"
+prerelease = false
+latest = true
