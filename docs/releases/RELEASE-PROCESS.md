@@ -2,16 +2,10 @@
 
 MusicClean uses `src/musicclean/version.py` as the authoritative version source.
 
-## Dependency maintenance and merge policy
+## Dependency maintenance and security
 
-Dependabot proposes scheduled dependency updates. Eligible PATCH and MINOR
-updates targeting `develop` may have GitHub auto-merge enabled while MAJOR
-updates remain manual.
-
-## Dependency security gate
-
-Dependency changes remain subject to Dependency Review, runtime `pip-audit`,
-normal CI, and repository branch protections.
+Dependabot updates remain subject to Dependency Review, runtime `pip-audit`,
+normal CI, branch protections, and the automated dependency merge policy.
 
 ## Release-candidate validation
 
@@ -29,23 +23,21 @@ provenance/SBOM attestations, and publishes the GitHub Release.
 
 Published tags are immutable.
 
-## Promotion
+## Promotion and rollback
 
-Release promotion changes channel metadata on an existing published release.
-Preview and stable promotion never rebuild or replace artifacts.
+Promotion and rollback change release-channel metadata only and never rebuild
+or replace immutable release artifacts.
 
-## Rollback and recovery
+## Audit evidence
 
-Rollback restores the stable channel to a previously published release. The
-current stable/latest release is demoted to prerelease/non-latest and the
-selected recovery release is promoted to non-prerelease/latest.
+Release audit evidence is collected separately using the read-only
+`Orion Release Audit Evidence` workflow.
 
-Rollback uses the protected `release-stable` GitHub Environment and never
-rebuilds artifacts, replaces assets, deletes tags, or creates a replacement
-release.
+Evidence collection checks out the exact published tag, downloads release
+assets, validates SHA256SUMS, records release/workflow identity, verifies the
+expected release components, and uploads a machine-readable evidence bundle.
 
-After rollback, fix-forward remediation uses the normal controlled-release path
-with a new version and immutable tag.
+Evidence collection never edits the audited GitHub Release.
 
 ## Post-release verification
 

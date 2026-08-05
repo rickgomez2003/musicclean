@@ -1,14 +1,15 @@
 # Book 14 — Operations
 
-0.6.39 adds stable-channel rollback and recovery.
+0.6.40 adds release audit trail and evidence collection.
 
-A rollback references two already-published releases: the current stable/latest
-tag and a previously published recovery tag.
+A manually dispatched read-only workflow resolves an existing published release,
+checks out the exact tag, downloads release assets, verifies SHA256SUMS, records
+release/workflow identity, confirms the expected wheel/source distribution/SBOM,
+and uploads a machine-readable evidence bundle.
 
-The `release-stable` GitHub Environment protects the operation. The workflow
-verifies the request, demotes the current release to prerelease/non-latest,
-restores the recovery release to non-prerelease/latest, and verifies final
-state.
+Audit evidence collection is separated from release creation, promotion, and
+rollback. The evidence workflow cannot edit or replace the audited release.
 
-Rollback preserves artifact and tag identity. Remediation then follows the
-normal fix-forward controlled-release process with a new version and tag.
+GitHub Actions retains the generated evidence artifact for 90 days. Export
+evidence to an external durable archive when organizational retention
+requirements exceed that period.

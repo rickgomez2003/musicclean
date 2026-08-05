@@ -1,0 +1,97 @@
+name: Orion Release Audit Evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing published release tag, for example v0.6.40
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  evidence:
+    name: Build Release Evidence
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out audit tooling
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check out exact release tag separately
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+          path: audited-source
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Resolve requested release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "${{ inputs.tag }}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --json tagName,isDraft,isPrerelease,publishedAt,url \
+            > release-metadata.json
+
+      - name: Download published assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p published-release
+          gh release download "${{ inputs.tag }}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --dir published-release
+
+      - name: Build and verify evidence
+        env:
+          EVIDENCE_REPOSITORY: ${{ github.repository }}
+          EVIDENCE_TAG: ${{ inputs.tag }}
+          EVIDENCE_ACTOR: ${{ github.actor }}
+          EVIDENCE_RUN_ID: ${{ github.run_id }}
+          EVIDENCE_RUN_ATTEMPT: ${{ github.run_attempt }}
+          EVIDENCE_WORKFLOW: ${{ github.workflow }}
+          EVIDENCE_SERVER_URL: ${{ github.server_url }}
+        run: |
+          python tools/release/build_audit_evidence.py \
+            --release-metadata release-metadata.json \
+            --assets published-release \
+            --source audited-source \
+            --output release-audit-evidence.json
+          python tools/release/verify_audit_evidence.py \
+            --evidence release-audit-evidence.json
+
+      - name: Generate evidence checksum
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+
+          evidence = Path("release-audit-evidence.json")
+          digest = hashlib.sha256(evidence.read_bytes()).hexdigest()
+          Path("release-audit-evidence.SHA256SUMS").write_text(
+              f"{digest}  {evidence.name}\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-audit-evidence-${{ inputs.tag }}-${{ github.run_id }}
+          path: |
+            release-audit-evidence.json
+            release-audit-evidence.SHA256SUMS
+            release-metadata.json
+          retention-days: 90
+          if-no-files-found: error
