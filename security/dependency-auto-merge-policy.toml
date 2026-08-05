@@ -1,0 +1,19 @@
+[policy]
+schema_version = 1
+actor = "dependabot[bot]"
+base_branch = "develop"
+merge_method = "squash"
+require_github_auto_merge = true
+require_branch_protection = true
+allow_admin_bypass = false
+
+[allowed_updates]
+types = [
+    "version-update:semver-patch",
+    "version-update:semver-minor",
+]
+
+[manual_updates]
+types = [
+    "version-update:semver-major",
+]
