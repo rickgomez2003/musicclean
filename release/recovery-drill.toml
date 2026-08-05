@@ -1,0 +1,13 @@
+[drill]
+schema_version = 1
+environment = "release-archive-export"
+authentication = "github-oidc"
+schedule = "weekly"
+require_known_archive = true
+verify_before_extract = true
+verify_restored_evidence = true
+record_elapsed_seconds = true
+record_restore_receipt = true
+upload_drill_record = true
+preserve_github_release = true
+no_automatic_republish = true

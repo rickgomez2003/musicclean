@@ -1,15 +1,16 @@
 # Book 14 — Operations
 
-0.6.43 adds archive restore and disaster recovery verification.
+0.6.44 adds automated recovery drills.
 
-Durable S3 archives can now be restored through a protected GitHub workflow.
-The restore path authenticates through GitHub OIDC, retrieves the manifest,
-checksum, and archive bundle, verifies S3 SHA-256 metadata, verifies the
-downloaded archive digest, safely extracts the deterministic archive, and
-validates the recovered release audit evidence.
+Orion can now run the 0.6.43 disaster-recovery trust chain manually or on a
+weekly schedule against a known durable archive. The drill verifies the remote
+archive identity, downloads and verifies the bundle, verifies before extraction,
+re-hashes immediately before extraction, safely restores evidence, and validates
+the recovered audit evidence.
 
-A restore receipt records the source destination, release identity, archive
-digest, and verification results.
+Each run produces a machine-readable recovery drill record containing the
+selected release, run identity, timestamps, elapsed duration, PASS/FAIL result,
+and restore receipt.
 
-Restore is deliberately evidence-only. It does not republish releases, recreate
-tags, or modify release channels automatically.
+The drill remains read-only with respect to GitHub Releases, tags, promotion
+state, and durable archive content.
