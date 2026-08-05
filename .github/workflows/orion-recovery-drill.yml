@@ -208,6 +208,23 @@ jobs:
         if: success()
         run: cat recovery-slo-alert-summary.md >> "${GITHUB_STEP_SUMMARY}"
 
+      - name: Deliver external recovery alert
+        if: success()
+        env:
+          RECOVERY_ALERT_WEBHOOK_URL: ${{ secrets.RECOVERY_ALERT_WEBHOOK_URL }}
+          RECOVERY_ALERT_WEBHOOK_HMAC_SECRET: ${{ secrets.RECOVERY_ALERT_WEBHOOK_HMAC_SECRET }}
+        run: |
+          python tools/release/deliver_recovery_alert.py \
+            --policy release/recovery-alerting.toml \
+            --alert recovery-slo-alert.json \
+            --receipt recovery-alert-delivery.json
+
+      - name: Verify external recovery alert delivery
+        if: success()
+        run: |
+          python tools/release/verify_external_recovery_alert_delivery.py \
+            --receipt recovery-alert-delivery.json
+
       - name: Upload recovery drill evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -220,6 +237,7 @@ jobs:
             recovery-slo-trend.json
             recovery-slo-alert.json
             recovery-slo-alert-summary.md
+            recovery-alert-delivery.json
             restore-receipt.json
             restored-archive/release-archive-manifest.json
             restored-archive/release-archive.SHA256SUMS

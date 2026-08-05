@@ -28,5 +28,6 @@
 | Recovery Drill Automation | Complete (0.6.44) |
 | Recovery Objectives & SLOs | Complete (0.6.45) |
 | Recovery SLO History & Trend Analysis | Complete (0.6.46) |
-| Recovery SLO Alerting & Escalation | Active (0.6.47) |
-| External Recovery Alert Delivery | Next |
+| Recovery SLO Alerting & Escalation | Complete (0.6.47) |
+| External Recovery Alert Delivery | Active (0.6.48) |
+| Recovery Alert Delivery Resilience | Next |

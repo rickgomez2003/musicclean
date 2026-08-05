@@ -31,11 +31,6 @@ def verify_configuration(root: Path = ROOT) -> tuple[str, ...]:
         errors.append("recovery alert suppression window must be 24 hours")
     if alerting.get("consecutive_failure_escalation") != 2:
         errors.append("recovery escalation threshold must be 2 failures")
-    if alerting.get("provider") != "github-summary":
-        errors.append("recovery alert provider must be github-summary")
-    if alerting.get("external_delivery_enabled") is not False:
-        errors.append("external recovery alert delivery must remain disabled")
-
     severity = alerting.get("severity")
     expected_severity = {
         "warn": "ADVISORY",
@@ -93,7 +88,6 @@ def verify_configuration(root: Path = ROOT) -> tuple[str, ...]:
         "SLACK_",
         "PAGERDUTY_",
         "TEAMS_",
-        "WEBHOOK",
         "--admin",
     )
     for fragment in forbidden:
@@ -143,9 +137,6 @@ def verify_alert(path: Path) -> tuple[str, ...]:
         errors.append("healthy recovery SLO alert cannot have severity")
     if alert.get("escalated") is True and severity != "ESCALATED":
         errors.append("escalated recovery SLO alert must use ESCALATED severity")
-    if alert.get("external_delivery_enabled") is not False:
-        errors.append("external delivery must remain disabled")
-
     return tuple(errors)
 
 
