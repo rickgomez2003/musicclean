@@ -1,0 +1,56 @@
+name: Orion Dependency Security
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    name: Dependency Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          fail-on-scopes: runtime
+
+  runtime-audit:
+    name: Python Runtime Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Create isolated audit environment
+        run: |
+          python -m venv dependency-audit
+          dependency-audit/bin/python -m pip install --upgrade pip
+          dependency-audit/bin/python -m pip install \
+            -e ".[orion-runtime,opentelemetry]"
+          dependency-audit/bin/python -m pip install pip-audit
+
+      - name: Audit resolved runtime dependencies
+        run: |
+          dependency-audit/bin/python -m pip_audit \
+            --local \
+            --skip-editable \
+            --progress-spinner off

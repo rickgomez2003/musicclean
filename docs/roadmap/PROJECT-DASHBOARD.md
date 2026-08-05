@@ -15,5 +15,6 @@
 | Post-Release Verification | Complete (0.6.31) |
 | Stable Release Operations | Complete (0.6.32) |
 | Release Provenance & Attestations | Complete (0.6.33) |
-| SBOM Generation & Attestation | Active (0.6.34) |
-| Dependency & Vulnerability Policy | Next |
+| SBOM Generation & Attestation | Complete (0.6.34) |
+| Dependency & Vulnerability Policy | Active (0.6.35) |
+| Dependency Update Automation | Next |
