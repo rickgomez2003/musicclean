@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import re
 import sys
 from pathlib import Path
 
@@ -16,12 +15,15 @@ def _read(root: Path, path: str) -> str:
     return (root / path).read_text(encoding="utf-8")
 
 
-def _candidate_workflow_version(text: str) -> str | None:
-    match = re.search(
-        r"verify_version\.py --expected (\d+\.\d+\.\d+)",
-        text,
+def _candidate_workflow_is_version_driven(text: str) -> bool:
+    required = (
+        "tools/release/current_version.py",
+        "steps.version.outputs.version",
+        'verify_version.py --expected "$RELEASE_VERSION"',
+        'verify_controlled_release.py --expected "$RELEASE_VERSION"',
+        'validate_candidate.py --dist dist --expected "$RELEASE_VERSION"',
     )
-    return match.group(1) if match else None
+    return all(item in text for item in required)
 
 
 def verify(
@@ -30,38 +32,27 @@ def verify(
     package_version: str = __version__,
     root: Path = ROOT,
 ) -> tuple[str, ...]:
-    """Verify that a repository snapshot is ready for a controlled release."""
     errors: list[str] = []
 
     if package_version != expected:
         errors.append(f"package version mismatch: package={package_version} expected={expected}")
 
-    candidate = _read(
-        root,
-        ".github/workflows/orion-release-candidate.yml",
-    )
-    candidate_version = _candidate_workflow_version(candidate)
+    candidate = _read(root, ".github/workflows/orion-release-candidate.yml")
+    if not _candidate_workflow_is_version_driven(candidate):
+        errors.append(
+            "release-candidate workflow does not derive its version "
+            "from the authoritative package version"
+        )
 
-    if candidate_version != expected:
-        errors.append("release-candidate workflow version does not match expected release")
-
-    release = _read(
-        root,
-        ".github/workflows/orion-release.yml",
-    )
+    release = _read(root, ".github/workflows/orion-release.yml")
     if 'tags:\n      - "v*.*.*"' not in release:
         errors.append("release workflow is not restricted to semantic version tags")
 
-    process = _read(
-        root,
-        "docs/releases/RELEASE-PROCESS.md",
-    )
-    normalized_process = process.lower().replace("-", " ")
-
-    if "annotated tag" not in normalized_process:
+    process = _read(root, "docs/releases/RELEASE-PROCESS.md")
+    normalized = process.lower().replace("-", " ")
+    if "annotated tag" not in normalized:
         errors.append("release process does not require an annotated tag")
-
-    if "release candidate" not in normalized_process:
+    if "release candidate" not in normalized:
         errors.append("release process does not require release-candidate validation")
 
     return tuple(errors)
@@ -71,14 +62,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--expected", required=True)
     args = parser.parse_args()
-
     errors = verify(args.expected)
-
     if errors:
         for error in errors:
             print(error, file=sys.stderr)
         return 1
-
     print(f"controlled release {args.expected} is ready for PR validation")
     return 0
 

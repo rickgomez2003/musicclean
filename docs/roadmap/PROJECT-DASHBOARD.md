@@ -12,5 +12,6 @@
 | Release Engineering | Complete (0.6.28) |
 | Release Candidate Validation | Complete (0.6.29) |
 | First Controlled Release | Complete (0.6.30) |
-| Post-Release Verification | Active (0.6.31) |
-| Stable Release Operations | Next |
+| Post-Release Verification | Complete (0.6.31) |
+| Stable Release Operations | Active (0.6.32) |
+| Release Provenance & Attestations | Next |

@@ -16,10 +16,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: pip
@@ -30,11 +30,22 @@ jobs:
           python -m pip install -e ".[dev,orion-runtime,opentelemetry]"
           python -m pip install build twine
 
+      - name: Resolve authoritative version
+        id: version
+        run: python tools/release/current_version.py --github-output "$GITHUB_OUTPUT"
+
       - name: Verify source version
-        run: python tools/release/verify_version.py --expected 0.6.31
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: python tools/release/verify_version.py --expected "$RELEASE_VERSION"
 
       - name: Verify controlled-release readiness
-        run: python tools/release/verify_controlled_release.py --expected 0.6.31
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: python tools/release/verify_controlled_release.py --expected "$RELEASE_VERSION"
+
+      - name: Verify stable release operations
+        run: python tools/release/verify_stable_operations.py
 
       - name: Quality gate
         run: |
@@ -54,30 +65,34 @@ jobs:
         run: python tools/release/checksums.py dist
 
       - name: Validate candidate artifacts
-        run: python tools/release/validate_candidate.py --dist dist --expected 0.6.31
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: python tools/release/validate_candidate.py --dist dist --expected "$RELEASE_VERSION"
 
       - name: Install wheel into clean environment
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
         run: |
           python -m venv release-candidate-smoke
           release-candidate-smoke/bin/python -m pip install --upgrade pip
-          release-candidate-smoke/bin/python -m pip install "dist/musicclean-0.6.31-py3-none-any.whl[orion-runtime]"
+          release-candidate-smoke/bin/python -m pip install             "dist/musicclean-${RELEASE_VERSION}-py3-none-any.whl[orion-runtime]"
 
       - name: Verify installed version
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          release-candidate-smoke/bin/python -c "import musicclean; assert musicclean.__version__ == '0.6.31'; print(musicclean.__version__)"
+          release-candidate-smoke/bin/python -c             "import musicclean, os; expected=os.environ['RELEASE_VERSION']; assert musicclean.__version__ == expected; print(musicclean.__version__)"
 
       - name: Runtime health smoke test
         shell: bash
         run: |
           set -euo pipefail
-
           export MUSICCLEAN_ORION_DATABASE="$RUNNER_TEMP/orion-rc.db"
           export MUSICCLEAN_ORION_HOST="127.0.0.1"
           export MUSICCLEAN_ORION_PORT="8765"
 
           release-candidate-smoke/bin/python -m musicclean.orion.runtime &
           ORION_PID=$!
-
           cleanup() {
             kill "$ORION_PID" 2>/dev/null || true
             wait "$ORION_PID" 2>/dev/null || true
@@ -91,7 +106,6 @@ jobs:
 
           url = "http://127.0.0.1:8765/v1/health"
           last_error = None
-
           for _ in range(30):
               try:
                   with urllib.request.urlopen(url, timeout=2) as response:
@@ -111,9 +125,9 @@ jobs:
       - name: Upload candidate artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: musicclean-0.6.31-release-candidate
+          name: musicclean-${{ steps.version.outputs.version }}-release-candidate
           path: |
-            dist/musicclean-0.6.31-py3-none-any.whl
-            dist/musicclean-0.6.31.tar.gz
+            dist/musicclean-${{ steps.version.outputs.version }}-py3-none-any.whl
+            dist/musicclean-${{ steps.version.outputs.version }}.tar.gz
             dist/SHA256SUMS
           if-no-files-found: error
