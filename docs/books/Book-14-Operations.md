@@ -1,14 +1,15 @@
-# Book 14 — Operations
+# Book 14 â€” Operations
 
-0.6.47 adds Recovery SLO Alerting & Escalation.
+0.6.48 adds External Recovery Alert Delivery.
 
-Recovery SLO status and recovery-duration trend evidence are converted into a
-provider-neutral alert record. WARN maps to ADVISORY, FAIL maps to CRITICAL,
-and two consecutive failed drills escalate to ESCALATED. A worsening duration
-trend can generate an advisory even when the point-in-time SLO has not failed.
+Recovery alerts are delivered through a generic HTTPS webhook. Required alert
+payloads are HMAC-SHA256 signed. Healthy/no-alert results generate no external
+request.
 
-A 24-hour suppression-window value is recorded for future delivery-provider
-deduplication.
+Delivery uses the protected `release-archive-export` GitHub Environment with
+two secrets: `RECOVERY_ALERT_WEBHOOK_URL` and
+`RECOVERY_ALERT_WEBHOOK_HMAC_SECRET`.
 
-The current implementation publishes only GitHub Actions summary/evidence and
-does not require external notification credentials.
+Delivery is bounded to three attempts and a ten-second request timeout.
+Machine-readable receipts intentionally exclude secret values and destination
+URLs.

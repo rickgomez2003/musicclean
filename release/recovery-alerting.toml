@@ -2,11 +2,20 @@
 schema_version = 1
 suppression_window_hours = 24
 consecutive_failure_escalation = 2
-provider = "github-summary"
-external_delivery_enabled = false
+provider = "generic-webhook"
+external_delivery_enabled = true
 
 [alerting.severity]
 warn = "ADVISORY"
 fail = "CRITICAL"
 worsening = "ADVISORY"
 escalated = "ESCALATED"
+
+[alerting.delivery]
+environment = "release-archive-export"
+url_secret = "RECOVERY_ALERT_WEBHOOK_URL"
+hmac_secret = "RECOVERY_ALERT_WEBHOOK_HMAC_SECRET"
+request_timeout_seconds = 10
+max_attempts = 3
+require_https = true
+sign_payload = true
