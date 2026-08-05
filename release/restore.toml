@@ -1,0 +1,13 @@
+[restore]
+schema_version = 1
+provider = "aws-s3"
+environment = "release-archive-export"
+authentication = "github-oidc"
+default_prefix = "musicclean/releases"
+verify_remote_sha256_metadata = true
+verify_archive_manifest = true
+safe_extract = true
+verify_restored_evidence = true
+upload_restore_receipt = true
+preserve_github_release = true
+no_automatic_republish = true
