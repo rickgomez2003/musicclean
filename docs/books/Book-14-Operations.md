@@ -1,18 +1,14 @@
 # Book 14 — Operations
 
-0.6.38 introduces release promotion and explicit release channels.
+0.6.39 adds stable-channel rollback and recovery.
 
-Controlled release creation remains responsible for building, validating,
-checksumming, SBOM generation, attestations, and publication.
+A rollback references two already-published releases: the current stable/latest
+tag and a previously published recovery tag.
 
-Promotion operates only on an already-published GitHub Release:
+The `release-stable` GitHub Environment protects the operation. The workflow
+verifies the request, demotes the current release to prerelease/non-latest,
+restores the recovery release to non-prerelease/latest, and verifies final
+state.
 
-- `preview` keeps the release marked as prerelease and not latest;
-- `stable` clears prerelease status and marks the release as latest.
-
-Promotion references GitHub Environments named `release-preview` and
-`release-stable`, allowing repository owners to add approval or deployment
-protection rules without coupling those rules to artifact creation.
-
-The critical invariant is that promotion changes metadata only. It never
-rebuilds or replaces release artifacts.
+Rollback preserves artifact and tag identity. Remediation then follows the
+normal fix-forward controlled-release process with a new version and tag.
