@@ -7,6 +7,9 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
 
 jobs:
   release:
@@ -53,8 +56,20 @@ jobs:
           release-smoke/bin/python -m pip install dist/*.whl
           release-smoke/bin/python -c "import musicclean; print(musicclean.__version__)"
 
+      - name: Attest release artifacts
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/SHA256SUMS
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}"             dist/*             --verify-tag             --generate-notes             --title "MusicClean ${GITHUB_REF_NAME}"
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/* \
+            --verify-tag \
+            --generate-notes \
+            --title "MusicClean ${GITHUB_REF_NAME}"

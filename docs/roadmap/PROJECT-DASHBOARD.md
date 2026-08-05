@@ -13,5 +13,6 @@
 | Release Candidate Validation | Complete (0.6.29) |
 | First Controlled Release | Complete (0.6.30) |
 | Post-Release Verification | Complete (0.6.31) |
-| Stable Release Operations | Active (0.6.32) |
-| Release Provenance & Attestations | Next |
+| Stable Release Operations | Complete (0.6.32) |
+| Release Provenance & Attestations | Active (0.6.33) |
+| SBOM Generation & Attestation | Next |
