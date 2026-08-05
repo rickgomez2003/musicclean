@@ -1,17 +1,18 @@
 # Book 14 — Operations
 
-0.6.34 adds controlled-release SBOM generation and attestation.
+0.6.35 adds dependency and vulnerability policy enforcement.
 
-The production release workflow generates an SPDX JSON SBOM from the built
-wheel with Syft. The SBOM is validated before publication, included in
-`SHA256SUMS`, covered by ordinary build provenance, and bound to the wheel by a
-GitHub SBOM attestation.
+Pull requests use GitHub Dependency Review to block newly introduced HIGH or
+CRITICAL vulnerabilities in runtime dependencies. A separate isolated Python
+environment installs the Orion runtime dependency set and audits it with
+`pip-audit`.
 
-The release trust model now has three distinct layers:
+The operational supply-chain controls are now layered:
 
-- SHA-256 checksums: artifact byte integrity;
+- SHA-256 checksums: byte integrity;
 - build provenance: repository, commit, and workflow identity;
-- SPDX SBOM: software component inventory.
+- SPDX SBOM: component inventory;
+- Dependency Review: vulnerable dependency changes before merge;
+- pip-audit: known vulnerabilities in the resolved runtime environment.
 
-The SBOM ships as a normal release asset and can be validated with
-`tools/release/verify_sbom.py`.
+Vulnerability exceptions must be explicit, owned, justified, and time-bounded.

@@ -2,6 +2,19 @@
 
 MusicClean uses `src/musicclean/version.py` as the authoritative version source.
 
+## Dependency security gate
+
+Before a change reaches a controlled release, pull-request automation performs
+two dependency-security checks:
+
+1. GitHub Dependency Review blocks newly introduced HIGH or CRITICAL
+   vulnerabilities in runtime dependency changes.
+2. `pip-audit` audits a fresh isolated environment containing the resolved
+   MusicClean Orion runtime dependencies.
+
+Vulnerability exceptions must follow
+`docs/security/DEPENDENCY-VULNERABILITY-POLICY.md`.
+
 ## Release-candidate validation
 
 Before creating a release tag, the intended release commit must pass the
@@ -25,19 +38,6 @@ The production release workflow:
 
 Published tags are immutable.
 
-## Verify provenance and SBOM
-
-For a downloaded wheel:
-
-`gh attestation verify PATH_TO_WHEEL --repo rickgomez2003/musicclean`
-
-Validate a downloaded SBOM with:
-
-`python tools/release/verify_sbom.py --sbom PATH_TO_SBOM`
-
-Artifact attestation and SBOM verification complement rather than replace
-SHA-256 checksum verification.
-
 ## Post-release verification
 
 Post-release verification downloads actual published release assets, verifies
@@ -46,5 +46,5 @@ and verifies `/v1/health`.
 
 ## Stable release operations
 
-Patch and hotfix releases follow the same candidate, provenance, SBOM, and
-post-release verification path.
+Patch and hotfix releases follow the same dependency-security, candidate,
+provenance, SBOM, and post-release verification path.
