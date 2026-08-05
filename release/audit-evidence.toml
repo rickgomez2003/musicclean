@@ -1,0 +1,11 @@
+[evidence]
+schema_version = 1
+workflow = "Orion Release Audit Evidence"
+retention_days = 90
+require_release_metadata = true
+require_sha256sums = true
+require_sbom = true
+require_wheel = true
+require_sdist = true
+preserve_release = true
+read_only_release_access = true
