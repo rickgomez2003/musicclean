@@ -23,5 +23,6 @@
 | Release Rollback & Recovery | Complete (0.6.39) |
 | Release Audit Trail & Evidence | Complete (0.6.40) |
 | Release Retention & Archival | Complete (0.6.41) |
-| Durable Archive Export | Active (0.6.42) |
-| Archive Restore & Disaster Recovery | Next |
+| Durable Archive Export | Complete (0.6.42) |
+| Archive Restore & Disaster Recovery | Active (0.6.43) |
+| Recovery Drill Automation | Next |

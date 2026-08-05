@@ -23,25 +23,26 @@ attestations, and publishes the GitHub Release.
 
 Published tags are immutable.
 
-## Promotion, rollback, evidence, and archival
+## Promotion, rollback, evidence, archival, and durable export
 
 Promotion and rollback modify channel metadata only. Audit evidence is
-read-only. Verified evidence can be packaged into deterministic release archive
-bundles.
+read-only. Verified evidence can be packaged into deterministic release
+archives and exported to durable S3 storage using GitHub OIDC.
 
-## Durable archive export
+## Archive restore and disaster recovery
 
-Verified release archives may be exported through `Orion Durable Archive
-Export`.
+`Orion Archive Restore` performs the reverse integrity path from durable S3
+storage.
 
-The first provider is AWS S3. GitHub OIDC supplies short-lived AWS credentials.
-The workflow verifies the local archive, uploads the provider-neutral archive
-bundle, writes the archive SHA-256 into remote object metadata, reads that
-metadata back, and produces a durable export receipt.
+The workflow retrieves the archive metadata and ZIP, verifies remote and local
+SHA-256 identity, verifies the archive bundle, safely extracts the evidence,
+validates the restored audit evidence, and generates a restore receipt.
 
-Long-lived AWS access keys are prohibited by policy.
+Restore never automatically publishes a GitHub Release, creates/pushes tags, or
+modifies release-channel metadata.
 
-Durable export never modifies the published GitHub Release or release tag.
+Any future release reconstruction must be a separate operator-approved action
+after restore verification succeeds.
 
 ## Post-release verification
 

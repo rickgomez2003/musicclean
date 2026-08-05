@@ -1,17 +1,15 @@
 # Book 14 — Operations
 
-0.6.42 adds durable archive export.
+0.6.43 adds archive restore and disaster recovery verification.
 
-Verified 0.6.41 release archive bundles can be exported to AWS S3 through a
-protected GitHub Environment. Authentication uses GitHub OIDC and a short-lived
-AWS role session instead of static AWS access keys.
+Durable S3 archives can now be restored through a protected GitHub workflow.
+The restore path authenticates through GitHub OIDC, retrieves the manifest,
+checksum, and archive bundle, verifies S3 SHA-256 metadata, verifies the
+downloaded archive digest, safely extracts the deterministic archive, and
+validates the recovered release audit evidence.
 
-The archive is verified before export. Its SHA-256 is written to S3 object
-metadata and read back after transfer. Export succeeds only when the remote
-metadata matches the local verified archive digest.
+A restore receipt records the source destination, release identity, archive
+digest, and verification results.
 
-A machine-readable export receipt records the durable destination and integrity
-result.
-
-The export workflow has read-only access to GitHub release/repository contents
-and does not alter published releases or tags.
+Restore is deliberately evidence-only. It does not republish releases, recreate
+tags, or modify release channels automatically.
