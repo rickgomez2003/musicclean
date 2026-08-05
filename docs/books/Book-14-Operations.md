@@ -1,20 +1,19 @@
 # Book 14 — Operations
 
-0.6.36 adds dependency update automation.
+0.6.37 adds a conservative automated dependency merge policy.
 
-Dependabot now proposes routine updates for Python packages, GitHub Actions,
-and the root runtime Dockerfile. Version-update pull requests target `develop`
-on staggered weekly schedules with bounded open-PR counts.
+Dependabot PATCH and MINOR version-update pull requests targeting `develop`
+may have GitHub auto-merge enabled automatically. MAJOR dependency updates
+remain manual.
 
-Automation is intentionally proposal-only. Every dependency update continues
-through the same security and quality gates established by prior Orion
-milestones:
+The automation uses squash auto-merge and never uses an administrative bypass.
+GitHub branch protection/rulesets remain the actual merge enforcement boundary.
 
-- normal CI and typing/tests;
-- GitHub Dependency Review;
-- isolated runtime `pip-audit`;
-- Release Candidate validation;
-- provenance and SBOM release controls.
+Before enabling this feature operationally:
 
-Python minor and patch updates are grouped to reduce maintenance noise while
-major updates remain separately reviewable.
+- enable repository **Allow auto-merge**;
+- require the intended CI/security checks on `develop`;
+- keep Dependency Review and Python Runtime Audit authoritative.
+
+Dependency proposal, security evaluation, and merge authorization remain
+separate responsibilities.

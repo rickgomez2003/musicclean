@@ -2,50 +2,43 @@
 
 MusicClean uses `src/musicclean/version.py` as the authoritative version source.
 
-## Dependency maintenance
+## Dependency maintenance and merge policy
 
 Dependabot proposes scheduled updates for Python packages, GitHub Actions, and
-the runtime Dockerfile. Routine version-update pull requests target `develop`
-and remain subject to normal branch protections and security gates.
+the runtime Dockerfile.
 
-Dependabot automation proposes changes; it does not grant automatic merge
-authority.
+PATCH and MINOR Dependabot version updates targeting `develop` may have GitHub
+auto-merge enabled automatically. MAJOR updates remain manual.
+
+Auto-merge does not bypass branch protections. The repository must require the
+CI/security checks that define merge readiness.
 
 ## Dependency security gate
 
-Before a change reaches a controlled release:
+Before a dependency change can merge:
 
-1. GitHub Dependency Review blocks newly introduced HIGH or CRITICAL
-   vulnerabilities in runtime dependency changes.
-2. `pip-audit` audits a fresh isolated environment containing the resolved
-   MusicClean Orion runtime dependencies.
-
-Vulnerability exceptions must follow
-`docs/security/DEPENDENCY-VULNERABILITY-POLICY.md`.
+1. GitHub Dependency Review evaluates introduced vulnerability risk.
+2. `pip-audit` audits the resolved MusicClean Orion runtime environment.
+3. normal CI and quality checks remain required according to branch policy.
 
 ## Release-candidate validation
 
 Before creating a release tag, the intended release commit must pass the
-`Orion Release Candidate` workflow. Candidate workflows do not publish
-production attestations.
+`Orion Release Candidate` workflow.
 
-## Publish a controlled release
+## Controlled release
 
-An annotated tag is created only from the exact merged commit that passed
-release-candidate validation.
+Controlled releases require an annotated tag matching the authoritative
+MusicClean version.
 
-The production release workflow builds and validates distribution artifacts,
-generates and validates the SPDX SBOM, generates checksums, smoke-tests the
-wheel, creates build and SBOM attestations, and publishes the GitHub Release.
+Example:
+
+git tag -a v<version> -m "MusicClean <version>"
+git push origin v<version>
+
+The production release path continues to build and validate artifacts, generate
+the SPDX SBOM and checksums, smoke-test the wheel, create provenance/SBOM
+attestations, publish the GitHub Release, and perform post-release
+verification.
 
 Published tags are immutable.
-
-## Post-release verification
-
-Post-release verification validates the actual published artifacts rather than
-only source-tree state.
-
-## Stable release operations
-
-Patch and hotfix releases follow the same dependency-maintenance,
-dependency-security, candidate, provenance, SBOM, and post-release path.
