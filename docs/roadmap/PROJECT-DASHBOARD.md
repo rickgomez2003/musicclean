@@ -27,5 +27,6 @@
 | Archive Restore & Disaster Recovery | Complete (0.6.43) |
 | Recovery Drill Automation | Complete (0.6.44) |
 | Recovery Objectives & SLOs | Complete (0.6.45) |
-| Recovery SLO History & Trend Analysis | Active (0.6.46) |
-| Recovery SLO Alerting & Escalation | Next |
+| Recovery SLO History & Trend Analysis | Complete (0.6.46) |
+| Recovery SLO Alerting & Escalation | Active (0.6.47) |
+| External Recovery Alert Delivery | Next |

@@ -1,0 +1,12 @@
+[alerting]
+schema_version = 1
+suppression_window_hours = 24
+consecutive_failure_escalation = 2
+provider = "github-summary"
+external_delivery_enabled = false
+
+[alerting.severity]
+warn = "ADVISORY"
+fail = "CRITICAL"
+worsening = "ADVISORY"
+escalated = "ESCALATED"

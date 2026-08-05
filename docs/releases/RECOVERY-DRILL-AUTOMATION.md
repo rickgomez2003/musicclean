@@ -3,11 +3,9 @@
 The **Orion Recovery Drill** workflow repeatedly proves that MusicClean can
 recover release evidence from durable storage.
 
-The workflow supports manual dispatch and weekly scheduled execution.
-
-0.6.46 retrieves prior Recovery Drill artifacts with read-only Actions access,
-builds bounded history, evaluates recovery SLOs against real cross-run samples,
-and generates rolling trend evidence.
+The workflow supports manual dispatch and weekly scheduled execution. It
+collects bounded historical drill evidence, evaluates recovery SLOs, computes
+trends, and now produces structured alert evidence.
 
 Outputs include:
 
@@ -15,7 +13,8 @@ Outputs include:
 - `recovery-drill-history.json`
 - `recovery-slo-report.json`
 - `recovery-slo-trend.json`
+- `recovery-slo-alert.json`
+- `recovery-slo-alert-summary.md`
 - restore evidence
 
-Recovery drills, history collection, and SLO analysis remain read-only with
-respect to releases, tags, promotion state, and durable archive objects.
+Alert generation is provider-neutral in 0.6.47 and does not deliver externally.

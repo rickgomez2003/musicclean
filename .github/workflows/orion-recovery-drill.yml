@@ -187,6 +187,27 @@ jobs:
           python tools/release/verify_recovery_slo_history.py \
             --trend recovery-slo-trend.json
 
+      - name: Build recovery SLO alert
+        if: success()
+        run: |
+          python tools/release/build_recovery_alert.py \
+            --policy release/recovery-alerting.toml \
+            --slo-report recovery-slo-report.json \
+            --trend-report recovery-slo-trend.json \
+            --history recovery-drill-history.json \
+            --output recovery-slo-alert.json \
+            --summary recovery-slo-alert-summary.md
+
+      - name: Verify recovery SLO alert
+        if: success()
+        run: |
+          python tools/release/verify_recovery_slo_alerting.py \
+            --alert recovery-slo-alert.json
+
+      - name: Publish recovery SLO summary
+        if: success()
+        run: cat recovery-slo-alert-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Upload recovery drill evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -197,6 +218,8 @@ jobs:
             recovery-drill-history.json
             recovery-slo-report.json
             recovery-slo-trend.json
+            recovery-slo-alert.json
+            recovery-slo-alert-summary.md
             restore-receipt.json
             restored-archive/release-archive-manifest.json
             restored-archive/release-archive.SHA256SUMS

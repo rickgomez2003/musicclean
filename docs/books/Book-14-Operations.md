@@ -1,14 +1,14 @@
 # Book 14 — Operations
 
-0.6.46 adds recovery SLO history and trend analysis.
+0.6.47 adds Recovery SLO Alerting & Escalation.
 
-Recovery Drill workflow artifacts are retrieved using GitHub Actions read-only
-permissions. The current drill is combined with prior records, de-duplicated,
-chronologically ordered, and bounded to 52 records.
+Recovery SLO status and recovery-duration trend evidence are converted into a
+provider-neutral alert record. WARN maps to ADVISORY, FAIL maps to CRITICAL,
+and two consecutive failed drills escalate to ESCALATED. A worsening duration
+trend can generate an advisory even when the point-in-time SLO has not failed.
 
-Orion calculates rolling 4-drill and 12-drill success ratios and average
-recovery durations. Recovery duration direction is classified as improving,
-stable, worsening, or insufficient data.
+A 24-hour suppression-window value is recorded for future delivery-provider
+deduplication.
 
-This allows the 0.6.45 success-ratio SLO to move from bootstrap WARN behavior
-toward evidence-backed evaluation as historical samples accumulate.
+The current implementation publishes only GitHub Actions summary/evidence and
+does not require external notification credentials.
