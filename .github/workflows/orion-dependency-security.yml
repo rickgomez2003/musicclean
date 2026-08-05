@@ -43,7 +43,7 @@ jobs:
       - name: Create isolated audit environment
         run: |
           python -m venv dependency-audit
-          dependency-audit/bin/python -m pip install --upgrade pip
+          dependency-audit/bin/python -m pip install --upgrade pip "setuptools>=83.0.0"
           dependency-audit/bin/python -m pip install \
             -e ".[orion-runtime,opentelemetry]"
           dependency-audit/bin/python -m pip install pip-audit
