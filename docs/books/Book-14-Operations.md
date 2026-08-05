@@ -1,15 +1,17 @@
 # Book 14 — Operations
 
-0.6.33 adds release provenance and GitHub artifact attestations.
+0.6.34 adds controlled-release SBOM generation and attestation.
 
-Controlled release artifacts retain SHA-256 checksum validation and additionally
-receive signed build provenance. Checksums establish byte integrity; provenance
-establishes the repository, commit and workflow identity associated with the
-artifact build.
+The production release workflow generates an SPDX JSON SBOM from the built
+wheel with Syft. The SBOM is validated before publication, included in
+`SHA256SUMS`, covered by ordinary build provenance, and bound to the wheel by a
+GitHub SBOM attestation.
 
-Only the production release workflow receives attestation-writing permissions.
-Release Candidate and ordinary CI workflows do not publish production
-attestations.
+The release trust model now has three distinct layers:
 
-Operators verify published artifacts with GitHub CLI attestation verification
-in addition to SHA256SUMS.
+- SHA-256 checksums: artifact byte integrity;
+- build provenance: repository, commit, and workflow identity;
+- SPDX SBOM: software component inventory.
+
+The SBOM ships as a normal release asset and can be validated with
+`tools/release/verify_sbom.py`.
