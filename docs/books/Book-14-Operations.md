@@ -1,16 +1,15 @@
 # Book 14 — Operations
 
-0.6.44 adds automated recovery drills.
+0.6.45 adds explicit recovery objectives and SLO evaluation.
 
-Orion can now run the 0.6.43 disaster-recovery trust chain manually or on a
-weekly schedule against a known durable archive. The drill verifies the remote
-archive identity, downloads and verifies the bundle, verifies before extraction,
-re-hashes immediately before extraction, safely restores evidence, and validates
-the recovered audit evidence.
+Recovery drill evidence is now evaluated against policy for recovery duration,
+age of the last successful drill, and successful-drill ratio. Metrics produce
+PASS, WARN, or FAIL outcomes, with warning thresholds providing early signal
+before a hard objective breach.
 
-Each run produces a machine-readable recovery drill record containing the
-selected release, run identity, timestamps, elapsed duration, PASS/FAIL result,
-and restore receipt.
+The default recovery-time objective is 900 seconds with warning at 720 seconds.
+The latest successful drill should be no older than 14 days, with warning after
+10 days. Successful-drill ratio must remain at or above 95 percent, with
+warning below 98 percent once enough samples exist.
 
-The drill remains read-only with respect to GitHub Releases, tags, promotion
-state, and durable archive content.
+SLO evaluation is read-only and emits machine-readable evidence.

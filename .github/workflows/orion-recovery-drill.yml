@@ -56,6 +56,7 @@ jobs:
             --retention-class "${{ steps.drill.outputs.retention_class }}" \
             --run-id "${GITHUB_RUN_ID}" \
             --repository "${GITHUB_REPOSITORY}"
+
       - name: Configure AWS credentials through OIDC
         uses: aws-actions/configure-aws-credentials@v5
         with:
@@ -64,7 +65,6 @@ jobs:
 
       - name: Install AWS CLI
         run: python -m pip install --upgrade awscli
-
 
       - name: Download and verify durable archive identity
         env:
@@ -123,6 +123,35 @@ jobs:
           python tools/release/verify_recovery_drill.py \
             --record recovery-drill.json
 
+      - name: Build drill history
+        if: success()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          record = json.loads(Path("recovery-drill.json").read_text(encoding="utf-8"))
+          Path("recovery-drill-history.json").write_text(
+              json.dumps([record], indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Evaluate recovery SLOs
+        if: success()
+        run: |
+          python tools/release/evaluate_recovery_slos.py \
+            --policy release/recovery-slos.toml \
+            --latest-drill recovery-drill.json \
+            --history recovery-drill-history.json \
+            --output recovery-slo-report.json
+
+      - name: Verify recovery SLO report
+        if: success()
+        run: |
+          python tools/release/verify_recovery_slos.py \
+            --report recovery-slo-report.json
+
       - name: Upload recovery drill evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -130,6 +159,8 @@ jobs:
           name: recovery-drill-${{ steps.drill.outputs.tag }}-${{ github.run_id }}
           path: |
             recovery-drill.json
+            recovery-drill-history.json
+            recovery-slo-report.json
             restore-receipt.json
             restored-archive/release-archive-manifest.json
             restored-archive/release-archive.SHA256SUMS

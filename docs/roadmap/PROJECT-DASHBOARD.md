@@ -25,5 +25,6 @@
 | Release Retention & Archival | Complete (0.6.41) |
 | Durable Archive Export | Complete (0.6.42) |
 | Archive Restore & Disaster Recovery | Complete (0.6.43) |
-| Recovery Drill Automation | Active (0.6.44) |
-| Recovery Objectives & SLOs | Next |
+| Recovery Drill Automation | Complete (0.6.44) |
+| Recovery Objectives & SLOs | Active (0.6.45) |
+| Recovery SLO History & Trend Analysis | Next |

@@ -5,33 +5,19 @@ recover release evidence from durable storage.
 
 ## Schedule
 
-The workflow supports:
+The workflow supports manual dispatch and weekly scheduled execution.
 
-- manual dispatch;
-- weekly scheduled execution.
-
-Scheduled drills use:
-
-- `RECOVERY_DRILL_TAG`
-- `RECOVERY_DRILL_RETENTION_CLASS`
-
-Manual workflow inputs may override those values.
+Scheduled drills use `RECOVERY_DRILL_TAG` and
+`RECOVERY_DRILL_RETENTION_CLASS`. Manual inputs may override them.
 
 ## Drill result
 
-Every drill produces `recovery-drill.json` with:
+Every drill produces `recovery-drill.json` with the selected release, run
+identity, timestamps, elapsed seconds, PASS/FAIL status, restore receipt, and
+failure reason when applicable.
 
-- drill ID;
-- repository and workflow run ID;
-- selected release tag;
-- retention class;
-- start/completion timestamps;
-- elapsed seconds;
-- PASS or FAIL status;
-- restore receipt for passing drills;
-- failure reason for failed drills.
+0.6.45 additionally evaluates passing drill evidence against recovery
+objectives and writes `recovery-slo-report.json`.
 
-A passing drill requires remote verification, download verification, safe
-extraction, and restored evidence validation to succeed.
-
-Recovery drills are evidence-only and do not mutate release state.
+Recovery drills and SLO evaluation remain read-only and do not mutate release,
+tag, promotion, or durable archive state.
