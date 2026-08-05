@@ -18,6 +18,7 @@ on:
     - cron: "23 7 * * 1"
 
 permissions:
+  actions: read
   contents: read
   id-token: write
 
@@ -123,19 +124,37 @@ jobs:
           python tools/release/verify_recovery_drill.py \
             --record recovery-drill.json
 
-      - name: Build drill history
+      - name: Collect prior recovery drill artifacts
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p prior-drills
+          gh run list \
+            --repo "${GITHUB_REPOSITORY}" \
+            --workflow "Orion Recovery Drill" \
+            --status completed \
+            --limit 52 \
+            --json databaseId \
+            --jq '.[].databaseId' > prior-run-ids.txt
+
+          while read -r run_id; do
+            [ -z "${run_id}" ] && continue
+            mkdir -p "prior-drills/${run_id}"
+            gh run download "${run_id}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --dir "prior-drills/${run_id}" \
+              --pattern "recovery-drill-*" || true
+          done < prior-run-ids.txt
+
+      - name: Build recovery drill history
         if: success()
         run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          record = json.loads(Path("recovery-drill.json").read_text(encoding="utf-8"))
-          Path("recovery-drill-history.json").write_text(
-              json.dumps([record], indent=2, sort_keys=True) + "\n",
-              encoding="utf-8",
-          )
-          PY
+          python tools/release/build_recovery_history.py \
+            --prior-root prior-drills \
+            --current-record recovery-drill.json \
+            --maximum-records 52 \
+            --output recovery-drill-history.json
 
       - name: Evaluate recovery SLOs
         if: success()
@@ -146,11 +165,27 @@ jobs:
             --history recovery-drill-history.json \
             --output recovery-slo-report.json
 
+      - name: Analyze recovery trends
+        if: success()
+        run: |
+          python tools/release/analyze_recovery_trends.py \
+            --history recovery-drill-history.json \
+            --short-window 4 \
+            --long-window 12 \
+            --minimum-trend-samples 4 \
+            --output recovery-slo-trend.json
+
       - name: Verify recovery SLO report
         if: success()
         run: |
           python tools/release/verify_recovery_slos.py \
             --report recovery-slo-report.json
+
+      - name: Verify recovery SLO history
+        if: success()
+        run: |
+          python tools/release/verify_recovery_slo_history.py \
+            --trend recovery-slo-trend.json
 
       - name: Upload recovery drill evidence
         if: always()
@@ -161,6 +196,7 @@ jobs:
             recovery-drill.json
             recovery-drill-history.json
             recovery-slo-report.json
+            recovery-slo-trend.json
             restore-receipt.json
             restored-archive/release-archive-manifest.json
             restored-archive/release-archive.SHA256SUMS

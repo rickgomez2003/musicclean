@@ -1,15 +1,14 @@
 # Book 14 — Operations
 
-0.6.45 adds explicit recovery objectives and SLO evaluation.
+0.6.46 adds recovery SLO history and trend analysis.
 
-Recovery drill evidence is now evaluated against policy for recovery duration,
-age of the last successful drill, and successful-drill ratio. Metrics produce
-PASS, WARN, or FAIL outcomes, with warning thresholds providing early signal
-before a hard objective breach.
+Recovery Drill workflow artifacts are retrieved using GitHub Actions read-only
+permissions. The current drill is combined with prior records, de-duplicated,
+chronologically ordered, and bounded to 52 records.
 
-The default recovery-time objective is 900 seconds with warning at 720 seconds.
-The latest successful drill should be no older than 14 days, with warning after
-10 days. Successful-drill ratio must remain at or above 95 percent, with
-warning below 98 percent once enough samples exist.
+Orion calculates rolling 4-drill and 12-drill success ratios and average
+recovery durations. Recovery duration direction is classified as improving,
+stable, worsening, or insufficient data.
 
-SLO evaluation is read-only and emits machine-readable evidence.
+This allows the 0.6.45 success-ratio SLO to move from bootstrap WARN behavior
+toward evidence-backed evaluation as historical samples accumulate.

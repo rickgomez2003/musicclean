@@ -1,0 +1,9 @@
+[history]
+schema_version = 1
+maximum_records = 52
+minimum_trend_samples = 4
+short_window = 4
+long_window = 12
+artifact_lookup_runs = 52
+deduplicate_by = "drill_id"
+sort_by = "completed_at"
