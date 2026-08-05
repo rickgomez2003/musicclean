@@ -2,10 +2,18 @@
 
 MusicClean uses `src/musicclean/version.py` as the authoritative version source.
 
+## Dependency maintenance
+
+Dependabot proposes scheduled updates for Python packages, GitHub Actions, and
+the runtime Dockerfile. Routine version-update pull requests target `develop`
+and remain subject to normal branch protections and security gates.
+
+Dependabot automation proposes changes; it does not grant automatic merge
+authority.
+
 ## Dependency security gate
 
-Before a change reaches a controlled release, pull-request automation performs
-two dependency-security checks:
+Before a change reaches a controlled release:
 
 1. GitHub Dependency Review blocks newly introduced HIGH or CRITICAL
    vulnerabilities in runtime dependency changes.
@@ -26,25 +34,18 @@ production attestations.
 An annotated tag is created only from the exact merged commit that passed
 release-candidate validation.
 
-The production release workflow:
-
-1. builds and validates the wheel and source distribution;
-2. generates and validates an SPDX JSON SBOM for the wheel;
-3. generates SHA256SUMS including the SBOM;
-4. smoke-tests the built wheel;
-5. creates build-provenance attestations for release assets;
-6. creates an SBOM attestation binding the wheel to its SBOM;
-7. publishes all assets to the GitHub Release.
+The production release workflow builds and validates distribution artifacts,
+generates and validates the SPDX SBOM, generates checksums, smoke-tests the
+wheel, creates build and SBOM attestations, and publishes the GitHub Release.
 
 Published tags are immutable.
 
 ## Post-release verification
 
-Post-release verification downloads actual published release assets, verifies
-checksums, installs the published wheel into a clean environment, starts Orion,
-and verifies `/v1/health`.
+Post-release verification validates the actual published artifacts rather than
+only source-tree state.
 
 ## Stable release operations
 
-Patch and hotfix releases follow the same dependency-security, candidate,
-provenance, SBOM, and post-release verification path.
+Patch and hotfix releases follow the same dependency-maintenance,
+dependency-security, candidate, provenance, SBOM, and post-release path.
