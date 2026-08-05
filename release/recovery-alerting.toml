@@ -12,10 +12,16 @@ worsening = "ADVISORY"
 escalated = "ESCALATED"
 
 [alerting.delivery]
-environment = "release-archive-export"
+environment = "recovery-alert-delivery"
 url_secret = "RECOVERY_ALERT_WEBHOOK_URL"
 hmac_secret = "RECOVERY_ALERT_WEBHOOK_HMAC_SECRET"
 request_timeout_seconds = 10
-max_attempts = 3
+max_attempts = 4
+initial_backoff_seconds = 1
+maximum_backoff_seconds = 8
+retry_statuses = [408, 429]
+retry_server_errors = true
 require_https = true
 sign_payload = true
+idempotency_header = "X-MusicClean-Delivery-ID"
+signature_header = "X-MusicClean-Signature-SHA256"

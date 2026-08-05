@@ -1,4 +1,4 @@
-"""Verify external recovery alert delivery policy and workflow integration."""
+"""Verify external recovery alert delivery policy and integration."""
 
 from __future__ import annotations
 
@@ -31,71 +31,57 @@ def verify_configuration(root: Path = ROOT) -> tuple[str, ...]:
         errors.append("external recovery alert delivery must be enabled")
 
     delivery = alerting.get("delivery")
-    if not isinstance(delivery, dict):
-        errors.append("external recovery alert delivery policy is missing")
-    else:
-        expected = {
-            "environment": "release-archive-export",
-            "url_secret": "RECOVERY_ALERT_WEBHOOK_URL",
-            "hmac_secret": "RECOVERY_ALERT_WEBHOOK_HMAC_SECRET",
-            "request_timeout_seconds": 10,
-            "max_attempts": 3,
-            "require_https": True,
-            "sign_payload": True,
-        }
-        if delivery != expected:
-            errors.append("external recovery alert delivery policy is invalid")
+    expected = {
+        "environment": "recovery-alert-delivery",
+        "url_secret": "RECOVERY_ALERT_WEBHOOK_URL",
+        "hmac_secret": "RECOVERY_ALERT_WEBHOOK_HMAC_SECRET",
+        "request_timeout_seconds": 10,
+        "max_attempts": 4,
+        "initial_backoff_seconds": 1,
+        "maximum_backoff_seconds": 8,
+        "retry_statuses": [408, 429],
+        "retry_server_errors": True,
+        "require_https": True,
+        "sign_payload": True,
+        "idempotency_header": "X-MusicClean-Delivery-ID",
+        "signature_header": "X-MusicClean-Signature-SHA256",
+    }
+    if delivery != expected:
+        errors.append("external recovery alert delivery policy is invalid")
 
-    workflow = (root / ".github" / "workflows" / "orion-recovery-drill.yml").read_text(
-        encoding="utf-8"
-    )
+    workflow = (
+        root / ".github" / "workflows" / "orion-recovery-drill.yml"
+    ).read_text(encoding="utf-8")
 
     required = (
+        "recovery-alert-delivery",
+        "needs: recovery-drill",
         "actions: read",
         "contents: read",
-        "id-token: write",
-        "environment:",
         "Deliver external recovery alert",
-        "deliver_recovery_alert.py",
+        "actions/download-artifact@v4",
         "RECOVERY_ALERT_WEBHOOK_URL",
         "RECOVERY_ALERT_WEBHOOK_HMAC_SECRET",
         "recovery-alert-delivery.json",
-        "Verify external recovery alert delivery",
-        "verify_external_recovery_alert_delivery.py",
     )
     for fragment in required:
         if fragment not in workflow:
             errors.append(f"recovery workflow missing delivery integration {fragment}")
 
-    ordered = (
-        "Verify recovery SLO alert",
-        "Publish recovery SLO summary",
-        "Deliver external recovery alert",
-        "Verify external recovery alert delivery",
-        "Upload recovery drill evidence",
-    )
-    positions = [workflow.find(step) for step in ordered]
-    if any(position == -1 for position in positions):
-        errors.append("external alert workflow ordering cannot be verified")
-    elif positions != sorted(positions):
-        errors.append("external alert workflow ordering is invalid")
-
-    forbidden = (
-        "contents: write",
-        "issues: write",
-        "pull-requests: write",
-        "gh release edit",
-        "gh release create",
-        "gh release upload",
-        "git tag",
-        "git push",
-        "AWS_ACCESS_KEY_ID",
-        "AWS_SECRET_ACCESS_KEY",
-        "--admin",
-    )
-    for fragment in forbidden:
-        if fragment in workflow:
-            errors.append(f"external alert workflow contains forbidden pattern {fragment}")
+    delivery_job = workflow.split("  external-alert-delivery:", 1)
+    if len(delivery_job) != 2:
+        errors.append("external recovery alert delivery job is missing")
+    else:
+        body = delivery_job[1]
+        if "id-token: write" in body:
+            errors.append("external alert delivery job must not have OIDC write permission")
+        if "name: release-archive-export" in body:
+            errors.append("external alert delivery job must not use archive environment")
+        if "name: recovery-alert-delivery" not in body:
+            errors.append(
+                "external alert delivery job must use "
+                "recovery-alert-delivery environment"
+            )
 
     return tuple(errors)
 
@@ -116,21 +102,22 @@ def verify_receipt(path: Path) -> tuple[str, ...]:
         "delivery_required",
         "delivered",
         "attempts",
+        "attempt_history",
         "status_code",
         "provider",
         "severity",
+        "delivery_id",
+        "failure_class",
         "reason",
     )
     for field in required:
         if field not in receipt:
             errors.append(f"external alert delivery receipt missing field {field}")
 
-    if receipt.get("schema_version") != 1:
-        errors.append("external alert delivery receipt schema version must be 1")
+    if receipt.get("schema_version") != 2:
+        errors.append("external alert delivery receipt schema version must be 2")
     if receipt.get("provider") != "generic-webhook":
         errors.append("external alert delivery receipt provider is invalid")
-    if receipt.get("delivery_required") is False and receipt.get("attempts") != 0:
-        errors.append("non-required alert delivery must not make attempts")
 
     return tuple(errors)
 

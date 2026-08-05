@@ -1,15 +1,12 @@
-# Book 14 â€” Operations
+# Book 14 — Operations
 
-0.6.48 adds External Recovery Alert Delivery.
+0.6.49 adds Recovery Alert Delivery Resilience.
 
-Recovery alerts are delivered through a generic HTTPS webhook. Required alert
-payloads are HMAC-SHA256 signed. Healthy/no-alert results generate no external
-request.
+Archive recovery remains in `release-archive-export` with AWS OIDC. External
+notification delivery moves into a separate `recovery-alert-delivery`
+environment with read-only repository permissions and no OIDC write access.
 
-Delivery uses the protected `release-archive-export` GitHub Environment with
-two secrets: `RECOVERY_ALERT_WEBHOOK_URL` and
-`RECOVERY_ALERT_WEBHOOK_HMAC_SECRET`.
-
-Delivery is bounded to three attempts and a ten-second request timeout.
-Machine-readable receipts intentionally exclude secret values and destination
-URLs.
+Transient delivery failures use bounded exponential backoff. Terminal 4xx
+responses fail immediately. Delivery receipts include attempt history,
+classification, and a deterministic delivery ID without storing destination
+URLs or signing secrets.

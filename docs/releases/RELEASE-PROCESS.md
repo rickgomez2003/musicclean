@@ -19,12 +19,12 @@ MusicClean version. Published tags are immutable.
 
 ## Recovery operations
 
-Recovery drills exercise durable archive restoration, evaluate recovery SLOs,
-analyze historical trends, and generate structured alerts.
+Recovery drills restore durable evidence and evaluate recovery objectives.
+Alert generation remains part of recovery analysis.
 
-0.6.48 delivers required recovery alerts through a signed generic HTTPS
-webhook protected by the `release-archive-export` GitHub Environment.
-Delivery does not grant repository or release mutation permissions.
+Beginning with 0.6.49, external alert delivery is privilege-separated into a
+dedicated downstream job and environment. Delivery retries only transient
+failures and records a deterministic delivery identifier plus attempt history.
 
 ## Post-release verification
 
