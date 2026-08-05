@@ -5,27 +5,22 @@ MusicClean uses `src/musicclean/version.py` as the authoritative version source.
 ## Release-candidate validation
 
 Before creating a release tag, the intended release commit must pass the
-`Orion Release Candidate` workflow.
+`Orion Release Candidate` workflow. The workflow derives its candidate version
+from the authoritative package version; candidate commands and artifact names
+do not require manual version synchronization.
 
 ## Publish a controlled release
 
 An annotated tag is created only from the exact merged commit that passed
-release-candidate validation.
-
-Example:
-
-`git tag -a v0.6.30 -m "MusicClean 0.6.30"`
-
-`git push origin v0.6.30`
-
-The tag triggers the `Orion Release` workflow and publishes the wheel, source
-distribution, and SHA256SUMS. Published tags are immutable.
+release-candidate validation. Published tags are immutable.
 
 ## Post-release verification
 
 After publication, run `Orion Post Release Verification` against the published
-tag. It downloads the actual release assets, verifies checksums, installs the
-published wheel into a clean environment, starts Orion, and verifies
-`/v1/health`.
+tag. Historical version literals are permitted there because the workflow
+intentionally targets an immutable published release.
 
-Corrections use a new version rather than moving a published tag.
+## Stable release operations
+
+Patch and hotfix releases follow the same candidate, controlled-release, and
+post-release verification path. Existing tags are never moved or reused.
