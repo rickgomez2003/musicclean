@@ -23,23 +23,22 @@ attestations, and publishes the GitHub Release.
 
 Published tags are immutable.
 
-## Promotion, rollback, evidence, archival, export, and restore
-
-Promotion and rollback modify channel metadata only. Audit evidence is
-read-only. Verified evidence can be archived, exported to durable S3 storage,
-and restored through the verified disaster-recovery path.
-
 ## Recovery drill automation
 
-`Orion Recovery Drill` exercises the archive restore path manually and on a
-weekly schedule.
+Recovery drills exercise the durable archive restore path without mutating
+release state. They record PASS/FAIL results and elapsed recovery duration.
 
-A known durable archive is selected, restored, verified before extraction,
-safely extracted, and validated. The workflow records elapsed duration and
-PASS/FAIL evidence in a machine-readable recovery drill record.
+## Recovery objectives and SLOs
 
-Recovery drills never publish releases, create/push tags, modify promotion
-state, or change durable archive objects.
+Passing recovery drill evidence is evaluated against explicit objectives for
+recovery duration, successful-drill freshness, and successful-drill ratio.
+
+Evaluation produces PASS, WARN, or FAIL status in
+`recovery-slo-report.json`. Warning thresholds provide early operational signal
+before a hard objective breach.
+
+SLO evaluation is read-only and cannot publish releases, create/push tags,
+change promotion state, or mutate archive objects.
 
 ## Post-release verification
 

@@ -1,0 +1,16 @@
+[recovery]
+schema_version = 1
+status_levels = ["PASS", "WARN", "FAIL"]
+
+[recovery.duration_seconds]
+warning = 720
+objective = 900
+
+[recovery.successful_drill_age_days]
+warning = 10
+objective = 14
+
+[recovery.success_ratio]
+warning = 0.98
+objective = 0.95
+minimum_samples = 4
