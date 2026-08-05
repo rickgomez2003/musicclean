@@ -17,27 +17,29 @@ Before creating a release tag, the intended release commit must pass the
 Controlled releases require an annotated tag matching the authoritative
 MusicClean version.
 
-The production release workflow builds and validates distribution artifacts,
-generates checksums and the SPDX SBOM, smoke-tests the wheel, creates
-provenance/SBOM attestations, and publishes the GitHub Release.
+The production release workflow builds and validates artifacts, generates
+checksums and the SPDX SBOM, smoke-tests the wheel, creates provenance/SBOM
+attestations, and publishes the GitHub Release.
 
 Published tags are immutable.
 
-## Promotion and rollback
+## Promotion, rollback, and evidence
 
-Promotion and rollback change release-channel metadata only and never rebuild
-or replace immutable release artifacts.
+Promotion and rollback change release-channel metadata only. Audit evidence is
+collected separately and read-only from an existing published release.
 
-## Audit evidence
+## Retention and archival
 
-Release audit evidence is collected separately using the read-only
-`Orion Release Audit Evidence` workflow.
+Verified release audit evidence may be packaged by `Orion Release Archive` into
+a deterministic provider-neutral archive bundle.
 
-Evidence collection checks out the exact published tag, downloads release
-assets, validates SHA256SUMS, records release/workflow identity, verifies the
-expected release components, and uploads a machine-readable evidence bundle.
+The archive contains the original evidence bundle, an archive manifest, and
+SHA-256 integrity metadata.
 
-Evidence collection never edits the audited GitHub Release.
+Operational retention is 90 days. Long-term retention is at least 2555 days
+and requires external durable export before the GitHub Actions artifact expires.
+
+Archival never modifies the published GitHub Release or tag.
 
 ## Post-release verification
 

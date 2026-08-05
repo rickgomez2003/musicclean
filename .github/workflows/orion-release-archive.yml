@@ -1,0 +1,78 @@
+name: Orion Release Archive
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing published release tag
+        required: true
+        type: string
+      evidence_run_id:
+        description: Run ID that produced the release audit evidence artifact
+        required: true
+        type: string
+      retention_class:
+        description: Archive retention class
+        required: true
+        type: choice
+        options:
+          - operational
+          - long-term
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  archive:
+    name: Build Release Archive
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Download release audit evidence artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p evidence-input
+          gh run download "${{ inputs.evidence_run_id }}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --name "release-audit-evidence-${{ inputs.tag }}-${{ inputs.evidence_run_id }}" \
+            --dir evidence-input
+
+      - name: Verify source evidence
+        run: |
+          python tools/release/verify_audit_evidence.py \
+            --evidence evidence-input/release-audit-evidence.json
+
+      - name: Build deterministic archive
+        env:
+          ARCHIVE_TAG: ${{ inputs.tag }}
+          ARCHIVE_RETENTION_CLASS: ${{ inputs.retention_class }}
+          ARCHIVE_SOURCE_RUN_ID: ${{ inputs.evidence_run_id }}
+          ARCHIVE_RUN_ID: ${{ github.run_id }}
+          ARCHIVE_REPOSITORY: ${{ github.repository }}
+        run: |
+          python tools/release/build_release_archive.py \
+            --evidence-dir evidence-input \
+            --output-dir release-archive
+
+      - name: Verify archive
+        run: |
+          python tools/release/verify_retention_archival.py \
+            --archive-dir release-archive
+
+      - name: Upload release archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-archive-${{ inputs.tag }}-${{ inputs.retention_class }}-${{ github.run_id }}
+          path: release-archive/
+          retention-days: 90
+          if-no-files-found: error

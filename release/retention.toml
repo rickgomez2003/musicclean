@@ -1,0 +1,13 @@
+[retention]
+schema_version = 1
+default_class = "operational"
+artifact_retention_days = 90
+preserve_source_evidence = true
+deterministic_archives = true
+external_export_required_for_long_term = true
+
+[retention.classes.operational]
+minimum_days = 90
+
+[retention.classes.long-term]
+minimum_days = 2555
