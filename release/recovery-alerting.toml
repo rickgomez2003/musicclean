@@ -42,3 +42,25 @@ record_delivery_latency = true
 record_delivery_id = true
 record_destination = false
 record_secret_material = false
+
+[alerting.slos]
+schema_version = 1
+minimum_samples = 4
+publish_step_summary = true
+retain_days = 90
+
+[alerting.slos.success_rate]
+warn_below = 0.99
+fail_below = 0.95
+
+[alerting.slos.retry_rate]
+warn_above = 0.10
+fail_above = 0.25
+
+[alerting.slos.terminal_failure_rate]
+warn_above = 0.02
+fail_above = 0.05
+
+[alerting.slos.average_latency_seconds]
+warn_above = 5.0
+fail_above = 10.0

@@ -42,9 +42,9 @@ def verify_configuration(root: Path = ROOT) -> tuple[str, ...]:
     if observability != expected:
         errors.append("recovery alert delivery observability policy is invalid")
 
-    workflow = (
-        root / ".github" / "workflows" / "orion-recovery-drill.yml"
-    ).read_text(encoding="utf-8")
+    workflow = (root / ".github" / "workflows" / "orion-recovery-drill.yml").read_text(
+        encoding="utf-8"
+    )
 
     required = (
         "Collect prior delivery evidence",
@@ -90,6 +90,11 @@ def verify_observation(path: Path) -> tuple[str, ...]:
         "delivered",
         "attempt_count",
         "retry_count",
+        "aggregate_attempt_count",
+        "aggregate_retry_count",
+        "retry_rate",
+        "terminal_failure_count",
+        "terminal_failure_rate",
         "status_code",
         "failure_class",
         "provider",

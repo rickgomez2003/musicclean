@@ -57,11 +57,13 @@ def test_observation_records_attempts_retries_and_success_rate() -> None:
             "delivery_required": True,
             "delivered": True,
             "attempts": 1,
+            "failure_class": None,
         },
         {
             "delivery_required": True,
             "delivered": False,
             "attempts": 4,
+            "failure_class": "terminal-http",
         },
     ]
 
@@ -75,6 +77,11 @@ def test_observation_records_attempts_retries_and_success_rate() -> None:
     assert observation["retry_count"] == 2
     assert observation["sample_count"] == 3
     assert observation["success_rate"] == 2 / 3
+    assert observation["aggregate_attempt_count"] == 8
+    assert observation["aggregate_retry_count"] == 5
+    assert observation["retry_rate"] == 5 / 8
+    assert observation["terminal_failure_count"] == 1
+    assert observation["terminal_failure_rate"] == 1 / 3
     assert observation["average_latency_seconds"] == 1.25
     assert observation["maximum_latency_seconds"] == 1.25
 
