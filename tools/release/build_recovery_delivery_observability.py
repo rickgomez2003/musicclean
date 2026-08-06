@@ -66,17 +66,20 @@ def build(
     attempts = int(receipt.get("attempts", 0))
     retry_count = max(attempts - 1, 0)
 
-    latencies = [
-        latency
-        for item in combined
-        if (latency := _latency_seconds(item)) is not None
-    ]
-
-    success_rate = (
-        len(delivered) / len(required)
-        if required
-        else 1.0
+    aggregate_attempt_count = sum(int(item.get("attempts", 0)) for item in required)
+    aggregate_retry_count = sum(max(int(item.get("attempts", 0)) - 1, 0) for item in required)
+    retry_rate = (
+        aggregate_retry_count / aggregate_attempt_count if aggregate_attempt_count > 0 else 0.0
     )
+
+    terminal_failure_count = sum(
+        1 for item in required if item.get("failure_class") == "terminal-http"
+    )
+    terminal_failure_rate = terminal_failure_count / len(required) if required else 0.0
+
+    latencies = [latency for item in combined if (latency := _latency_seconds(item)) is not None]
+
+    success_rate = len(delivered) / len(required) if required else 1.0
 
     return {
         "schema_version": int(policy["schema_version"]),
@@ -86,6 +89,11 @@ def build(
         "delivered": receipt.get("delivered"),
         "attempt_count": attempts,
         "retry_count": retry_count,
+        "aggregate_attempt_count": aggregate_attempt_count,
+        "aggregate_retry_count": aggregate_retry_count,
+        "retry_rate": retry_rate,
+        "terminal_failure_count": terminal_failure_count,
+        "terminal_failure_rate": terminal_failure_rate,
         "status_code": receipt.get("status_code"),
         "failure_class": receipt.get("failure_class"),
         "provider": receipt.get("provider"),
@@ -93,9 +101,7 @@ def build(
         "required_sample_count": len(required),
         "delivered_sample_count": len(delivered),
         "success_rate": success_rate,
-        "average_latency_seconds": (
-            statistics.fmean(latencies) if latencies else None
-        ),
+        "average_latency_seconds": (statistics.fmean(latencies) if latencies else None),
         "maximum_latency_seconds": max(latencies) if latencies else None,
         "history_limit": int(policy["history_limit"]),
     }
