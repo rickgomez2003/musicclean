@@ -99,6 +99,7 @@ def verify_receipt(path: Path) -> tuple[str, ...]:
     required = (
         "schema_version",
         "delivered_at",
+        "elapsed_seconds",
         "delivery_required",
         "delivered",
         "attempts",
@@ -118,6 +119,15 @@ def verify_receipt(path: Path) -> tuple[str, ...]:
         errors.append("external alert delivery receipt schema version must be 2")
     if receipt.get("provider") != "generic-webhook":
         errors.append("external alert delivery receipt provider is invalid")
+
+    elapsed_seconds = receipt.get("elapsed_seconds")
+    if (
+        not isinstance(elapsed_seconds, (int, float))
+        or elapsed_seconds < 0
+    ):
+        errors.append(
+            "external alert delivery elapsed_seconds must be non-negative"
+        )
 
     return tuple(errors)
 

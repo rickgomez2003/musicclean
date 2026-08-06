@@ -1,12 +1,11 @@
 # Book 14 — Operations
 
-0.6.49 adds Recovery Alert Delivery Resilience.
+0.6.50 adds Recovery Alert Delivery Observability.
 
-Archive recovery remains in `release-archive-export` with AWS OIDC. External
-notification delivery moves into a separate `recovery-alert-delivery`
-environment with read-only repository permissions and no OIDC write access.
+The delivery job now derives operational metrics from its current receipt and
+up to 52 prior delivery artifacts. GitHub Actions summaries show delivery
+outcome, attempts, retries, HTTP status, failure class, sample count, and
+historical success rate.
 
-Transient delivery failures use bounded exponential backoff. Terminal 4xx
-responses fail immediately. Delivery receipts include attempt history,
-classification, and a deterministic delivery ID without storing destination
-URLs or signing secrets.
+Observability is artifact-based and excludes webhook destinations, signing
+secrets, and other secret material.

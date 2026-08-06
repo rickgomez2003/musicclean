@@ -30,5 +30,6 @@
 | Recovery SLO History & Trend Analysis | Complete (0.6.46) |
 | Recovery SLO Alerting & Escalation | Complete (0.6.47) |
 | External Recovery Alert Delivery | Complete (0.6.48) |
-| Recovery Alert Delivery Resilience | Active (0.6.49) |
-| Recovery Alert Delivery Observability | Next |
+| Recovery Alert Delivery Resilience | Complete (0.6.49) |
+| Recovery Alert Delivery Observability | Active (0.6.50) |
+| Recovery Alert Delivery SLOs | Next |

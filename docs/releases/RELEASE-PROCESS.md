@@ -20,11 +20,11 @@ MusicClean version. Published tags are immutable.
 ## Recovery operations
 
 Recovery drills restore durable evidence and evaluate recovery objectives.
-Alert generation remains part of recovery analysis.
+External delivery remains privilege separated from archive recovery.
 
-Beginning with 0.6.49, external alert delivery is privilege-separated into a
-dedicated downstream job and environment. Delivery retries only transient
-failures and records a deterministic delivery identifier plus attempt history.
+0.6.50 adds artifact-based delivery observability with bounded historical
+collection, machine-readable metrics, and GitHub Actions summaries. Secret
+material and destination URLs are excluded.
 
 ## Post-release verification
 

@@ -2,14 +2,9 @@
 
 External recovery alerts use a generic HTTPS webhook with HMAC-SHA256 signing.
 
-Beginning with 0.6.49, delivery runs in a separate `external-alert-delivery`
-job using the protected `recovery-alert-delivery` GitHub Environment.
+Delivery runs in the privilege-separated `external-alert-delivery` job using
+the protected `recovery-alert-delivery` GitHub Environment.
 
-Required environment secrets:
-- `RECOVERY_ALERT_WEBHOOK_URL`
-- `RECOVERY_ALERT_WEBHOOK_HMAC_SECRET`
-
-The delivery job does not receive AWS OIDC permissions.
-
-Retry behavior is limited to transient failures, and every delivery carries a
-deterministic idempotency/correlation identifier.
+0.6.50 adds delivery outcome, retry, failure classification, success-rate, and
+latency observability derived from delivery receipts and prior artifacts.
+Secret values and destination URLs are excluded from observability evidence.

@@ -77,10 +77,13 @@ def deliver(
     opener: Callable[..., Any] = urllib.request.urlopen,
     sleeper: Callable[[float], None] = time.sleep,
 ) -> dict[str, Any]:
+    started_at = time.monotonic()
+
     if not alert.get("alert_required"):
         return {
             "schema_version": 2,
             "delivered_at": datetime.now(UTC).isoformat(),
+            "elapsed_seconds": round(time.monotonic() - started_at, 6),
             "delivery_required": False,
             "delivered": False,
             "attempts": 0,
@@ -151,6 +154,10 @@ def deliver(
                 return {
                     "schema_version": 2,
                     "delivered_at": datetime.now(UTC).isoformat(),
+                    "elapsed_seconds": round(
+                        time.monotonic() - started_at,
+                        6,
+                    ),
                     "delivery_required": True,
                     "delivered": True,
                     "attempts": attempt,
@@ -194,6 +201,7 @@ def deliver(
     return {
         "schema_version": 2,
         "delivered_at": datetime.now(UTC).isoformat(),
+        "elapsed_seconds": round(time.monotonic() - started_at, 6),
         "delivery_required": True,
         "delivered": False,
         "attempts": len(attempt_history),
