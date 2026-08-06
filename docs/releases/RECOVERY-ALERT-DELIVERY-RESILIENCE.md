@@ -1,30 +1,16 @@
 # Recovery Alert Delivery Resilience
 
-Orion 0.6.49 separates recovery execution from webhook delivery.
+Orion separates recovery execution from webhook delivery.
 
-## Privilege separation
+The dedicated delivery job uses the `recovery-alert-delivery` environment,
+read-only repository permissions, and no OIDC write permission.
 
-`recovery-drill`:
-- environment: `release-archive-export`
-- OIDC enabled for archive access
+Retry semantics remain:
 
-`external-alert-delivery`:
-- environment: `recovery-alert-delivery`
-- no OIDC permission
-- webhook secrets only
+- retry HTTP 408;
+- retry HTTP 429;
+- retry HTTP 5xx;
+- retry network and timeout failures;
+- do not retry other HTTP 4xx responses.
 
-## Retry policy
-
-Retry:
-- HTTP 408
-- HTTP 429
-- HTTP 5xx
-- network/timeout failures
-
-Do not retry:
-- other HTTP 4xx responses
-
-Backoff is bounded exponential: 1, 2, 4, then at most 8 seconds.
-
-Every delivery uses a deterministic `X-MusicClean-Delivery-ID` derived from
-the canonical JSON payload and records attempt history in the delivery receipt.
+0.6.50 adds artifact-based observability around this resilient delivery path.

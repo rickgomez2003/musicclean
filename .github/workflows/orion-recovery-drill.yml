@@ -260,6 +260,28 @@ jobs:
         with:
           name: recovery-alert-handoff-${{ github.run_id }}
 
+      - name: Collect prior delivery evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p prior-deliveries
+          gh run list \
+            --repo "${GITHUB_REPOSITORY}" \
+            --workflow "Orion Recovery Drill" \
+            --status completed \
+            --limit 52 \
+            --json databaseId \
+            --jq '.[].databaseId' > prior-delivery-run-ids.txt
+
+          while read -r run_id; do
+            [ -z "${run_id}" ] && continue
+            mkdir -p "prior-deliveries/${run_id}"
+            gh run download "${run_id}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --dir "prior-deliveries/${run_id}" \
+              --pattern "recovery-alert-delivery-*" || true
+          done < prior-delivery-run-ids.txt
+
       - name: Deliver external recovery alert
         env:
           RECOVERY_ALERT_WEBHOOK_URL: ${{ secrets.RECOVERY_ALERT_WEBHOOK_URL }}
@@ -276,11 +298,34 @@ jobs:
           python tools/release/verify_external_recovery_alert_delivery.py \
             --receipt recovery-alert-delivery.json
 
+      - name: Build recovery delivery observability
+        if: ${{ always() && hashFiles('recovery-alert-delivery.json') != '' }}
+        run: |
+          python tools/release/build_recovery_delivery_observability.py \
+            --policy release/recovery-alerting.toml \
+            --receipt recovery-alert-delivery.json \
+            --history-root prior-deliveries \
+            --output recovery-alert-delivery-observability.json \
+            --summary recovery-alert-delivery-summary.md
+
+      - name: Verify recovery delivery observability
+        if: ${{ always() && hashFiles('recovery-alert-delivery-observability.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_observability.py \
+            --observation recovery-alert-delivery-observability.json
+
+      - name: Publish recovery delivery summary
+        if: ${{ always() && hashFiles('recovery-alert-delivery-summary.md') != '' }}
+        run: cat recovery-alert-delivery-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Upload delivery evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: recovery-alert-delivery-${{ github.run_id }}
-          path: recovery-alert-delivery.json
+          path: |
+            recovery-alert-delivery.json
+            recovery-alert-delivery-observability.json
+            recovery-alert-delivery-summary.md
           retention-days: 90
           if-no-files-found: warn

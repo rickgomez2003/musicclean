@@ -25,3 +25,20 @@ require_https = true
 sign_payload = true
 idempotency_header = "X-MusicClean-Delivery-ID"
 signature_header = "X-MusicClean-Signature-SHA256"
+
+[alerting.observability]
+schema_version = 1
+history_limit = 52
+short_window = 4
+long_window = 12
+minimum_trend_samples = 4
+publish_step_summary = true
+retain_days = 90
+record_attempt_count = true
+record_retry_count = true
+record_failure_class = true
+record_status_code = true
+record_delivery_latency = true
+record_delivery_id = true
+record_destination = false
+record_secret_material = false
