@@ -64,3 +64,12 @@ fail_above = 0.05
 [alerting.slos.average_latency_seconds]
 warn_above = 5.0
 fail_above = 10.0
+
+[alerting.slo_history]
+schema_version = 1
+maximum_records = 52
+short_window = 4
+long_window = 12
+minimum_trend_samples = 4
+retain_days = 90
+deduplicate = true

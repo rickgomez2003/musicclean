@@ -333,9 +333,62 @@ jobs:
         if: ${{ always() && hashFiles('recovery-alert-delivery-summary.md') != '' }}
         run: cat recovery-alert-delivery-summary.md >> "${GITHUB_STEP_SUMMARY}"
 
+      - name: Collect prior delivery SLO evidence
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo.json') != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p prior-delivery-slos
+          gh run list \
+            --repo "${GITHUB_REPOSITORY}" \
+            --workflow "Orion Recovery Drill" \
+            --status completed \
+            --limit 52 \
+            --json databaseId \
+            --jq '.[].databaseId' > prior-delivery-slo-run-ids.txt
+
+          while read -r run_id; do
+            [ -z "${run_id}" ] && continue
+            mkdir -p "prior-delivery-slos/${run_id}"
+            gh run download "${run_id}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --dir "prior-delivery-slos/${run_id}" \
+              --pattern "recovery-alert-delivery-*" || true
+          done < prior-delivery-slo-run-ids.txt
+
+      - name: Build recovery alert delivery SLO history
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo.json') != '' }}
+        run: |
+          python tools/release/build_recovery_alert_delivery_slo_history.py \
+            --prior-root prior-delivery-slos \
+            --current-report recovery-alert-delivery-slo.json \
+            --maximum-records 52 \
+            --output recovery-alert-delivery-slo-history.json
+
+      - name: Analyze recovery alert delivery SLO trends
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo-history.json') != '' }}
+        run: |
+          python tools/release/analyze_recovery_alert_delivery_slo_trends.py \
+            --history recovery-alert-delivery-slo-history.json \
+            --short-window 4 \
+            --long-window 12 \
+            --minimum-trend-samples 4 \
+            --output recovery-alert-delivery-slo-trend.json \
+            --summary recovery-alert-delivery-slo-trend-summary.md
+
+      - name: Verify recovery alert delivery SLO history
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo-trend.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_slo_history.py \
+            --trend recovery-alert-delivery-slo-trend.json
+
       - name: Publish recovery delivery SLO summary
         if: ${{ always() && hashFiles('recovery-alert-delivery-slo-summary.md') != '' }}
         run: cat recovery-alert-delivery-slo-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Publish recovery delivery SLO trend summary
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo-trend-summary.md') != '' }}
+        run: cat recovery-alert-delivery-slo-trend-summary.md >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Upload delivery evidence
         if: always()
@@ -348,5 +401,8 @@ jobs:
             recovery-alert-delivery-summary.md
             recovery-alert-delivery-slo.json
             recovery-alert-delivery-slo-summary.md
+            recovery-alert-delivery-slo-history.json
+            recovery-alert-delivery-slo-trend.json
+            recovery-alert-delivery-slo-trend-summary.md
           retention-days: 90
           if-no-files-found: warn
