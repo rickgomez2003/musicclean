@@ -8,3 +8,7 @@ HTTP status codes, server-error retry behavior, and transport retries.
 
 The selected route and deterministic delivery ID remain stable across retries,
 and each delivery receipt records an ordered attempt history.
+
+## Observability in 0.6.57
+
+0.6.57 consumes resilience receipts to provide bounded, secret-safe routed-delivery health metrics and summaries.

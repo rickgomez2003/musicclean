@@ -119,3 +119,15 @@ retry_status_codes = [408, 425, 429]
 retry_transport_errors = true
 preserve_route_across_retries = true
 preserve_delivery_id_across_retries = true
+
+[alerting.routed_delivery_observability]
+schema_version = 1
+history_limit = 52
+record_success_rate = true
+record_retry_rate = true
+record_attempt_distribution = true
+record_route_distribution = true
+record_failure_classes = true
+record_latency = true
+record_destination = false
+record_secret_material = false
