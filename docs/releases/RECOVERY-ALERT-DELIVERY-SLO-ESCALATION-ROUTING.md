@@ -8,3 +8,7 @@ escalation. Repeated non-pass conditions and worsening critical conditions can
 force the escalation route.
 
 This milestone generates evidence only. It does not perform external delivery.
+
+## Routed delivery in 0.6.55
+
+0.6.55 consumes the route decision and performs route-specific signed delivery using separately configured operations and incident-response endpoints.

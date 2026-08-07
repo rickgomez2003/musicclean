@@ -4,3 +4,7 @@
 
 History is read-only, artifact-based, deduplicated, capped at 52 records, and
 published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alerting (0.6.53)\n\n0.6.53 emits provider-neutral alert decisions from delivery SLO and trend evidence.\n\n\n## Recovery Alert Delivery SLO Escalation & Routing (0.6.54)\n\n0.6.54 converts provider-neutral SLO alert evidence into a provider-neutral routing decision.\n
+
+## Recovery Alert Delivery Routed Delivery (0.6.55)
+
+0.6.55 delivers route decisions through route-specific signed HTTPS webhooks and emits secret-safe receipts.
