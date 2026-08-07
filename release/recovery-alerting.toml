@@ -84,3 +84,16 @@ fail_severity = "CRITICAL"
 worsening_severity = "ADVISORY"
 escalated_severity = "ESCALATED"
 external_delivery_enabled = false
+
+[alerting.slo_routing]
+schema_version = 1
+default_route = "operations"
+escalation_route = "incident-response"
+consecutive_nonpass_escalation = 3
+escalate_worsening_critical = true
+external_delivery_enabled = false
+
+[alerting.slo_routing.routes]
+advisory = "operations"
+critical = "operations"
+escalated = "incident-response"

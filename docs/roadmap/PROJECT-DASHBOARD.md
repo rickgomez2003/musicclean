@@ -34,5 +34,5 @@
 | Recovery Alert Delivery Observability | Complete (0.6.50) |
 | Recovery Alert Delivery SLOs | Complete (0.6.51) |
 | Recovery Alert Delivery SLO History & Trends | Complete (0.6.52) |
-| Recovery Alert Delivery SLO Alerting | Active (0.6.53) |
-| Recovery Alert Delivery SLO Escalation & Routing | Next |
+| Recovery Alert Delivery SLO Alerting | Complete (0.6.53) |
+| Recovery Alert Delivery SLO Escalation & Routing | Active (0.6.54) |
