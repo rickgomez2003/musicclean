@@ -449,6 +449,7 @@ jobs:
             --alert recovery-alert-delivery-slo-alert.json \
             --endpoint-url "${endpoint_url}" \
             --hmac-secret "${hmac_secret}" \
+            --policy release/recovery-alerting.toml \
             --receipt recovery-alert-routed-delivery.json
 
       - name: Verify routed recovery alert delivery
@@ -456,6 +457,13 @@ jobs:
         run: |
           python tools/release/verify_recovery_alert_delivery_routed_delivery.py \
             --receipt recovery-alert-routed-delivery.json
+
+      - name: Verify routed recovery alert delivery resilience
+        if: ${{ always() && hashFiles('recovery-alert-routed-delivery.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_delivery_resilience.py \
+            --receipt recovery-alert-routed-delivery.json
+
 
       - name: Publish recovery delivery SLO routing summary
         if: ${{ always() && hashFiles('recovery-alert-delivery-slo-route-summary.md') != '' }}

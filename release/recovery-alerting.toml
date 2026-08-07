@@ -107,3 +107,15 @@ incident_hmac_secret = "RECOVERY_ALERT_INCIDENT_HMAC_SECRET"
 timeout_seconds = 10
 require_https = true
 signed_payloads = true
+
+[alerting.routed_delivery_resilience]
+schema_version = 1
+max_attempts = 4
+initial_backoff_seconds = 1
+backoff_multiplier = 2
+max_backoff_seconds = 8
+retry_server_errors = true
+retry_status_codes = [408, 425, 429]
+retry_transport_errors = true
+preserve_route_across_retries = true
+preserve_delivery_id_across_retries = true

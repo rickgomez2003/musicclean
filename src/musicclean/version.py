@@ -1,3 +1,3 @@
 """Authoritative MusicClean package version."""
 
-__version__ = "0.6.55"
+__version__ = "0.6.56"
