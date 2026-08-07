@@ -12,3 +12,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed Delivery Resilience (0.6.56)
 
 0.6.56 adds bounded retries, exponential backoff, stable delivery IDs, and attempt history to route-specific recovery alert delivery.
+
+## Recovery Alert Delivery Routed Delivery Observability (0.6.57)
+
+0.6.57 aggregates bounded routed-delivery receipts into success, retry, attempt, route, failure-class, and latency observability while excluding destination and secret material.

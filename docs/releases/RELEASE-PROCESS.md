@@ -28,3 +28,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed recovery alert delivery resilience
 
 0.6.56 verifies bounded retry policy, route preservation, stable delivery identity, and secret-safe attempt history.
+
+## Routed recovery alert delivery observability
+
+0.6.57 generates and verifies secret-safe routed-delivery observability artifacts and publishes the summary with recovery drill evidence.
