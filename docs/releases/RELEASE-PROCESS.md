@@ -19,4 +19,4 @@ recovery alert delivery SLO evidence.
 
 ## Post-release verification
 
-Post-release verification validates actual published artifacts.
+Post-release verification validates actual published artifacts.\n\n## Recovery alert delivery SLO alerting\n\n0.6.53 emits a provider-neutral alert decision without new write privileges.\n

@@ -73,3 +73,14 @@ long_window = 12
 minimum_trend_samples = 4
 retain_days = 90
 deduplicate = true
+
+[alerting.slo_alerting]
+schema_version = 1
+minimum_trend_samples = 4
+alert_on_worsening_trend = true
+consecutive_nonpass_escalation = 2
+warn_severity = "ADVISORY"
+fail_severity = "CRITICAL"
+worsening_severity = "ADVISORY"
+escalated_severity = "ESCALATED"
+external_delivery_enabled = false
