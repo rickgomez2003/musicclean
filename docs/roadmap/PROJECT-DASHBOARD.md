@@ -32,5 +32,6 @@
 | External Recovery Alert Delivery | Complete (0.6.48) |
 | Recovery Alert Delivery Resilience | Complete (0.6.49) |
 | Recovery Alert Delivery Observability | Complete (0.6.50) |
-| Recovery Alert Delivery SLOs | Active (0.6.51) |
-| Recovery Alert Delivery SLO History & Trends | Next |
+| Recovery Alert Delivery SLOs | Complete (0.6.51) |
+| Recovery Alert Delivery SLO History & Trends | Active (0.6.52) |
+| Recovery Alert Delivery SLO Alerting | Next |
