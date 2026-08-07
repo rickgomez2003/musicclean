@@ -417,6 +417,46 @@ jobs:
           python tools/release/verify_recovery_alert_delivery_slo_routing.py \
             --route recovery-alert-delivery-slo-route.json
 
+      - name: Deliver routed recovery alert
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo-route.json') != '' }}
+        shell: bash
+        env:
+          RECOVERY_ALERT_OPERATIONS_WEBHOOK_URL: ${{ secrets.RECOVERY_ALERT_OPERATIONS_WEBHOOK_URL }}
+          RECOVERY_ALERT_OPERATIONS_HMAC_SECRET: ${{ secrets.RECOVERY_ALERT_OPERATIONS_HMAC_SECRET }}
+          RECOVERY_ALERT_INCIDENT_WEBHOOK_URL: ${{ secrets.RECOVERY_ALERT_INCIDENT_WEBHOOK_URL }}
+          RECOVERY_ALERT_INCIDENT_HMAC_SECRET: ${{ secrets.RECOVERY_ALERT_INCIDENT_HMAC_SECRET }}
+        run: |
+          route="$(python -c 'import json; print(json.load(open("recovery-alert-delivery-slo-route.json", encoding="utf-8"))["route"])')"
+
+          if [ "${route}" = "operations" ]; then
+            endpoint_url="${RECOVERY_ALERT_OPERATIONS_WEBHOOK_URL}"
+            hmac_secret="${RECOVERY_ALERT_OPERATIONS_HMAC_SECRET}"
+          elif [ "${route}" = "incident-response" ]; then
+            endpoint_url="${RECOVERY_ALERT_INCIDENT_WEBHOOK_URL}"
+            hmac_secret="${RECOVERY_ALERT_INCIDENT_HMAC_SECRET}"
+          else
+            echo "No routed recovery alert delivery required for route: ${route}"
+            exit 0
+          fi
+
+          if [ -z "${endpoint_url}" ] || [ -z "${hmac_secret}" ]; then
+            echo "Required routed recovery alert delivery secret is not configured"
+            exit 1
+          fi
+
+          python tools/release/deliver_routed_recovery_alert.py \
+            --route recovery-alert-delivery-slo-route.json \
+            --alert recovery-alert-delivery-slo-alert.json \
+            --endpoint-url "${endpoint_url}" \
+            --hmac-secret "${hmac_secret}" \
+            --receipt recovery-alert-routed-delivery.json
+
+      - name: Verify routed recovery alert delivery
+        if: ${{ always() && hashFiles('recovery-alert-routed-delivery.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_delivery.py \
+            --receipt recovery-alert-routed-delivery.json
+
       - name: Publish recovery delivery SLO routing summary
         if: ${{ always() && hashFiles('recovery-alert-delivery-slo-route-summary.md') != '' }}
         run: cat recovery-alert-delivery-slo-route-summary.md >> "${GITHUB_STEP_SUMMARY}"
@@ -447,5 +487,6 @@ jobs:
             recovery-alert-delivery-slo-alert-summary.md
             recovery-alert-delivery-slo-route.json
             recovery-alert-delivery-slo-route-summary.md
+            recovery-alert-routed-delivery.json
           retention-days: 90
           if-no-files-found: warn

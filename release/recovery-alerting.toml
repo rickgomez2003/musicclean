@@ -97,3 +97,13 @@ external_delivery_enabled = false
 advisory = "operations"
 critical = "operations"
 escalated = "incident-response"
+
+[alerting.routed_delivery]
+schema_version = 1
+operations_url_secret = "RECOVERY_ALERT_OPERATIONS_WEBHOOK_URL"
+operations_hmac_secret = "RECOVERY_ALERT_OPERATIONS_HMAC_SECRET"
+incident_url_secret = "RECOVERY_ALERT_INCIDENT_WEBHOOK_URL"
+incident_hmac_secret = "RECOVERY_ALERT_INCIDENT_HMAC_SECRET"
+timeout_seconds = 10
+require_https = true
+signed_payloads = true
