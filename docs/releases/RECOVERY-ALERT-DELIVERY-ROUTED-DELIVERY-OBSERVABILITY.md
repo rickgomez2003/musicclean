@@ -8,3 +8,7 @@ route distribution, failure-class counts, and latency statistics.
 
 A Markdown summary is published to the recovery drill job summary and both
 artifacts are retained with recovery drill evidence.
+
+## SLO evaluation in 0.6.58
+
+0.6.58 converts routed-delivery observability into sample-gated PASS, WARN, and FAIL service-level evidence.

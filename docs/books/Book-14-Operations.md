@@ -16,3 +16,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed Delivery Observability (0.6.57)
 
 0.6.57 aggregates bounded routed-delivery receipts into success, retry, attempt, route, failure-class, and latency observability while excluding destination and secret material.
+
+## Recovery Alert Delivery Routed Delivery SLOs (0.6.58)
+
+0.6.58 evaluates routed-delivery observability against sample-gated, policy-driven service-level objectives.

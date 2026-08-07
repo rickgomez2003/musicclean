@@ -131,3 +131,31 @@ record_failure_classes = true
 record_latency = true
 record_destination = false
 record_secret_material = false
+
+[alerting.routed_delivery_slos]
+schema_version = 1
+minimum_samples = 4
+
+[alerting.routed_delivery_slos.success_rate]
+warn_below = 0.98
+fail_below = 0.95
+
+[alerting.routed_delivery_slos.retry_rate]
+warn_above = 0.20
+fail_above = 0.35
+
+[alerting.routed_delivery_slos.average_attempts]
+warn_above = 1.50
+fail_above = 2.00
+
+[alerting.routed_delivery_slos.average_latency_seconds]
+warn_above = 5.0
+fail_above = 10.0
+
+[alerting.routed_delivery_slos.terminal_http_failure_rate]
+warn_above = 0.02
+fail_above = 0.05
+
+[alerting.routed_delivery_slos.transport_failure_rate]
+warn_above = 0.02
+fail_above = 0.05
