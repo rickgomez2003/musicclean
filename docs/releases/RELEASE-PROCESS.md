@@ -32,3 +32,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed recovery alert delivery observability
 
 0.6.57 generates and verifies secret-safe routed-delivery observability artifacts and publishes the summary with recovery drill evidence.
+
+## Routed recovery alert delivery SLOs
+
+0.6.58 evaluates and verifies secret-safe, policy-driven routed-delivery SLO evidence during recovery drills.
