@@ -402,6 +402,25 @@ jobs:
           python tools/release/verify_recovery_alert_delivery_slo_alerting.py \
             --alert recovery-alert-delivery-slo-alert.json
 
+      - name: Build recovery alert delivery SLO route
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo-alert.json') != '' }}
+        run: |
+          python tools/release/build_recovery_alert_delivery_slo_route.py \
+            --policy release/recovery-alerting.toml \
+            --alert recovery-alert-delivery-slo-alert.json \
+            --output recovery-alert-delivery-slo-route.json \
+            --summary recovery-alert-delivery-slo-route-summary.md
+
+      - name: Verify recovery alert delivery SLO route
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo-route.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_slo_routing.py \
+            --route recovery-alert-delivery-slo-route.json
+
+      - name: Publish recovery delivery SLO routing summary
+        if: ${{ always() && hashFiles('recovery-alert-delivery-slo-route-summary.md') != '' }}
+        run: cat recovery-alert-delivery-slo-route-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Publish recovery delivery SLO alert summary
         if: ${{ always() && hashFiles('recovery-alert-delivery-slo-alert-summary.md') != '' }}
         run: cat recovery-alert-delivery-slo-alert-summary.md >> "${GITHUB_STEP_SUMMARY}"
@@ -426,5 +445,7 @@ jobs:
             recovery-alert-delivery-slo-trend-summary.md
             recovery-alert-delivery-slo-alert.json
             recovery-alert-delivery-slo-alert-summary.md
+            recovery-alert-delivery-slo-route.json
+            recovery-alert-delivery-slo-route-summary.md
           retention-days: 90
           if-no-files-found: warn
