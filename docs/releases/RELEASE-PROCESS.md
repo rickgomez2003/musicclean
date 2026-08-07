@@ -24,3 +24,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Recovery alert routed delivery
 
 0.6.55 performs signed route-specific webhook delivery and retains a secret-safe delivery receipt with recovery drill evidence.
+
+## Routed recovery alert delivery resilience
+
+0.6.56 verifies bounded retry policy, route preservation, stable delivery identity, and secret-safe attempt history.

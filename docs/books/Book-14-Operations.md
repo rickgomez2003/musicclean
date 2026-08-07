@@ -8,3 +8,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed Delivery (0.6.55)
 
 0.6.55 delivers route decisions through route-specific signed HTTPS webhooks and emits secret-safe receipts.
+
+## Recovery Alert Delivery Routed Delivery Resilience (0.6.56)
+
+0.6.56 adds bounded retries, exponential backoff, stable delivery IDs, and attempt history to route-specific recovery alert delivery.

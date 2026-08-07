@@ -9,3 +9,7 @@ secret.
 
 The delivery tool emits a secret-safe receipt containing route, severity,
 status, elapsed time, deterministic delivery ID, and failure classification.
+
+## Resilience in 0.6.56
+
+0.6.56 adds bounded retry behavior while preserving route selection and deterministic delivery identity across attempts.
