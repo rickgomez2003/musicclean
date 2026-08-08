@@ -52,3 +52,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed recovery SLO alert delivery
 
 0.6.62 performs route-specific HTTPS delivery for routed SLO alerts, using HMAC-SHA256 signatures and secret-safe receipt evidence.
+
+## Routed SLO alert delivery resilience
+
+0.6.63 applies bounded retry policy and retains secret-safe per-attempt evidence.

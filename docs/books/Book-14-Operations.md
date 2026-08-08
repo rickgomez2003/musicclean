@@ -36,3 +36,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery (0.6.62)
 
 0.6.62 delivers routed SLO alerts to route-specific HTTPS webhooks using separate HMAC credentials and secret-safe receipts.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Resilience (0.6.63)
+
+0.6.63 adds bounded retries, exponential backoff, deterministic delivery IDs, and secret-safe attempt history.
