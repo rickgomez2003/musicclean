@@ -593,6 +593,25 @@ jobs:
           python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery.py \
             --receipt recovery-alert-routed-slo-delivery.json
 
+      - name: Build routed recovery SLO alert delivery observability
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery.json') != '' }}
+        run: |
+          python tools/release/build_recovery_alert_routed_slo_delivery_observability.py \
+            --policy release/recovery-alerting.toml \
+            --receipt recovery-alert-routed-slo-delivery.json \
+            --output recovery-alert-routed-slo-delivery-observability.json \
+            --summary recovery-alert-routed-slo-delivery-observability-summary.md
+
+      - name: Verify routed recovery SLO alert delivery observability
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-observability.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_observability.py \
+            --report recovery-alert-routed-slo-delivery-observability.json
+
+      - name: Publish routed recovery SLO alert delivery observability summary
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-observability-summary.md') != '' }}
+        run: cat recovery-alert-routed-slo-delivery-observability-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Publish routed recovery alert delivery SLO route summary
         if: ${{ always() && hashFiles('recovery-alert-routed-delivery-slo-route-summary.md') != '' }}
         run: cat recovery-alert-routed-delivery-slo-route-summary.md >> "${GITHUB_STEP_SUMMARY}"

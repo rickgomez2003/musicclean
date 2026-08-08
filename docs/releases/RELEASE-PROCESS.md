@@ -56,3 +56,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed SLO alert delivery resilience
 
 0.6.63 applies bounded retry policy and retains secret-safe per-attempt evidence.
+
+## Routed SLO alert delivery observability
+
+0.6.64 builds and verifies bounded, secret-safe routed SLO delivery observability.
