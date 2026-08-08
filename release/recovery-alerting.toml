@@ -197,3 +197,12 @@ https_required = true
 signature_algorithm = "hmac-sha256"
 operations_secret_prefix = "RECOVERY_SLO_ALERT_OPERATIONS_"
 incident_secret_prefix = "RECOVERY_SLO_ALERT_INCIDENT_"
+
+[alerting.routed_slo_alert_delivery_resilience]
+schema_version = 1
+max_attempts = 3
+base_delay_seconds = 1.0
+max_delay_seconds = 4.0
+retryable_http_statuses = [408, 425, 429, 500, 502, 503, 504]
+retry_transport_errors = true
+preserve_delivery_id = true

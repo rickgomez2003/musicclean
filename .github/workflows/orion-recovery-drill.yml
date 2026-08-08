@@ -584,6 +584,7 @@ jobs:
             --alert recovery-alert-routed-delivery-slo-alert.json \
             --endpoint-url "${endpoint_url}" \
             --hmac-secret "${hmac_secret}" \
+            --policy release/recovery-alerting.toml \
             --receipt recovery-alert-routed-slo-delivery.json
 
       - name: Verify routed recovery SLO alert delivery
