@@ -190,3 +190,10 @@ NONE = "none"
 ADVISORY = "operations"
 CRITICAL = "incident-response"
 ESCALATED = "incident-response"
+
+[alerting.routed_slo_alert_delivery]
+schema_version = 1
+https_required = true
+signature_algorithm = "hmac-sha256"
+operations_secret_prefix = "RECOVERY_SLO_ALERT_OPERATIONS_"
+incident_secret_prefix = "RECOVERY_SLO_ALERT_INCIDENT_"

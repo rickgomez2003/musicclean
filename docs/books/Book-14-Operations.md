@@ -32,3 +32,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed Delivery SLO Escalation & Routing (0.6.61)
 
 0.6.61 maps provider-neutral routed-delivery SLO alerts to logical operations or incident-response routes while keeping external delivery disabled.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery (0.6.62)
+
+0.6.62 delivers routed SLO alerts to route-specific HTTPS webhooks using separate HMAC credentials and secret-safe receipts.
