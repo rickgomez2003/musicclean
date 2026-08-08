@@ -44,3 +44,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Observability (0.6.64)
 
 0.6.64 adds bounded secret-safe delivery observability evidence.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery SLOs (0.6.65)
+
+0.6.65 evaluates routed SLO delivery success, retries, attempt count, and transport failure health using sample-gated policy thresholds.

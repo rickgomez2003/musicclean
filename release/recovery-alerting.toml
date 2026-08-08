@@ -212,3 +212,16 @@ schema_version = 1
 max_attempt_records = 10
 retain_days = 90
 external_export_enabled = false
+
+[alerting.routed_slo_alert_delivery_slos]
+schema_version = 1
+minimum_samples = 5
+sample_count = 5
+success_rate_warn = 0.99
+success_rate_fail = 0.95
+retry_rate_warn = 0.10
+retry_rate_fail = 0.25
+average_attempts_warn = 1.25
+average_attempts_fail = 2.0
+transport_failure_rate_warn = 0.02
+transport_failure_rate_fail = 0.05
