@@ -60,3 +60,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed SLO alert delivery observability
 
 0.6.64 builds and verifies bounded, secret-safe routed SLO delivery observability.
+
+## Routed SLO alert delivery SLOs
+
+0.6.65 evaluates and verifies routed SLO alert delivery SLO evidence before release validation.
