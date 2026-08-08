@@ -9,3 +9,7 @@ attempts, average latency, terminal HTTP failures, and transport failures.
 
 A minimum-sample gate marks whether the report is authoritative. Structured JSON
 and Markdown summary evidence are retained with the recovery drill artifacts.
+
+## History and trends in 0.6.59
+
+0.6.59 retains bounded routed-delivery SLO evidence and classifies per-metric trends as improving, stable, worsening, or insufficient.

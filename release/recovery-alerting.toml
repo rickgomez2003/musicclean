@@ -159,3 +159,13 @@ fail_above = 0.05
 [alerting.routed_delivery_slos.transport_failure_rate]
 warn_above = 0.02
 fail_above = 0.05
+
+[alerting.routed_delivery_slo_history]
+schema_version = 1
+history_limit = 52
+short_window = 4
+long_window = 12
+minimum_trend_samples = 4
+trend_tolerance = 0.000001
+retain_days = 90
+deduplicate = true

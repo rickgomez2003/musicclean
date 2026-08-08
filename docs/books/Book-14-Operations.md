@@ -20,3 +20,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed Delivery SLOs (0.6.58)
 
 0.6.58 evaluates routed-delivery observability against sample-gated, policy-driven service-level objectives.
+
+## Recovery Alert Delivery Routed Delivery SLO History & Trends (0.6.59)
+
+0.6.59 adds bounded, deduplicated routed-delivery SLO history and sample-gated short/long-window trend analysis.

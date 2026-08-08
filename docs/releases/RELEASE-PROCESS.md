@@ -36,3 +36,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed recovery alert delivery SLOs
 
 0.6.58 evaluates and verifies secret-safe, policy-driven routed-delivery SLO evidence during recovery drills.
+
+## Routed recovery alert delivery SLO history and trends
+
+0.6.59 builds bounded, deduplicated routed-delivery SLO history and verifies secret-safe trend evidence during recovery drills.
