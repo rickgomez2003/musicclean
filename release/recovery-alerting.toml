@@ -169,3 +169,13 @@ minimum_trend_samples = 4
 trend_tolerance = 0.000001
 retain_days = 90
 deduplicate = true
+
+[alerting.routed_delivery_slo_alerting]
+schema_version = 1
+alert_on_worsening_trend = true
+consecutive_nonpass_escalation = 2
+warn_severity = "ADVISORY"
+fail_severity = "CRITICAL"
+worsening_severity = "ADVISORY"
+escalated_severity = "ESCALATED"
+external_delivery_enabled = false

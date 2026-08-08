@@ -10,3 +10,7 @@ INSUFFICIENT_SAMPLES.
 
 Structured history, trend JSON, and Markdown trend summaries are retained with
 recovery drill evidence.
+
+## Alerting in 0.6.60
+
+0.6.60 consumes routed-delivery SLO history and trend evidence to produce provider-neutral alert decisions without external delivery.
