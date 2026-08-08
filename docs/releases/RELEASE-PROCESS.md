@@ -48,3 +48,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed recovery alert delivery SLO escalation and routing
 
 0.6.61 builds and verifies provider-neutral SLO routing evidence before any future external-delivery layer is permitted.
+
+## Routed recovery SLO alert delivery
+
+0.6.62 performs route-specific HTTPS delivery for routed SLO alerts, using HMAC-SHA256 signatures and secret-safe receipt evidence.
