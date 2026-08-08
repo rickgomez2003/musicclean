@@ -179,3 +179,14 @@ fail_severity = "CRITICAL"
 worsening_severity = "ADVISORY"
 escalated_severity = "ESCALATED"
 external_delivery_enabled = false
+
+[alerting.routed_delivery_slo_routing]
+schema_version = 1
+escalated_route = "incident-response"
+external_delivery_enabled = false
+
+[alerting.routed_delivery_slo_routing.severity_routes]
+NONE = "none"
+ADVISORY = "operations"
+CRITICAL = "incident-response"
+ESCALATED = "incident-response"
