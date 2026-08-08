@@ -495,6 +495,35 @@ jobs:
           python tools/release/verify_recovery_alert_delivery_routed_delivery_slos.py \
             --report recovery-alert-routed-delivery-slo.json
 
+      - name: Build routed recovery alert delivery SLO history
+        if: ${{ always() && hashFiles('recovery-alert-routed-delivery-slo.json') != '' }}
+        run: |
+          python tools/release/build_recovery_alert_routed_delivery_slo_history.py \
+            --policy release/recovery-alerting.toml \
+            --report recovery-alert-routed-delivery-slo.json \
+            --history-root prior-deliveries \
+            --output recovery-alert-routed-delivery-slo-history.json
+
+      - name: Analyze routed recovery alert delivery SLO trends
+        if: ${{ always() && hashFiles('recovery-alert-routed-delivery-slo-history.json') != '' }}
+        run: |
+          python tools/release/analyze_recovery_alert_routed_delivery_slo_trends.py \
+            --policy release/recovery-alerting.toml \
+            --history recovery-alert-routed-delivery-slo-history.json \
+            --output recovery-alert-routed-delivery-slo-trend.json \
+            --summary recovery-alert-routed-delivery-slo-trend-summary.md
+
+      - name: Verify routed recovery alert delivery SLO history
+        if: ${{ always() && hashFiles('recovery-alert-routed-delivery-slo-trend.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_delivery_slo_history.py \
+            --history recovery-alert-routed-delivery-slo-history.json \
+            --trend recovery-alert-routed-delivery-slo-trend.json
+
+      - name: Publish routed recovery alert delivery SLO trend summary
+        if: ${{ always() && hashFiles('recovery-alert-routed-delivery-slo-trend-summary.md') != '' }}
+        run: cat recovery-alert-routed-delivery-slo-trend-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Publish routed recovery alert delivery SLO summary
         if: ${{ always() && hashFiles('recovery-alert-routed-delivery-slo-summary.md') != '' }}
         run: cat recovery-alert-routed-delivery-slo-summary.md >> "${GITHUB_STEP_SUMMARY}"
