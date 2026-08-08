@@ -40,3 +40,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Resilience (0.6.63)
 
 0.6.63 adds bounded retries, exponential backoff, deterministic delivery IDs, and secret-safe attempt history.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Observability (0.6.64)
+
+0.6.64 adds bounded secret-safe delivery observability evidence.
