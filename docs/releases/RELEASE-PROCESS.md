@@ -68,3 +68,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed SLO alert delivery SLO history and trends
 
 0.6.66 builds, verifies, and retains bounded secret-safe SLO history and trend evidence before release validation.
+
+## Routed SLO alert delivery SLO alerting
+
+0.6.67 builds and verifies provider-neutral routed SLO delivery SLO alert evidence before release validation.

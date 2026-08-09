@@ -47,5 +47,6 @@
 | Recovery Alert Delivery Routed SLO Alert Delivery Resilience | Complete (0.6.63) |
 | Recovery Alert Delivery Routed SLO Alert Delivery Observability | Complete (0.6.64) |
 | Recovery Alert Delivery Routed SLO Alert Delivery SLOs | Complete (0.6.65) |
-| Recovery Alert Delivery Routed SLO Alert Delivery SLO History & Trends | Active (0.6.66) |
-| Recovery Alert Delivery Routed SLO Alert Delivery SLO Alerting | Next |
+| Recovery Alert Delivery Routed SLO Alert Delivery SLO History & Trends | Complete (0.6.66) |
+| Recovery Alert Delivery Routed SLO Alert Delivery SLO Alerting | Active (0.6.67) |
+| Recovery Alert Delivery Routed SLO Alert Delivery SLO Escalation & Routing | Next |

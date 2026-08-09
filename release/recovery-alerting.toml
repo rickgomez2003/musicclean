@@ -233,3 +233,13 @@ minimum_trend_samples = 4
 short_window = 2
 long_window = 4
 read_only = true
+
+[alerting.routed_slo_alert_delivery_slo_alerting]
+schema_version = 1
+warn_severity = "ADVISORY"
+fail_severity = "CRITICAL"
+worsening_trend_severity = "ADVISORY"
+alert_on_worsening_trend = true
+escalate_after_consecutive_non_passing = 3
+external_delivery_enabled = false
+provider_neutral = true
