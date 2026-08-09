@@ -48,3 +48,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery SLOs (0.6.65)
 
 0.6.65 evaluates routed SLO delivery success, retries, attempt count, and transport failure health using sample-gated policy thresholds.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery SLO History & Trends (0.6.66)
+
+0.6.66 adds bounded, deduplicated SLO history plus sample-gated trend classification for routed SLO alert delivery.
