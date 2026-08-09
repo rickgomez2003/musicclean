@@ -623,6 +623,34 @@ jobs:
           python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_slos.py \
             --report recovery-alert-routed-slo-delivery-slos.json
 
+      - name: Build routed recovery SLO alert delivery SLO history
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-slos.json') != '' }}
+        run: |
+          python tools/release/build_recovery_alert_routed_slo_delivery_slo_history.py \
+            --policy release/recovery-alerting.toml \
+            --current recovery-alert-routed-slo-delivery-slos.json \
+            --output recovery-alert-routed-slo-delivery-slo-history.json
+
+      - name: Analyze routed recovery SLO alert delivery SLO trends
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-slo-history.json') != '' }}
+        run: |
+          python tools/release/analyze_recovery_alert_routed_slo_delivery_slo_trends.py \
+            --policy release/recovery-alerting.toml \
+            --history recovery-alert-routed-slo-delivery-slo-history.json \
+            --output recovery-alert-routed-slo-delivery-slo-trends.json \
+            --summary recovery-alert-routed-slo-delivery-slo-trends-summary.md
+
+      - name: Verify routed recovery SLO alert delivery SLO history
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-slo-trends.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_slo_history.py \
+            --history recovery-alert-routed-slo-delivery-slo-history.json \
+            --trend recovery-alert-routed-slo-delivery-slo-trends.json
+
+      - name: Publish routed recovery SLO alert delivery SLO trend summary
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-slo-trends-summary.md') != '' }}
+        run: cat recovery-alert-routed-slo-delivery-slo-trends-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Publish routed recovery SLO alert delivery SLO summary
         if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-slos-summary.md') != '' }}
         run: cat recovery-alert-routed-slo-delivery-slos-summary.md >> "${GITHUB_STEP_SUMMARY}"
