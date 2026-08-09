@@ -56,3 +56,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery SLO Alerting (0.6.67)
 
 0.6.67 converts routed SLO delivery SLO and trend evidence into provider-neutral alert severity while keeping external delivery disabled.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery SLO Escalation & Routing (0.6.68)
+
+0.6.68 converts provider-neutral SLO alert severity into explicit logical routes while keeping external delivery disabled.
