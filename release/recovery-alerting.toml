@@ -252,3 +252,11 @@ critical_route = "incident-response"
 escalated_route = "incident-response"
 external_delivery_enabled = false
 provider_neutral = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery]
+schema_version = 1
+https_required = true
+signature_algorithm = "hmac-sha256"
+operations_secret_prefix = "RECOVERY_SLO_DELIVERY_OPERATIONS_"
+incident_secret_prefix = "RECOVERY_SLO_DELIVERY_INCIDENT_"
+timeout_seconds = 10.0
