@@ -80,3 +80,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed SLO alert delivery routed delivery
 
 0.6.69 performs route-specific signed webhook delivery and verifies secret-safe delivery receipts before release validation.
+
+## Routed SLO alert delivery routed-delivery resilience
+
+0.6.70 verifies bounded retry policy and secret-safe resilient delivery receipts before controlled release validation.

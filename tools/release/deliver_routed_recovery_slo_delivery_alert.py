@@ -1,4 +1,4 @@
-"""Deliver routed recovery SLO-delivery alerts to route-specific signed webhooks."""
+"""Deliver routed recovery SLO-delivery alerts with bounded retry resilience."""
 
 from __future__ import annotations
 
@@ -6,6 +6,8 @@ import argparse
 import hashlib
 import hmac
 import json
+import time
+import tomllib
 import urllib.error
 import urllib.request
 from collections.abc import Callable
@@ -15,6 +17,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 Transport = Callable[[urllib.request.Request, float], int]
+Sleeper = Callable[[float], None]
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -22,6 +25,18 @@ def _load_json(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return data
+
+
+def _load_resilience_policy(path: Path) -> dict[str, Any]:
+    with path.open("rb") as stream:
+        document = tomllib.load(stream)
+    alerting = document.get("alerting")
+    if not isinstance(alerting, dict):
+        raise ValueError("alerting policy is missing")
+    policy = alerting.get("routed_slo_alert_delivery_routed_delivery_resilience")
+    if not isinstance(policy, dict):
+        raise ValueError("routed SLO alert delivery routed-delivery resilience policy is missing")
+    return policy
 
 
 def _canonical_json(data: dict[str, Any]) -> bytes:
@@ -49,6 +64,10 @@ def _default_transport(request: urllib.request.Request, timeout: float) -> int:
         return int(response.status)
 
 
+def _backoff_delay(attempt: int, base: float, maximum: float) -> float:
+    return min(maximum, base * (2 ** max(0, attempt - 1)))
+
+
 def deliver(
     route: dict[str, Any],
     alert: dict[str, Any],
@@ -56,10 +75,20 @@ def deliver(
     endpoint_url: str | None,
     hmac_secret: str | None,
     timeout_seconds: float = 10.0,
+    resilience: dict[str, Any] | None = None,
     transport: Transport | None = None,
+    sleeper: Sleeper = time.sleep,
 ) -> dict[str, Any]:
     logical_route = str(route.get("route", "none"))
     delivery_id = _delivery_id(route, alert)
+
+    policy = resilience or {}
+    max_attempts = max(1, int(policy.get("max_attempts", 1)))
+    base_delay = max(0.0, float(policy.get("base_delay_seconds", 0.0)))
+    max_delay = max(base_delay, float(policy.get("max_delay_seconds", base_delay)))
+    retryable_statuses = {int(value) for value in policy.get("retryable_http_statuses", [])}
+    retry_transport_errors = bool(policy.get("retry_transport_errors", False))
+    preserve_delivery_id = bool(policy.get("preserve_delivery_id", True))
 
     receipt: dict[str, Any] = {
         "schema_version": 1,
@@ -68,6 +97,9 @@ def deliver(
         "logical_route": logical_route,
         "severity": route.get("severity"),
         "delivered": False,
+        "attempt_count": 0,
+        "retry_count": 0,
+        "attempts": [],
         "http_status": None,
         "failure_classification": None,
     }
@@ -100,33 +132,82 @@ def deliver(
         hashlib.sha256,
     ).hexdigest()
 
-    request = urllib.request.Request(
-        endpoint_url,
-        data=body,
-        method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "X-MusicClean-Delivery-ID": delivery_id,
-            "X-MusicClean-Signature": f"sha256={signature}",
-        },
-    )
-
     sender = transport or _default_transport
-    try:
-        status = sender(request, timeout_seconds)
-    except urllib.error.HTTPError as exc:
-        receipt["http_status"] = int(exc.code)
-        receipt["failure_classification"] = "http_error"
-        return receipt
-    except (urllib.error.URLError, TimeoutError, OSError):
-        receipt["failure_classification"] = "transport_error"
-        return receipt
 
-    receipt["http_status"] = int(status)
-    if 200 <= int(status) < 300:
-        receipt["delivered"] = True
-    else:
-        receipt["failure_classification"] = "http_error"
+    for attempt in range(1, max_attempts + 1):
+        request_delivery_id = (
+            delivery_id
+            if preserve_delivery_id
+            else _delivery_id(
+                {**route, "attempt": attempt},
+                alert,
+            )
+        )
+        request = urllib.request.Request(
+            endpoint_url,
+            data=body,
+            method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "X-MusicClean-Delivery-ID": request_delivery_id,
+                "X-MusicClean-Signature": f"sha256={signature}",
+            },
+        )
+
+        receipt["attempt_count"] = attempt
+        attempt_record: dict[str, Any] = {
+            "attempt": attempt,
+            "http_status": None,
+            "classification": None,
+            "retryable": False,
+        }
+
+        try:
+            status = int(sender(request, timeout_seconds))
+            attempt_record["http_status"] = status
+            receipt["http_status"] = status
+            if 200 <= status < 300:
+                receipt["delivered"] = True
+                receipt["failure_classification"] = None
+                attempt_record["classification"] = "success"
+                receipt["attempts"].append(attempt_record)
+                break
+
+            retryable = status in retryable_statuses
+            attempt_record["classification"] = "http_error"
+            attempt_record["retryable"] = retryable
+            receipt["failure_classification"] = "http_error"
+            receipt["attempts"].append(attempt_record)
+
+            if not retryable or attempt >= max_attempts:
+                break
+
+        except urllib.error.HTTPError as exc:
+            status = int(exc.code)
+            attempt_record["http_status"] = status
+            receipt["http_status"] = status
+            retryable = status in retryable_statuses
+            attempt_record["classification"] = "http_error"
+            attempt_record["retryable"] = retryable
+            receipt["failure_classification"] = "http_error"
+            receipt["attempts"].append(attempt_record)
+
+            if not retryable or attempt >= max_attempts:
+                break
+
+        except (urllib.error.URLError, TimeoutError, OSError):
+            attempt_record["classification"] = "transport_error"
+            attempt_record["retryable"] = retry_transport_errors
+            receipt["failure_classification"] = "transport_error"
+            receipt["attempts"].append(attempt_record)
+
+            if not retry_transport_errors or attempt >= max_attempts:
+                break
+
+        receipt["retry_count"] += 1
+        delay = _backoff_delay(attempt, base_delay, max_delay)
+        if delay > 0:
+            sleeper(delay)
 
     return receipt
 
@@ -151,6 +232,7 @@ def verify_receipt_secret_safe(receipt: dict[str, Any]) -> tuple[str, ...]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--policy", type=Path, required=True)
     parser.add_argument("--route", type=Path, required=True)
     parser.add_argument("--alert", type=Path, required=True)
     parser.add_argument("--endpoint-url")
@@ -165,6 +247,7 @@ def main() -> int:
         endpoint_url=args.endpoint_url,
         hmac_secret=args.hmac_secret,
         timeout_seconds=args.timeout_seconds,
+        resilience=_load_resilience_policy(args.policy),
     )
 
     errors = verify_receipt_secret_safe(receipt)

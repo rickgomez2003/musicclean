@@ -698,6 +698,7 @@ jobs:
             hmac_secret="${RECOVERY_SLO_DELIVERY_INCIDENT_HMAC_SECRET}"
           fi
           python tools/release/deliver_routed_recovery_slo_delivery_alert.py \
+            --policy release/recovery-alerting.toml \
             --route recovery-alert-routed-slo-delivery-slo-route.json \
             --alert recovery-alert-routed-slo-delivery-slo-alert.json \
             --endpoint-url "${endpoint_url}" \
@@ -708,6 +709,12 @@ jobs:
         if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery.json') != '' }}
         run: |
           python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery.py \
+            --receipt recovery-alert-routed-slo-delivery-routed-delivery.json
+
+      - name: Verify routed recovery SLO alert delivery routed delivery resilience
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery_resilience.py \
             --receipt recovery-alert-routed-slo-delivery-routed-delivery.json
 
       - name: Publish routed recovery SLO alert delivery SLO route summary

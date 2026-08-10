@@ -6,3 +6,7 @@ SLO alert-delivery alerts.
 Operations and incident-response routes use separate credentials. HTTPS is
 required, payloads are HMAC-SHA256 signed, delivery IDs are deterministic, and
 delivery receipts remain secret-safe.
+
+## Delivery resilience in 0.6.70
+
+0.6.70 adds bounded, idempotency-aware retry behavior while preserving the route-specific signed-webhook security model.
