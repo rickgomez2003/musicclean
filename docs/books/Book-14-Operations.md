@@ -80,3 +80,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery SLO History & Trends (0.6.73)
 
 0.6.73 adds bounded, deduplicated routed-delivery SLO history and minimum-sample-gated trend analysis.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery SLO Alerting (0.6.74)
+
+0.6.74 adds provider-neutral routed-delivery SLO alert generation from authoritative SLO and trend evidence.
