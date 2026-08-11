@@ -72,3 +72,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Observability (0.6.71)
 
 0.6.71 adds bounded, secret-safe observability for resilient routed SLO alert delivery outcomes and retry behavior.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery SLOs (0.6.72)
+
+0.6.72 evaluates routed-delivery SLOs for success rate, retry rate, average attempts, and transport failure rate with minimum-sample gating.
