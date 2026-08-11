@@ -313,3 +313,13 @@ critical_route = "incident-response"
 escalated_route = "incident-response"
 external_delivery_enabled = false
 provider_neutral = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery_routed_delivery]
+schema_version = 1
+operations_route = "operations"
+incident_route = "incident-response"
+none_route = "none"
+https_only = true
+signature_algorithm = "hmac-sha256"
+deterministic_delivery_id = true
+external_delivery_enabled = true
