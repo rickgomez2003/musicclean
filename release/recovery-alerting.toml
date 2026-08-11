@@ -333,3 +333,10 @@ retry_transport_errors = true
 retry_http_statuses = [408, 425, 429, 500, 502, 503, 504]
 preserve_delivery_id = true
 max_attempt_records = 3
+
+[alerting.routed_slo_alert_delivery_routed_delivery_routed_delivery_observability]
+schema_version = 1
+max_attempt_records = 3
+external_export_enabled = false
+provider_neutral = true
+secret_safe = true

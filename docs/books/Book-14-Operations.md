@@ -96,3 +96,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery Resilience (0.6.77)
 
 0.6.77 adds bounded, idempotency-aware retries with capped exponential backoff and secret-safe per-attempt evidence.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery Observability (0.6.78)
+
+0.6.78 adds bounded, secret-safe observability over resilient routed-delivery receipts.
