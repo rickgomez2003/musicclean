@@ -84,3 +84,7 @@ Post-release verification validates actual published artifacts.\n\n## Recovery a
 ## Routed SLO alert delivery routed-delivery resilience
 
 0.6.70 verifies bounded retry policy and secret-safe resilient delivery receipts before controlled release validation.
+
+## Routed SLO alert delivery routed-delivery observability
+
+0.6.71 builds and verifies bounded, secret-safe routed-delivery observability evidence before controlled release validation.
