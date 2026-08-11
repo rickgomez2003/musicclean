@@ -84,3 +84,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery SLO Alerting (0.6.74)
 
 0.6.74 adds provider-neutral routed-delivery SLO alert generation from authoritative SLO and trend evidence.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery SLO Escalation & Routing (0.6.75)
+
+0.6.75 adds provider-neutral, policy-driven logical routing for routed-delivery SLO alerts.

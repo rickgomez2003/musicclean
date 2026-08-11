@@ -304,3 +304,12 @@ alert_on_worsening_trend = true
 escalate_after_consecutive_non_passing = 3
 external_delivery_enabled = false
 provider_neutral = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery_slo_routing]
+schema_version = 1
+none_route = "none"
+advisory_route = "operations"
+critical_route = "incident-response"
+escalated_route = "incident-response"
+external_delivery_enabled = false
+provider_neutral = true
