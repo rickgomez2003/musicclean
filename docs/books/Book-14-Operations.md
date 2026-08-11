@@ -76,3 +76,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery SLOs (0.6.72)
 
 0.6.72 evaluates routed-delivery SLOs for success rate, retry rate, average attempts, and transport failure rate with minimum-sample gating.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery SLO History & Trends (0.6.73)
+
+0.6.73 adds bounded, deduplicated routed-delivery SLO history and minimum-sample-gated trend analysis.
