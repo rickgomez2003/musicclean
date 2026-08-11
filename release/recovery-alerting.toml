@@ -323,3 +323,13 @@ https_only = true
 signature_algorithm = "hmac-sha256"
 deterministic_delivery_id = true
 external_delivery_enabled = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery_routed_delivery_resilience]
+schema_version = 1
+max_attempts = 3
+initial_backoff_seconds = 1.0
+max_backoff_seconds = 4.0
+retry_transport_errors = true
+retry_http_statuses = [408, 425, 429, 500, 502, 503, 504]
+preserve_delivery_id = true
+max_attempt_records = 3
