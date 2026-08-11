@@ -88,3 +88,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery SLO Escalation & Routing (0.6.75)
 
 0.6.75 adds provider-neutral, policy-driven logical routing for routed-delivery SLO alerts.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery (0.6.76)
+
+0.6.76 adds route-specific HTTPS webhook delivery with deterministic delivery IDs and HMAC-SHA256 signing.

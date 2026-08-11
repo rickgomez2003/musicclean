@@ -803,6 +803,24 @@ jobs:
           python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery_slo_routing.py \
             --route recovery-alert-routed-slo-delivery-routed-delivery-slo-route.json
 
+      - name: Deliver routed recovery SLO alert delivery routed delivery
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slo-route.json') != '' }}
+        env:
+          ORION_ROUTED_SLO_ROUTED_DELIVERY_OPERATIONS_URL: ${{ secrets.ORION_ROUTED_SLO_ROUTED_DELIVERY_OPERATIONS_URL }}
+          ORION_ROUTED_SLO_ROUTED_DELIVERY_OPERATIONS_HMAC_SECRET: ${{ secrets.ORION_ROUTED_SLO_ROUTED_DELIVERY_OPERATIONS_HMAC_SECRET }}
+          ORION_ROUTED_SLO_ROUTED_DELIVERY_INCIDENT_URL: ${{ secrets.ORION_ROUTED_SLO_ROUTED_DELIVERY_INCIDENT_URL }}
+          ORION_ROUTED_SLO_ROUTED_DELIVERY_INCIDENT_HMAC_SECRET: ${{ secrets.ORION_ROUTED_SLO_ROUTED_DELIVERY_INCIDENT_HMAC_SECRET }}
+        run: |
+          python tools/release/deliver_routed_recovery_slo_delivery_routed_delivery_alert.py \
+            --route recovery-alert-routed-slo-delivery-routed-delivery-slo-route.json \
+            --receipt recovery-alert-routed-slo-delivery-routed-delivery-delivery.json
+
+      - name: Verify routed recovery SLO alert delivery routed delivery routed delivery
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-delivery.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery_routed_delivery.py \
+            --receipt recovery-alert-routed-slo-delivery-routed-delivery-delivery.json
+
       - name: Publish routed recovery SLO alert delivery routed delivery SLO route summary
         if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slo-route-summary.md') != '' }}
         run: cat recovery-alert-routed-slo-delivery-routed-delivery-slo-route-summary.md >> "${GITHUB_STEP_SUMMARY}"
