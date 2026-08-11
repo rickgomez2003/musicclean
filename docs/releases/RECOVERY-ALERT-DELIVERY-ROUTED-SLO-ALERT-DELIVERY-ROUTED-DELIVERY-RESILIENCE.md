@@ -6,3 +6,7 @@ webhooks.
 Retries are limited by policy, retryable HTTP statuses and transport failures
 are explicit, backoff is bounded, delivery IDs are preserved across attempts,
 and final receipts remain secret-safe.
+
+## Routed-delivery observability in 0.6.71
+
+0.6.71 summarizes resilient delivery outcomes and bounded per-attempt status evidence without persisting sensitive delivery material.
