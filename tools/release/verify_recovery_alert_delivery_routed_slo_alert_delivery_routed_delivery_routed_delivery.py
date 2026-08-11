@@ -74,8 +74,8 @@ def verify_receipt(receipt: Any) -> tuple[str, ...]:
     if not isinstance(receipt, dict):
         return ("routed-delivery receipt must be a JSON object",)
 
-    if receipt.get("schema_version") != 1:
-        errors.append("receipt schema_version must be 1")
+    if receipt.get("schema_version") not in {1, 2}:
+        errors.append("receipt schema_version must be 1 or 2")
 
     if receipt.get("logical_route") not in {
         "none",
