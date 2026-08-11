@@ -295,3 +295,12 @@ max_records = 30
 trend_minimum_samples = 3
 trend_tolerance = 0.0
 external_export_enabled = false
+
+[alerting.routed_slo_alert_delivery_routed_delivery_slo_alerting]
+schema_version = 1
+alert_on_warn = true
+alert_on_fail = true
+alert_on_worsening_trend = true
+escalate_after_consecutive_non_passing = 3
+external_delivery_enabled = false
+provider_neutral = true

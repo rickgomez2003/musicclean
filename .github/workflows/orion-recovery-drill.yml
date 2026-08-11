@@ -771,6 +771,27 @@ jobs:
             --history recovery-alert-routed-slo-delivery-routed-delivery-slo-history.json \
             --trend recovery-alert-routed-slo-delivery-routed-delivery-slo-trends.json
 
+      - name: Build routed recovery SLO alert delivery routed delivery SLO alert
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slos.json') != '' }}
+        run: |
+          python tools/release/build_recovery_alert_routed_slo_delivery_routed_delivery_slo_alert.py \
+            --policy release/recovery-alerting.toml \
+            --slo recovery-alert-routed-slo-delivery-routed-delivery-slos.json \
+            --trend recovery-alert-routed-slo-delivery-routed-delivery-slo-trends.json \
+            --history recovery-alert-routed-slo-delivery-routed-delivery-slo-history.json \
+            --output recovery-alert-routed-slo-delivery-routed-delivery-slo-alert.json \
+            --summary recovery-alert-routed-slo-delivery-routed-delivery-slo-alert-summary.md
+
+      - name: Verify routed recovery SLO alert delivery routed delivery SLO alerting
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slo-alert.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery_slo_alerting.py \
+            --alert recovery-alert-routed-slo-delivery-routed-delivery-slo-alert.json
+
+      - name: Publish routed recovery SLO alert delivery routed delivery SLO alert summary
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slo-alert-summary.md') != '' }}
+        run: cat recovery-alert-routed-slo-delivery-routed-delivery-slo-alert-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Publish routed recovery SLO alert delivery routed delivery SLO trend summary
         if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slo-trends-summary.md') != '' }}
         run: cat recovery-alert-routed-slo-delivery-routed-delivery-slo-trends-summary.md >> "${GITHUB_STEP_SUMMARY}"
