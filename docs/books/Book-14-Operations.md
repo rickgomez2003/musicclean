@@ -100,3 +100,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery Observability (0.6.78)
 
 0.6.78 adds bounded, secret-safe observability over resilient routed-delivery receipts.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery SLOs (0.6.79)
+
+0.6.79 adds policy-driven, sample-gated SLO evaluation over routed-delivery observability evidence.

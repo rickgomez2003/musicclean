@@ -340,3 +340,17 @@ max_attempt_records = 3
 external_export_enabled = false
 provider_neutral = true
 secret_safe = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery_routed_delivery_slos]
+schema_version = 1
+minimum_samples = 3
+delivery_success_rate_pass = 0.99
+delivery_success_rate_warn = 0.97
+retry_rate_pass = 0.10
+retry_rate_warn = 0.25
+average_attempts_pass = 1.10
+average_attempts_warn = 1.50
+transport_failure_rate_pass = 0.01
+transport_failure_rate_warn = 0.05
+external_export_enabled = false
+provider_neutral = true

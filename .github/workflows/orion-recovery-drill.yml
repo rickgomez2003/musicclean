@@ -842,6 +842,25 @@ jobs:
           python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery_routed_delivery_observability.py \
             --report recovery-alert-routed-slo-delivery-routed-delivery-observability.json
 
+      - name: Evaluate routed recovery SLO alert delivery routed delivery routed delivery SLOs
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-observability.json') != '' }}
+        run: |
+          python tools/release/evaluate_recovery_alert_routed_slo_delivery_routed_delivery_routed_delivery_slos.py \
+            --policy release/recovery-alerting.toml \
+            --observability recovery-alert-routed-slo-delivery-routed-delivery-observability.json \
+            --output recovery-alert-routed-slo-delivery-routed-delivery-slos.json \
+            --summary recovery-alert-routed-slo-delivery-routed-delivery-slos-summary.md
+
+      - name: Verify routed recovery SLO alert delivery routed delivery routed delivery SLOs
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slos.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery_routed_delivery_slos.py \
+            --report recovery-alert-routed-slo-delivery-routed-delivery-slos.json
+
+      - name: Publish routed recovery SLO alert delivery routed delivery routed delivery SLO summary
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slos-summary.md') != '' }}
+        run: cat recovery-alert-routed-slo-delivery-routed-delivery-slos-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Publish routed recovery SLO alert delivery routed delivery routed delivery observability summary
         if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-observability-summary.md') != '' }}
         run: cat recovery-alert-routed-slo-delivery-routed-delivery-observability-summary.md >> "${GITHUB_STEP_SUMMARY}"
