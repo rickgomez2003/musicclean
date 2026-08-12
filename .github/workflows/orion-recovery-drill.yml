@@ -857,6 +857,36 @@ jobs:
           python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery_routed_delivery_slos.py \
             --report recovery-alert-routed-slo-delivery-routed-delivery-slos.json
 
+      - name: Build routed recovery SLO alert delivery routed delivery routed delivery SLO history
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slos.json') != '' }}
+        run: |
+          python tools/release/build_recovery_alert_routed_slo_delivery_routed_delivery_routed_delivery_slo_history.py \
+            --history recovery-alert-routed-slo-delivery-routed-delivery-slo-history.json \
+            --slo recovery-alert-routed-slo-delivery-routed-delivery-slos.json \
+            --output recovery-alert-routed-slo-delivery-routed-delivery-slo-history.json \
+            --max-entries 20
+
+      - name: Analyze routed recovery SLO alert delivery routed delivery routed delivery SLO trends
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slo-history.json') != '' }}
+        run: |
+          python tools/release/analyze_recovery_alert_routed_slo_delivery_routed_delivery_routed_delivery_slo_trends.py \
+            --history recovery-alert-routed-slo-delivery-routed-delivery-slo-history.json \
+            --output recovery-alert-routed-slo-delivery-routed-delivery-slo-trends.json \
+            --summary recovery-alert-routed-slo-delivery-routed-delivery-slo-trends-summary.md \
+            --minimum-samples 4 \
+            --window-size 3
+
+      - name: Verify routed recovery SLO alert delivery routed delivery routed delivery SLO history and trends
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slo-trends.json') != '' }}
+        run: |
+          python tools/release/verify_recovery_alert_delivery_routed_slo_alert_delivery_routed_delivery_routed_delivery_slo_history.py \
+            --history recovery-alert-routed-slo-delivery-routed-delivery-slo-history.json \
+            --trend recovery-alert-routed-slo-delivery-routed-delivery-slo-trends.json
+
+      - name: Publish routed recovery SLO alert delivery routed delivery routed delivery SLO trend summary
+        if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slo-trends-summary.md') != '' }}
+        run: cat recovery-alert-routed-slo-delivery-routed-delivery-slo-trends-summary.md >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Publish routed recovery SLO alert delivery routed delivery routed delivery SLO summary
         if: ${{ always() && hashFiles('recovery-alert-routed-slo-delivery-routed-delivery-slos-summary.md') != '' }}
         run: cat recovery-alert-routed-slo-delivery-routed-delivery-slos-summary.md >> "${GITHUB_STEP_SUMMARY}"
