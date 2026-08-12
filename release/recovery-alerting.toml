@@ -354,3 +354,13 @@ transport_failure_rate_pass = 0.01
 transport_failure_rate_warn = 0.05
 external_export_enabled = false
 provider_neutral = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery_routed_delivery_slo_history]
+schema_version = 1
+max_history_entries = 20
+minimum_trend_samples = 4
+trend_window_size = 3
+external_export_enabled = false
+provider_neutral = true
+read_only = true
+deduplicated = true

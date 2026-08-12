@@ -104,3 +104,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery SLOs (0.6.79)
 
 0.6.79 adds policy-driven, sample-gated SLO evaluation over routed-delivery observability evidence.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery SLO History & Trends (0.6.80)
+
+0.6.80 adds bounded, deduplicated historical SLO evidence and read-only trend analysis.
