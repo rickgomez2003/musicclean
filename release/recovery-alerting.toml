@@ -364,3 +364,12 @@ external_export_enabled = false
 provider_neutral = true
 read_only = true
 deduplicated = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery_routed_delivery_slo_alerting]
+schema_version = 1
+escalation_threshold = 3
+worsening_trend_escalates_advisory = true
+insufficient_evidence_alerts = false
+external_delivery_enabled = false
+provider_neutral = true
+secret_safe = true
