@@ -3,3 +3,7 @@
 Orion 0.6.78 adds bounded, secret-safe observability for resilient routed delivery.
 
 The report summarizes terminal delivery state, attempts, retries, terminal HTTP status, failure classification, transport-failure state, and bounded per-attempt evidence. External observability export remains disabled.
+
+## Routed-delivery SLOs in 0.6.79
+
+0.6.79 evaluates delivery success rate, retry rate, average attempts, and transport-failure rate with a minimum-sample gate.
