@@ -373,3 +373,13 @@ insufficient_evidence_alerts = false
 external_delivery_enabled = false
 provider_neutral = true
 secret_safe = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery_routed_delivery_slo_routing]
+schema_version = 1
+none_route = "none"
+advisory_route = "operations"
+critical_route = "incident_response"
+escalated_route = "incident_response"
+external_delivery_enabled = false
+provider_neutral = true
+secret_safe = true
