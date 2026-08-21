@@ -383,3 +383,14 @@ escalated_route = "incident_response"
 external_delivery_enabled = false
 provider_neutral = true
 secret_safe = true
+
+[alerting.routed_slo_alert_delivery_routed_delivery_routed_delivery_routed_delivery]
+schema_version = 1
+https_only = true
+hmac_sha256 = true
+deterministic_delivery_id = true
+route_specific_credentials = true
+persist_endpoint_urls = false
+persist_credentials = false
+persist_request_headers = false
+secret_safe_receipts = true

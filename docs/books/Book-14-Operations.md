@@ -116,3 +116,7 @@ published to the GitHub Actions summary.\n\n## Recovery Alert Delivery SLO Alert
 ## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery SLO Escalation & Routing (0.6.82)
 
 0.6.82 maps provider-neutral routed-delivery SLO alerts to logical operational routes while external delivery remains disabled.
+
+## Recovery Alert Delivery Routed SLO Alert Delivery Routed Delivery Routed Delivery Routed Delivery (0.6.83)
+
+0.6.83 delivers routed SLO alerts through route-specific HTTPS webhooks with deterministic IDs and HMAC-SHA256 signing.
